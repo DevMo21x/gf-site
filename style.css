@@ -1,0 +1,645 @@
+/* ==========================================================================
+   A pocket garden journal, for Gabrielle
+   ========================================================================== */
+
+:root {
+  /* The palette (exact brief colours) */
+  --sand: #F3EAD8;
+  --cream: #FBF6EC;
+  --terracotta: #C2693F;
+  --sage: #8A9A5B;
+  --moss: #5E6B3A;
+  --rose: #D8A48F;
+  --clay: #4A3526;
+
+  /* Derived from the palette */
+  --terracotta-deep: #A9582F;
+  --sand-deep: #E9DCC3;
+  --clay-soft: #6B5242;
+  --shadow-ink: 74 53 38;
+
+  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-body: "Nunito", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --radius: 16px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  --plant-h: 104px;
+  --gutter: 16px;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .29 0 0 0 0 .21 0 0 0 0 .15 0 0 0 .7 -.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --fibres: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .54 0 0 0 0 .42 0 0 0 0 .3 0 0 0 1.1 -.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+
+  color-scheme: light;
+  accent-color: var(--terracotta);
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--sand);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--clay);
+  background:
+    radial-gradient(70% 45% at 0% 0%, rgb(216 164 143 / .22), transparent 70%),
+    radial-gradient(60% 40% at 100% 100%, rgb(138 154 91 / .16), transparent 70%),
+    var(--sand);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* paper grain + long fibres, over the background only */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--grain), var(--fibres);
+  background-size: 220px 220px, 600px 600px;
+  opacity: .45;
+}
+
+::selection { background: rgb(216 164 143 / .55); color: var(--clay); }
+
+img, svg { display: block; max-width: 100%; }
+
+button { font: inherit; color: inherit; }
+
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 3px solid var(--moss);
+  outline-offset: 4px;
+}
+[tabindex="-1"]:focus-visible { outline: none; }
+
+em { font-style: italic; }
+
+/* ---------- Type ---------- */
+
+.display,
+.card__title,
+.question,
+.signoff {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.display {
+  font-size: clamp(2.25rem, 1.55rem + 3.4vw, 4rem);
+  font-weight: 480;
+  line-height: 1.02;
+  letter-spacing: -.025em;
+}
+.display em,
+.card__title em,
+.question em {
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  font-weight: 400;
+  color: var(--terracotta);
+}
+
+.lede {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 1.125rem;
+  color: var(--clay-soft);
+  text-wrap: pretty;
+}
+
+/* ---------- Stage & pages ---------- */
+
+.stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding:
+    calc(env(safe-area-inset-top) + 72px)
+    max(var(--gutter), env(safe-area-inset-right))
+    calc(env(safe-area-inset-bottom) + var(--plant-h) + 28px)
+    max(var(--gutter), env(safe-area-inset-left));
+}
+
+.page {
+  grid-area: 1 / 1;
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  max-width: 32rem;
+}
+
+.page[hidden] { display: none; }
+
+/* heading words rise from behind a mask */
+.w {
+  display: inline-block;
+  overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: .04em;
+  vertical-align: top;
+  padding: 0 .08em .14em 0;
+  margin: 0 -.08em -.14em 0;
+}
+.wi { display: inline-block; }
+
+/* ---------- Photos ("prints" with washi tape) ---------- */
+
+.print {
+  position: relative;
+  margin: 0;
+  padding: 9px 9px 30px;
+  background: var(--cream);
+  border-radius: 4px;
+  box-shadow:
+    0 1px 2px rgb(var(--shadow-ink) / .12),
+    0 18px 34px -16px rgb(var(--shadow-ink) / .45);
+  transform: rotate(var(--tilt, -3deg));
+}
+.print img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--sand-deep);
+}
+.print::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -13px;
+  left: 50%;
+  width: 96px;
+  height: 26px;
+  translate: -50% 0;
+  rotate: -4deg;
+  background:
+    repeating-linear-gradient(90deg, rgb(251 246 236 / .22) 0 3px, transparent 3px 9px),
+    rgb(216 164 143 / .78);
+  clip-path: polygon(0 8%, 4% 0, 8% 10%, 12% 0, 88% 0, 92% 9%, 96% 0, 100% 9%, 100% 92%, 96% 100%, 92% 90%, 88% 100%, 12% 100%, 8% 91%, 4% 100%, 0 92%);
+  box-shadow: 0 1px 1px rgb(var(--shadow-ink) / .08);
+}
+
+/* ---------- Intro ---------- */
+
+.page--intro {
+  display: grid;
+  justify-items: center;
+  gap: 1.75rem;
+  text-align: center;
+}
+.print--intro {
+  --tilt: -3.5deg;
+  width: min(62vw, 250px);
+  width: min(62vw, 250px, calc((100svh - 400px) * .66));
+  min-width: 170px;
+}
+.intro__text {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+.intro__text .btn { margin-top: .5rem; }
+
+/* ---------- Cards ---------- */
+
+.card {
+  position: relative;
+  padding: clamp(2.5rem, 1.9rem + 3vw, 3.5rem) clamp(1.5rem, 1rem + 3vw, 2.75rem) clamp(2rem, 1.4rem + 3vw, 3rem);
+  background: var(--grain) 0 0 / 220px 220px, var(--cream);
+  background-blend-mode: soft-light, normal;
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 2px rgb(var(--shadow-ink) / .08),
+    0 22px 48px -22px rgb(var(--shadow-ink) / .42);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.card__title {
+  font-size: clamp(1.9rem, 1.45rem + 2.2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -.02em;
+  margin-bottom: 1rem;
+  padding-right: .5rem;
+}
+.card__title--big { font-size: clamp(2.2rem, 1.6rem + 3vw, 3.4rem); }
+
+.card__body {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 1.125rem;
+  text-wrap: pretty;
+}
+
+.card .btn--next { margin-top: 2rem; }
+
+/* Doodles in card corners */
+.doodle {
+  --doodle-stem: var(--moss);
+  --doodle-leaf: var(--moss);
+  --doodle-leaf-2: var(--sage);
+  --doodle-accent: var(--rose);
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+.doodle--tl { top: -34px; left: -26px; width: 72px; height: 72px; transform: scaleX(-1) rotate(-8deg); }
+.doodle--tr { top: -34px; right: -22px; width: 72px; height: 72px; transform: rotate(-6deg); }
+.doodle--br { bottom: -14px; right: -12px; width: 64px; height: 64px; }
+.doodle--bl { bottom: -16px; left: -10px; width: 64px; height: 64px; transform: scaleX(-1); }
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  min-width: 44px;
+  min-height: 52px;
+  padding: .75rem 1.65rem;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 1.1875rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: .01em;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 160ms var(--ease-out);
+}
+.btn svg { width: 22px; height: 22px; flex: none; transition: transform 260ms var(--ease-out); }
+
+.btn--primary {
+  background: var(--terracotta);
+  color: var(--cream);
+  box-shadow:
+    0 1px 1px rgb(var(--shadow-ink) / .12),
+    0 10px 20px -10px rgb(169 88 47 / .75);
+}
+.btn--primary:hover { background: var(--terracotta-deep); }
+.btn--primary:hover svg { transform: translateX(3px); }
+.btn:active { transform: translateY(1px) scale(.98); }
+
+/* ---------- Things I love about you ---------- */
+
+.loves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.1rem;
+}
+.loves:empty { display: none; }
+.loves li {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: .8rem;
+  align-items: start;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.loves li svg { width: 26px; height: 26px; margin-top: .05rem; }
+.loves li.is-new { animation: sprout 700ms var(--ease-out) both; }
+.loves li.is-new svg { animation: unfurl 900ms var(--ease-spring) both; }
+@keyframes sprout {
+  from { opacity: 0; transform: translateY(10px); }
+}
+@keyframes unfurl {
+  from { opacity: 0; transform: scale(.2) rotate(-40deg); }
+}
+
+/* ---------- The question ---------- */
+
+.page--question {
+  position: relative;
+  max-width: 40rem;
+  text-align: center;
+  padding-block: 1rem;
+}
+.question {
+  display: grid;
+  gap: .6rem;
+  font-weight: 500;
+}
+.question__lead {
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  font-size: clamp(1.4rem, 1.2rem + 1vw, 1.9rem);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--terracotta-deep);
+}
+.question__ask {
+  font-size: clamp(2.6rem, 1.7rem + 4.6vw, 5.25rem);
+  line-height: .98;
+  letter-spacing: -.03em;
+}
+
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 1.25rem;
+  min-height: 150px;
+  margin-top: 1.5rem;
+}
+
+.btn--yes {
+  --yes-scale: 1;
+  min-width: 132px;
+  font-size: 1.3rem;
+  transform: scale(var(--yes-scale));
+  transition:
+    background-color 200ms ease,
+    transform 520ms var(--ease-spring);
+}
+.btn--yes:active { transform: scale(calc(var(--yes-scale) * .97)); }
+
+.no-slot { display: inline-flex; }
+.no-slot[hidden] { display: none; }
+
+.btn--no {
+  min-width: 96px;
+  background: var(--sand-deep);
+  color: var(--clay);
+  box-shadow: 0 1px 1px rgb(var(--shadow-ink) / .1);
+}
+
+/* once it starts running it lives in its own fixed layer */
+.dodge-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+.btn--no.is-loose {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  pointer-events: auto;
+  white-space: nowrap;
+  transition:
+    transform 420ms var(--ease-out),
+    background-color 200ms ease,
+    opacity 200ms ease;
+}
+.btn--no.is-gone { opacity: 0; pointer-events: none; }
+
+.doodle--q-left,
+.doodle--q-right {
+  width: 84px;
+  height: 84px;
+  top: -3.5rem;
+  opacity: .9;
+}
+.doodle--q-left { left: 0; transform: scaleX(-1) rotate(-14deg); }
+.doodle--q-right { right: 0; transform: rotate(-14deg); }
+
+/* ---------- Celebration ---------- */
+
+.page--yay {
+  display: grid;
+  justify-items: center;
+}
+.print--yay {
+  --tilt: 3deg;
+  z-index: 2;
+  width: min(46vw, 180px);
+  margin-bottom: -2.25rem;
+  margin-left: 30%;
+}
+.card--yay { width: 100%; }
+
+.signoff {
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  margin-top: 1.75rem;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--terracotta-deep);
+}
+.signoff::before { content: "— "; color: var(--clay-soft); }
+
+/* ---------- Sound toggle ---------- */
+
+.sound-toggle {
+  position: fixed;
+  z-index: 30;
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: max(14px, env(safe-area-inset-right));
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(251 246 236 / .88);
+  color: var(--moss);
+  box-shadow:
+    0 1px 2px rgb(var(--shadow-ink) / .1),
+    0 8px 18px -10px rgb(var(--shadow-ink) / .45);
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 160ms var(--ease-out);
+}
+.sound-toggle:hover { background: var(--cream); }
+.sound-toggle:active { transform: scale(.94); }
+.sound-toggle svg { width: 24px; height: 24px; }
+.sound-toggle__off { display: none !important; }
+.sound-toggle[aria-pressed="true"] { color: var(--clay-soft); }
+.sound-toggle[aria-pressed="true"] .sound-toggle__on { display: none; }
+.sound-toggle[aria-pressed="true"] .sound-toggle__off { display: block !important; }
+
+/* ---------- The plant ---------- */
+
+.plant {
+  position: fixed;
+  z-index: 10;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 8px);
+  width: 64px;
+  height: var(--plant-h);
+  translate: -50% 0;
+  pointer-events: none;
+}
+.plant svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 96%;
+  animation: sway 7s ease-in-out infinite alternate;
+}
+@keyframes sway {
+  from { transform: rotate(-1.4deg); }
+  to   { transform: rotate(1.4deg); }
+}
+
+.plant__stem {
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: var(--stem-offset, 92);
+  transition: stroke-dashoffset 1100ms var(--ease-out);
+}
+.plant[data-stage="0"] { --stem-offset: 87; }
+.plant[data-stage="1"] { --stem-offset: 78; }
+.plant[data-stage="2"] { --stem-offset: 64; }
+.plant[data-stage="3"] { --stem-offset: 49; }
+.plant[data-stage="4"] { --stem-offset: 33; }
+.plant[data-stage="5"] { --stem-offset: 8; }
+.plant[data-stage="6"] { --stem-offset: 0; }
+
+.plant__leaf,
+.plant__bud,
+.plant__flower {
+  transform: scale(0);
+  transition: transform 900ms var(--ease-spring) 380ms;
+}
+.plant__leaf.is-grown,
+.plant__bud.is-grown { transform: scale(1); }
+
+.plant__flower { transform: scale(0) rotate(-70deg); transition-duration: 1400ms; transition-delay: 500ms; }
+.plant__flower.is-grown { transform: scale(1) rotate(0); }
+.plant__bud.is-gone { transform: scale(0); transition-delay: 0ms; transition-duration: 400ms; }
+
+/* ---------- Falling leaves & petals ---------- */
+
+.petals {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.lilies {
+  position: fixed;
+  inset: 0;
+  z-index: 28;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+/* the fade is compositor-only: the canvas stops redrawing and just drifts away */
+.lilies.is-fading {
+  opacity: 0;
+  transform: translate3d(0, -28px, 0) scale(1.04);
+  transition:
+    opacity 2600ms cubic-bezier(.45, 0, .55, 1),
+    transform 2800ms cubic-bezier(.16, 1, .3, 1);
+}
+.lilies.is-quick.is-fading { transform: none; transition: opacity 700ms linear; }
+
+.noscript {
+  position: fixed;
+  inset: auto 16px 50% 16px;
+  z-index: 40;
+  text-align: center;
+  font-size: 1.125rem;
+}
+
+/* ---------- Larger screens ---------- */
+
+@media (min-width: 760px) {
+  :root { --plant-h: 128px; }
+  .plant { width: 78px; }
+
+  .stage { padding-top: 88px; }
+
+  .page--intro {
+    max-width: 58rem;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: center;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    text-align: left;
+  }
+  .print--intro { width: 100%; max-width: 320px; justify-self: end; }
+  .intro__text { justify-items: start; }
+
+  .page--memory,
+  .page--loves { max-width: 38rem; }
+
+  .lede,
+  .card__body,
+  .loves li { font-size: 1.25rem; }
+
+  .page--yay {
+    max-width: 60rem;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+    align-items: center;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+  .page--yay .card--yay { grid-column: 1; grid-row: 1; }
+  .print--yay { grid-column: 2; grid-row: 1; width: 100%; max-width: 290px; justify-self: start; margin: 0; }
+
+  .doodle--tl, .doodle--tr { width: 96px; height: 96px; }
+  .doodle--br, .doodle--bl { width: 76px; height: 76px; }
+  .doodle--q-left, .doodle--q-right { width: 120px; height: 120px; top: -5rem; }
+  .doodle--q-left { left: -2rem; }
+  .doodle--q-right { right: -2rem; }
+}
+
+/* short phones: keep the intro above the fold */
+@media (max-height: 640px) and (max-width: 759px) {
+  .stage { padding-top: calc(env(safe-area-inset-top) + 64px); }
+  .page--intro { gap: 1.25rem; }
+  .print--intro { min-width: 150px; }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .plant svg { animation: none; }
+  .loves li.is-new,
+  .loves li.is-new svg { animation: none; }
+  .btn,
+  .btn--yes,
+  .btn--no.is-loose { transition-duration: 1ms; }
+  .plant__stem,
+  .plant__leaf,
+  .plant__bud,
+  .plant__flower { transition-duration: 200ms; transition-delay: 0ms; }
+}

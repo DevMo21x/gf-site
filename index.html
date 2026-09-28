@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F3EAD8">
+  <meta name="robots" content="noindex">
+  <title>For Gabrielle</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 29C16 20 15 13 17 5' stroke='%235E6B3A' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M16 18C10 17 6 13 5 8c6 0 10 4 11 10z' fill='%238A9A5B'/%3E%3Cpath d='M16.5 13c5-1 9-4 10-9-5 0-9 3-10 9z' fill='%23C2693F'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Nunito:wght@400..800&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<!--
+  THESIS: a pocket garden journal, not a slideshow. Each page is a pressed leaf; the plant in the pot keeps count and blooms at "yes".
+  OWN-WORLD: sand paper with grain, cream journal cards set down slightly crooked, moss and sage sprigs in the corners, rose washi tape on real photos, soft-axis Fraunces over rounded Nunito.
+  STORY: she's greeted, walks through three memories and three reasons, gets asked, and there's only one button she can catch.
+  FIRST VIEWPORT: the two of you, taped at a tilt, above "Hey my sweet beautiful angel..." and a single terracotta button.
+  SIGNATURE: the terracotta pot at the bottom growing a leaf per page and flowering after yes.
+-->
+
+  <!-- Reusable hand-drawn doodles -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <g id="leaflet">
+        <path d="M0 0C3.2-7.4 10.4-11.6 18.6-10.2 16.4-3.6 8.8 1.4 0 0Z" fill="currentColor" fill-opacity=".38" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M.8-.6C6-3.8 11.2-6.8 17.4-9.6" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+      </g>
+
+      <symbol id="sprig" viewBox="0 0 96 96">
+        <path d="M8 90C19 76 27 62 34 47 40 34 49 20 63 11c5-3 10-5 15-6" fill="none" style="stroke:var(--doodle-stem)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M34 47c3-5 4-9 5-15" fill="none" style="stroke:var(--doodle-stem)" stroke-width="1.4" stroke-linecap="round"/>
+        <g style="color:var(--doodle-leaf)">
+          <use href="#leaflet" transform="translate(16 74) rotate(-100)"/>
+          <use href="#leaflet" transform="translate(23 70) rotate(8)"/>
+        </g>
+        <g style="color:var(--doodle-leaf-2)">
+          <use href="#leaflet" transform="translate(28 55) rotate(-112)"/>
+          <use href="#leaflet" transform="translate(36 49) rotate(2)"/>
+          <use href="#leaflet" transform="translate(38 31) rotate(-78) scale(.9)"/>
+          <use href="#leaflet" transform="translate(49 25) rotate(-2) scale(.9)"/>
+          <use href="#leaflet" transform="translate(56 16) rotate(-118) scale(.8)"/>
+        </g>
+        <circle cx="79" cy="5" r="2.6" fill="#D8A48F" stroke="#C2693F" stroke-width="1"/>
+      </symbol>
+
+      <symbol id="fern" viewBox="0 0 80 80">
+        <path d="M72 76C62 64 51 55 36 47 24 41 14 37 5 36" fill="none" style="stroke:var(--doodle-leaf-2)" stroke-width="1.6" stroke-linecap="round"/>
+        <g fill="none" style="stroke:var(--doodle-leaf-2)" stroke-width="1.4" stroke-linecap="round">
+          <path d="M61 64c-1-6-5-10-9-12"/><path d="M61 64c-6 1-11 0-15-2"/>
+          <path d="M48 54c-1-6-4-9-8-11"/><path d="M48 54c-6 1-10 1-14-1"/>
+          <path d="M35 47c-2-5-5-7-8-8"/><path d="M35 47c-5 1-9 1-12-1"/>
+          <path d="M22 41c-2-3-4-5-6-5"/><path d="M22 41c-4 1-6 1-9 0"/>
+        </g>
+        <g style="color:var(--doodle-accent)"><use href="#leaflet" transform="translate(66 72) rotate(-150) scale(.8)"/></g>
+      </symbol>
+
+      <symbol id="leaf-bullet" viewBox="0 0 24 24">
+        <path d="M4 20C4 11 10 4 21 3c0 11-6 17-17 17Z" fill="#8A9A5B" fill-opacity=".45" stroke="#5E6B3A" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M4.5 19.5C9 14 13 10 18 6" fill="none" stroke="#5E6B3A" stroke-width="1.3" stroke-linecap="round"/>
+      </symbol>
+
+      <symbol id="icon-sound-on" viewBox="0 0 24 24">
+        <path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M15.4 9.2c1.4 1.6 1.4 4 0 5.6M18 6.6c2.9 3 2.9 7.8 0 10.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-sound-off" viewBox="0 0 24 24">
+        <path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M15.6 9.6l4.8 4.8M20.4 9.6l-4.8 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M5 12.4c4.6-.3 9.2-.2 13.6 0M13.6 7.4c1.8 1.8 3.4 3.4 5 5-1.6 1.6-3.2 3.3-5 5.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <button class="sound-toggle" type="button" aria-pressed="false" data-sound-toggle>
+    <svg class="sound-toggle__on" aria-hidden="true"><use href="#icon-sound-on"/></svg>
+    <svg class="sound-toggle__off" aria-hidden="true"><use href="#icon-sound-off"/></svg>
+    <span class="visually-hidden" data-sound-label>Mute music</span>
+  </button>
+
+  <main class="stage">
+
+    <!-- 1 · Intro -->
+    <section class="page page--intro" data-page="0" aria-labelledby="intro-title">
+      <figure class="print print--intro">
+        <img data-photo="intro" src="images/us-cheek.webp" width="960" height="1280" alt="" decoding="async" fetchpriority="high">
+      </figure>
+      <div class="intro__text">
+        <h1 class="display" id="intro-title" tabindex="-1" data-text="intro.title"></h1>
+        <p class="lede" data-text="intro.body"></p>
+        <button class="btn btn--primary" type="button" data-action="begin">
+          <span data-text="intro.button"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2–4 · Memories -->
+    <section class="page page--memory" data-page="1" data-memory="0" hidden aria-labelledby="m0-title">
+      <article class="card" style="--tilt:-1.2deg">
+        <svg class="doodle doodle--tl" aria-hidden="true"><use href="#sprig"/></svg>
+        <svg class="doodle doodle--br" aria-hidden="true"><use href="#fern"/></svg>
+        <h2 class="card__title" id="m0-title" tabindex="-1" data-text="memories.0.title"></h2>
+        <p class="card__body" data-text="memories.0.body"></p>
+        <button class="btn btn--primary btn--next" type="button" data-action="next">
+          <span data-text="nextButton"></span><svg aria-hidden="true"><use href="#icon-arrow"/></svg>
+        </button>
+      </article>
+    </section>
+
+    <section class="page page--memory" data-page="2" data-memory="1" hidden aria-labelledby="m1-title">
+      <article class="card" style="--tilt:.9deg">
+        <svg class="doodle doodle--tr" aria-hidden="true"><use href="#sprig"/></svg>
+        <svg class="doodle doodle--bl" aria-hidden="true"><use href="#fern"/></svg>
+        <h2 class="card__title" id="m1-title" tabindex="-1" data-text="memories.1.title"></h2>
+        <p class="card__body" data-text="memories.1.body"></p>
+        <button class="btn btn--primary btn--next" type="button" data-action="next">
+          <span data-text="nextButton"></span><svg aria-hidden="true"><use href="#icon-arrow"/></svg>
+        </button>
+      </article>
+    </section>
+
+    <section class="page page--memory" data-page="3" data-memory="2" hidden aria-labelledby="m2-title">
+      <article class="card" style="--tilt:-.6deg">
+        <svg class="doodle doodle--tl" aria-hidden="true"><use href="#sprig"/></svg>
+        <svg class="doodle doodle--br" aria-hidden="true"><use href="#fern"/></svg>
+        <h2 class="card__title" id="m2-title" tabindex="-1" data-text="memories.2.title"></h2>
+        <p class="card__body" data-text="memories.2.body"></p>
+        <button class="btn btn--primary btn--next" type="button" data-action="next">
+          <span data-text="nextButton"></span><svg aria-hidden="true"><use href="#icon-arrow"/></svg>
+        </button>
+      </article>
+    </section>
+
+    <!-- 5 · Things I love about you -->
+    <section class="page page--loves" data-page="4" hidden aria-labelledby="loves-title">
+      <article class="card" style="--tilt:.5deg">
+        <svg class="doodle doodle--tr" aria-hidden="true"><use href="#sprig"/></svg>
+        <svg class="doodle doodle--bl" aria-hidden="true"><use href="#fern"/></svg>
+        <h2 class="card__title" id="loves-title" tabindex="-1" data-text="loves.title"></h2>
+        <ol class="loves" data-loves aria-live="polite"></ol>
+        <button class="btn btn--primary btn--next" type="button" data-action="reveal">
+          <span data-reveal-label></span><svg aria-hidden="true"><use href="#icon-arrow"/></svg>
+        </button>
+      </article>
+    </section>
+
+    <!-- 6 · The question -->
+    <section class="page page--question" data-page="5" hidden aria-labelledby="question-title">
+      <svg class="doodle doodle--q-left" aria-hidden="true"><use href="#sprig"/></svg>
+      <svg class="doodle doodle--q-right" aria-hidden="true"><use href="#sprig"/></svg>
+      <h2 class="question" id="question-title" tabindex="-1">
+        <span class="question__lead" data-text="question.lead"></span>
+        <span class="question__ask" data-text="question.title"></span>
+      </h2>
+      <div class="answers">
+        <button class="btn btn--primary btn--yes" type="button" data-action="yes">
+          <span data-text="question.yes"></span>
+        </button>
+        <span class="no-slot" data-no-slot>
+          <button class="btn btn--no" type="button" data-no></button>
+        </span>
+      </div>
+    </section>
+
+    <!-- 7 · Celebration -->
+    <section class="page page--yay" data-page="6" hidden aria-labelledby="yay-title">
+      <figure class="print print--yay">
+        <img data-photo="celebration" src="images/us-cake.webp" width="960" height="1280" alt="" decoding="async">
+      </figure>
+      <article class="card card--yay" style="--tilt:-.8deg">
+        <svg class="doodle doodle--tl" aria-hidden="true"><use href="#sprig"/></svg>
+        <svg class="doodle doodle--br" aria-hidden="true"><use href="#fern"/></svg>
+        <h2 class="card__title card__title--big" id="yay-title" tabindex="-1" data-text="celebration.title"></h2>
+        <p class="card__body" data-text="celebration.body"></p>
+        <p class="signoff" data-text="celebration.signoff"></p>
+      </article>
+    </section>
+
+  </main>
+
+  <!-- Progress: the plant grows a leaf per page, blooms on the last -->
+  <div class="plant" data-plant data-stage="0" role="img" aria-label="Page 1 of 7">
+    <svg viewBox="0 0 80 132" aria-hidden="true" focusable="false">
+      <ellipse cx="40" cy="129" rx="22" ry="2.6" fill="#4A3526" opacity=".12"/>
+      <path class="plant__stem" pathLength="100" d="M40 101c-1-10 2-20 0-30s2-20 0-30c-1-7 0-12 0-19" fill="none" stroke="#5E6B3A" stroke-width="2.4" stroke-linecap="round"/>
+
+      <g transform="translate(40.6 89) rotate(-14)"><g class="plant__leaf" data-leaf="1">
+        <path d="M0 0C4-8 13-11 21-8 16-2 8 2 0 0Z" fill="#8A9A5B" stroke="#5E6B3A" stroke-width=".9" stroke-linejoin="round"/>
+        <path d="M1-.5C7-4 13-6.5 19.5-7.8" fill="none" stroke="#5E6B3A" stroke-width=".7" opacity=".6"/>
+      </g></g>
+      <g transform="translate(39.6 77) scale(-1 1) rotate(-18)"><g class="plant__leaf" data-leaf="2">
+        <path d="M0 0C4-8 13-11 21-8 16-2 8 2 0 0Z" fill="#8A9A5B" stroke="#5E6B3A" stroke-width=".9" stroke-linejoin="round"/>
+        <path d="M1-.5C7-4 13-6.5 19.5-7.8" fill="none" stroke="#5E6B3A" stroke-width=".7" opacity=".6"/>
+      </g></g>
+      <g transform="translate(40.8 65) rotate(-22)"><g class="plant__leaf" data-leaf="3">
+        <path d="M0 0C4-7.4 12-10 19-7.4 14.6-1.8 7.4 1.8 0 0Z" fill="#8A9A5B" stroke="#5E6B3A" stroke-width=".9" stroke-linejoin="round"/>
+        <path d="M1-.5C6.4-3.7 12-6 17.6-7.2" fill="none" stroke="#5E6B3A" stroke-width=".7" opacity=".6"/>
+      </g></g>
+      <g transform="translate(39.4 53) scale(-1 1) rotate(-24)"><g class="plant__leaf" data-leaf="4">
+        <path d="M0 0C4-7.4 12-10 19-7.4 14.6-1.8 7.4 1.8 0 0Z" fill="#8A9A5B" stroke="#5E6B3A" stroke-width=".9" stroke-linejoin="round"/>
+        <path d="M1-.5C6.4-3.7 12-6 17.6-7.2" fill="none" stroke="#5E6B3A" stroke-width=".7" opacity=".6"/>
+      </g></g>
+      <g transform="translate(40.4 42) rotate(-30)"><g class="plant__leaf" data-leaf="5">
+        <path d="M0 0C3.4-6.4 10.4-8.8 16.6-6.6 12.8-1.6 6.4 1.6 0 0Z" fill="#8A9A5B" stroke="#5E6B3A" stroke-width=".9" stroke-linejoin="round"/>
+        <path d="M1-.5C5.6-3.2 10.4-5.3 15.4-6.4" fill="none" stroke="#5E6B3A" stroke-width=".7" opacity=".6"/>
+      </g></g>
+
+      <g transform="translate(40 25)"><g class="plant__bud">
+        <path d="M-3.8 3.4C-2.2 4.6 2.2 4.6 3.8 3.4" fill="none" stroke="#5E6B3A" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M0-7C3.4-4 3.8.6 0 3.4-3.8.6-3.4-4 0-7Z" fill="#C2693F"/>
+      </g></g>
+
+      <g transform="translate(40 22)"><g class="plant__flower">
+        <g class="plant__petals" fill="#D8A48F" stroke="#C2693F" stroke-width=".8">
+          <ellipse cx="0" cy="-7.6" rx="4.4" ry="7.2" transform="rotate(0)"/>
+          <ellipse cx="0" cy="-7.6" rx="4.4" ry="7.2" transform="rotate(60)"/>
+          <ellipse cx="0" cy="-7.6" rx="4.4" ry="7.2" transform="rotate(120)"/>
+          <ellipse cx="0" cy="-7.6" rx="4.4" ry="7.2" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-7.6" rx="4.4" ry="7.2" transform="rotate(240)"/>
+          <ellipse cx="0" cy="-7.6" rx="4.4" ry="7.2" transform="rotate(300)"/>
+        </g>
+        <circle r="4" fill="#C2693F"/>
+        <circle r="1.4" cx="-1" cy="-1" fill="#FBF6EC" opacity=".7"/>
+      </g></g>
+
+      <path d="M22 100h36v5.4c0 1.2-1 2-2.2 2H24.2c-1.2 0-2.2-.8-2.2-2z" fill="#A9582F"/>
+      <path d="M24.6 107.4h30.8l-3.6 19.4c-.2 1-1 1.6-2 1.6H30.2c-1 0-1.8-.6-2-1.6z" fill="#C2693F"/>
+      <path d="M29 112.6c5 1.2 16 1.2 22 0" fill="none" stroke="#FBF6EC" stroke-width="1" stroke-linecap="round" opacity=".35"/>
+      <ellipse cx="40" cy="100.4" rx="16.5" ry="2.2" fill="#4A3526"/>
+    </svg>
+  </div>
+
+  <canvas class="petals" data-petals aria-hidden="true"></canvas>
+  <canvas class="lilies" data-lilies aria-hidden="true"></canvas>
+  <div class="dodge-layer" data-dodge-layer></div>
+
+  <noscript><p class="noscript">This little site needs JavaScript turned on.</p></noscript>
+</body>
+</html>
