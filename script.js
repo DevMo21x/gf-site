@@ -83,9 +83,44 @@ const CONTENT = {
       6: "welcome to the family!",
     },
     dodge: ["hehe, nope", "that button's shy", "try the big one"],
+    startled: "eep!",
+  },
+
+  // Tufo the cat: white, pink-eyed, mean. Everything he says.
+  tufo: {
+    label: "Tufo the cat. He does not like being touched.",
+    intro: "I'm Tufo. I don't do cute.",
+    hello: "don't. touch. me.",
+    hiss: ["hsssss", "back OFF", "I bite. hard."],
+    swat: ["*swat*", "no touching", "that was a warning"],
+    ignore: "I'm ignoring you now",
+    rude: ["your hands are cold", "mid petting, honestly", "I was here first", "don't look at me", "go pet the other one"],
+    allow: "…fine. ONE pet.",
+    allowAfter: "okay that's enough",
+    jealous: ["why does SHE get pets", "ew. affection.", "Mei is a suck-up"],
+    hissAtMei: "hsss. MY human.",
+    knock: "oops. not sorry.",
+    knockLove: "oops. it fell.",
+    // things he says when a page opens (by page number, starting at 0)
+    pages: {
+      1: "he was SO nervous. pathetic.",
+      3: "and nobody saved me any",
+      4: "eh. I'm funnier",
+      5: "press No. I dare you.",
+      6: "ugh. fine. welcome, I guess",
+    },
+    dodge: ["HA. coward button", "even No is scared of you", "just press it. oh wait."],
   },
 
   progress: "Page {n} of {total}",
+
+  // Background music. Swap the file in /audio and change src to use another song.
+  music: {
+    src: "audio/there-is-romance.m4a",
+    volume: 1,     // 0–1 (the file itself is already mixed soft; iPhones ignore this and play at 1)
+    startAt: 0,    // seconds into the song to begin from
+    credit: "Music: “There is Romance” by Kevin MacLeod (incompetech.com), CC BY 4.0",
+  },
 };
 
 /* ========================================================================== */
@@ -276,6 +311,7 @@ const CONTENT = {
         Plant.set(index, pages.length);
         arrive(to);
         Mei.onPage(index, to);
+        Tufo.onPage(index, to);
 
         const heading = $("h1, h2", to);
         if (heading) heading.focus({ preventScroll: true });
@@ -349,6 +385,7 @@ const CONTENT = {
         format(CONTENT.loves.items[shown]) +
         "</span>";
       list.appendChild(li);
+      Tufo.onLove(li, shown);
       shown += 1;
       updateLabel();
     }
@@ -425,7 +462,7 @@ const CONTENT = {
       const maxX = Math.max(MARGIN, vw - bw - MARGIN);
       const maxY = Math.max(MARGIN, vh - bh - MARGIN);
 
-      const avoid = [inflate(yesTargetRect(), 18), inflate(soundToggle.getBoundingClientRect(), 10), inflate(Mei.rect, 8)];
+      const avoid = [inflate(yesTargetRect(), 18), inflate(soundToggle.getBoundingClientRect(), 10), inflate(Mei.rect, 8), inflate(Tufo.rect, 8)];
       const prefer = [inflate(question.getBoundingClientRect(), 6)]; // try not to cover the question
       const current = { left: pos.x, top: pos.y, right: pos.x + bw, bottom: pos.y + bh };
       const reach = Math.max(bw, bh) / 2 + 56;
@@ -487,6 +524,7 @@ const CONTENT = {
 
       place(pickSpot());
       Mei.onDodge();
+      Tufo.onDodge();
     }
 
     function rememberPointer(e) {
@@ -524,58 +562,36 @@ const CONTENT = {
     return { retire };
   })();
 
-  /* ---------- Music (Web Audio, no files) ----------
-     A slow romantic waltz in F major, 3/4 at 72 BPM, 16 bars that loop:
-     electric-piano melody, rolling broken chords, a string pad, soft bass,
-     all in a generated hall reverb. */
+  /* ---------- Music ----------
+     The background track is a real recording (see CONTENT.music), played
+     from a local file. Little sound effects (harp, chime, Mei) are still
+     made live with Web Audio, tuned to the track's key. */
 
   const Music = (() => {
     const AC = window.AudioContext || window.webkitAudioContext;
-    const BPM = 72;
-    const BEAT = 60 / BPM;
-    const BAR = BEAT * 3;
-    const VOLUME = 0.1;
-    const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+    const TRACK = CONTENT.music;
+    const SFX_VOLUME = 0.1;
+    const KEY = -5; // the flourishes were written in F; the track is in C
+    const mtof = (m) => 440 * Math.pow(2, (m + KEY - 69) / 12);
 
-    // root = bass note, tones = chord voicing (MIDI)
-    const CHORDS = {
-      Fmaj7: { root: 41, tones: [53, 57, 60, 64] },
-      Am7: { root: 45, tones: [52, 55, 57, 60] },
-      Dm7: { root: 38, tones: [53, 57, 60, 62] },
-      Bbmaj7: { root: 46, tones: [53, 57, 58, 62] },
-      Gm7: { root: 43, tones: [53, 55, 58, 62] },
-      Csus: { root: 36, tones: [53, 55, 58, 60] },
-      C7: { root: 36, tones: [52, 55, 58, 60] },
-    };
-
-    // [chord, beats] and melody [note | null, beats]
-    const SONG = [
-      [[["Fmaj7", 3]], [[72, 2], [69, 1]]],
-      [[["Am7", 3]], [[76, 1.5], [74, 0.5], [72, 1]]],
-      [[["Dm7", 3]], [[74, 2], [69, 1]]],
-      [[["Bbmaj7", 3]], [[77, 1.5], [76, 0.5], [74, 1]]],
-      [[["Gm7", 3]], [[74, 1], [72, 1], [70, 1]]],
-      [[["Csus", 1.5], ["C7", 1.5]], [[72, 1.5], [70, 0.5], [67, 1]]],
-      [[["Fmaj7", 3]], [[69, 3]]],
-      [[["Bbmaj7", 1.5], ["C7", 1.5]], [[70, 1.5], [69, 0.5], [67, 1]]],
-      [[["Fmaj7", 3]], [[72, 1], [77, 2]]],
-      [[["Am7", 3]], [[76, 1.5], [74, 0.5], [72, 1]]],
-      [[["Dm7", 3]], [[74, 1], [76, 1], [77, 1]]],
-      [[["Bbmaj7", 3]], [[77, 2], [74, 1]]],
-      [[["Gm7", 3]], [[74, 1.5], [72, 0.5], [70, 1]]],
-      [[["C7", 3]], [[69, 1], [67, 1], [72, 1]]],
-      [[["Fmaj7", 3]], [[72, 1.5], [69, 0.5], [65, 1]]],
-      [[["Gm7", 1.5], ["C7", 1.5]], [[67, 3]]],
-    ];
-    // broken-chord pattern over six eighth notes (index into chord tones)
-    const ROLL = [null, 0, 2, 3, 2, 1];
+    // The song plays through a plain <audio> element, never through Web Audio:
+    // iPhones mute Web Audio when the silent switch is on, and browsers silence
+    // media routed through Web Audio when the page is opened from disk.
+    const audio = new Audio();
+    audio.src = TRACK.src;
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.setAttribute("playsinline", "");
+    audio.volume = 0;
+    audio.addEventListener("error", () => {
+      console.warn("Music file could not be loaded:", TRACK.src, audio.error && audio.error.code);
+    });
 
     let ctx = null;
-    let master, music, dry, reverbIn, epBus, padBus;
+    let master, sfx, reverbIn;
     let muted = false;
-    let timer = null;
-    let nextBar = 0;
-    let bar = 0;
+    let started = false;
+    let fadeRaf = 0;
 
     function impulse(seconds, decay) {
       const rate = ctx.sampleRate;
@@ -600,20 +616,12 @@ const CONTENT = {
       ctx = new AC();
 
       master = ctx.createGain(); // mute lives here
-      master.gain.value = VOLUME;
+      master.gain.value = muted ? 0 : 1;
       master.connect(ctx.destination);
 
-      music = ctx.createGain(); // the 3s fade-in lives here
-      music.gain.value = 0;
-      music.connect(master);
-
-      const tone = ctx.createBiquadFilter();
-      tone.type = "lowpass";
-      tone.frequency.value = 4200;
-      tone.connect(music);
-
-      dry = ctx.createGain();
-      dry.connect(tone);
+      sfx = ctx.createGain();
+      sfx.gain.value = SFX_VOLUME;
+      sfx.connect(master);
 
       reverbIn = ctx.createGain();
       const verb = ctx.createConvolver();
@@ -623,171 +631,62 @@ const CONTENT = {
       wet.gain.value = 0.5;
       reverbIn.connect(verb);
       verb.connect(wet);
-      wet.connect(tone);
-
-      epBus = ctx.createGain();
-      epBus.connect(dry);
-      const epSend = ctx.createGain();
-      epSend.gain.value = 0.55;
-      epBus.connect(epSend);
-      epSend.connect(reverbIn);
-
-      const padFilter = ctx.createBiquadFilter();
-      padFilter.type = "lowpass";
-      padFilter.frequency.value = 1100;
-      padFilter.Q.value = 0.6;
-      padBus = ctx.createGain();
-      padBus.connect(padFilter);
-      padFilter.connect(dry);
-      const padSend = ctx.createGain();
-      padSend.gain.value = 0.8;
-      padFilter.connect(padSend);
-      padSend.connect(reverbIn);
+      wet.connect(sfx);
     }
 
-    // Soft electric piano: a sine carrier with a decaying FM "bark", plus a bell tine
-    function ep(midi, t, vel, dur, tine = true) {
-      const f = mtof(midi);
-      const car = ctx.createOscillator();
-      const mod = ctx.createOscillator();
-      const modAmt = ctx.createGain();
-      const amp = ctx.createGain();
-      car.frequency.value = f;
-      mod.frequency.value = f;
-      modAmt.gain.setValueAtTime(f * 2.4 * vel, t);
-      modAmt.gain.exponentialRampToValueAtTime(f * 0.22 + 1, t + 1.1);
-      mod.connect(modAmt);
-      modAmt.connect(car.frequency);
-
-      amp.gain.setValueAtTime(0.0001, t);
-      amp.gain.exponentialRampToValueAtTime(vel, t + 0.006);
-      amp.gain.exponentialRampToValueAtTime(vel * 0.4, t + 0.55);
-      amp.gain.exponentialRampToValueAtTime(0.0001, t + dur + 2.2);
-      car.connect(amp);
-      amp.connect(epBus);
-      car.start(t);
-      mod.start(t);
-      car.stop(t + dur + 2.4);
-      mod.stop(t + dur + 2.4);
-
-      if (tine) {
-        const bell = ctx.createOscillator();
-        const bellAmp = ctx.createGain();
-        bell.frequency.value = f * 4;
-        bellAmp.gain.setValueAtTime(0.0001, t);
-        bellAmp.gain.exponentialRampToValueAtTime(vel * 0.07, t + 0.004);
-        bellAmp.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
-        bell.connect(bellAmp);
-        bellAmp.connect(epBus);
-        bell.start(t);
-        bell.stop(t + 1);
-      }
-    }
-
-    function strings(tones, t, dur) {
-      tones.forEach((note) => {
-        [-7, 7].forEach((cents) => {
-          const osc = ctx.createOscillator();
-          const g = ctx.createGain();
-          osc.type = "sawtooth";
-          osc.frequency.value = mtof(note + 12);
-          osc.detune.value = cents;
-          g.gain.setValueAtTime(0, t);
-          g.gain.linearRampToValueAtTime(0.018, t + 1.8);
-          g.gain.setValueAtTime(0.018, t + dur);
-          g.gain.setTargetAtTime(0, t + dur, 0.7);
-          osc.connect(g);
-          g.connect(padBus);
-          osc.start(t);
-          osc.stop(t + dur + 4);
-        });
-      });
-    }
-
-    function bass(midi, t, dur) {
-      [[midi + 12, "sine", 0.24], [midi, "triangle", 0.12]].forEach(([note, type, peak]) => {
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
-        osc.type = type;
-        osc.frequency.value = mtof(note);
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(peak, t + 0.03);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 1.2);
-        osc.connect(g);
-        g.connect(dry);
-        osc.start(t);
-        osc.stop(t + dur + 1.3);
-      });
-    }
-
-    const human = () => (Math.random() - 0.5) * 0.018;
-
-    function scheduleBar(t) {
-      const [chords, melody] = SONG[bar % SONG.length];
-      const firstPass = bar < SONG.length;
-
-      let beat = 0;
-      chords.forEach(([name, beats]) => {
-        const chord = CHORDS[name];
-        const start = t + beat * BEAT;
-        bass(chord.root, start, beats * BEAT);
-        strings(chord.tones, start, beats * BEAT);
-        beat += beats;
-      });
-
-      // rolling eighth-note broken chords
-      ROLL.forEach((idx, i) => {
-        if (idx === null) return;
-        const at = i * 0.5;
-        let acc = 0;
-        const chord = CHORDS[chords.find(([, b]) => (acc += b) > at)[0]];
-        ep(chord.tones[idx] + 12, t + at * BEAT + human(), 0.12 + Math.random() * 0.04, BEAT * 0.9, false);
-      });
-
-      // the melody sits out the very first two bars, then sings
-      if (!(firstPass && bar < 2)) {
-        let m = 0;
-        melody.forEach(([note, beats]) => {
-          if (note !== null) ep(note, t + m * BEAT + human(), 0.42 + Math.random() * 0.08, beats * BEAT);
-          m += beats;
-        });
-      }
-      bar += 1;
-    }
-
-    function tick() {
-      while (nextBar < ctx.currentTime + 1.5) {
-        scheduleBar(nextBar);
-        nextBar += BAR;
-      }
-    }
-
-    function start() {
-      if (!AC) return;
+    function setSession() {
       try {
-        if (navigator.audioSession) navigator.audioSession.type = "playback"; // plays with the iPhone silent switch on
+        // "playback" keeps sound on with the iPhone silent switch on (Safari 17+)
+        if (navigator.audioSession) navigator.audioSession.type = "playback";
       } catch (_) { /* not supported */ }
+    }
 
-      if (!timer) {
-        if (!ctx) build();
-        master.gain.value = muted ? 0 : VOLUME;
-        const now = ctx.currentTime;
-        music.gain.setValueAtTime(0, now);
-        music.gain.linearRampToValueAtTime(1, now + 3); // 3s fade in
-        nextBar = now + 0.9; // let the harp gliss ring first
-        tick();
-        timer = setInterval(tick, 200);
+    function fadeElement(to, ms) {
+      cancelAnimationFrame(fadeRaf);
+      const from = audio.volume;
+      const t0 = performance.now();
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / ms);
+        audio.volume = from + (to - from) * p;
+        if (p < 1) fadeRaf = requestAnimationFrame(step);
+      };
+      fadeRaf = requestAnimationFrame(step);
+    }
+
+    function playSong() {
+      audio.muted = muted;
+      const playing = audio.play();
+      if (playing && playing.then) {
+        playing.then(() => fadeElement(TRACK.volume, 3000)).catch((err) => {
+          // blocked (rare): try again on her next tap anywhere
+          console.warn("Music was blocked, retrying on next tap:", err && err.name);
+          started = false;
+          document.addEventListener("pointerup", start, { once: true });
+        });
+      } else {
+        fadeElement(TRACK.volume, 3000);
       }
-      if (ctx.state === "suspended") ctx.resume();
+    }
+
+    // Called from the "Tap to begin" tap: browsers only allow sound after one
+    function start() {
+      setSession();
+      if (AC && !ctx) build();
+      if (ctx && ctx.state === "suspended") ctx.resume();
+      if (started) return;
+      started = true;
+      if (TRACK.startAt) audio.currentTime = TRACK.startAt;
+      playSong();
     }
 
     function setMuted(value) {
       muted = value;
+      audio.muted = muted;
       if (!ctx) return;
       const now = ctx.currentTime;
       master.gain.cancelScheduledValues(now);
       master.gain.setValueAtTime(master.gain.value, now);
-      master.gain.setTargetAtTime(muted ? 0 : VOLUME, now, muted ? 0.12 : 0.4);
+      master.gain.setTargetAtTime(muted ? 0 : 1, now, muted ? 0.12 : 0.4);
       if (!muted && ctx.state === "suspended") ctx.resume();
     }
 
@@ -811,7 +710,7 @@ const CONTENT = {
     function sendBus(level) {
       const bus = ctx.createGain();
       bus.gain.value = level;
-      bus.connect(master);
+      bus.connect(sfx);
       const send = ctx.createGain();
       send.gain.value = 0.8;
       bus.connect(send);
@@ -826,7 +725,7 @@ const CONTENT = {
       const scale = [53, 55, 57, 60, 62, 65, 67, 69, 72, 74, 77, 79, 81, 84, 86, 89];
       const t0 = ctx.currentTime + 0.03;
       scale.forEach((note, i) => pluck(note, t0 + i * 0.048, 0.18 + i * 0.012, bus));
-      [65, 69, 72, 77].forEach((note) => ep(note, t0 + scale.length * 0.048 + 0.1, 0.22, 2));
+      [65, 69, 72, 77].forEach((note) => pluck(note, t0 + scale.length * 0.048 + 0.1, 0.14, bus));
     }
 
     // A brighter bell flourish for "yes"
@@ -857,13 +756,18 @@ const CONTENT = {
 
     // pause while the phone is locked / tab hidden
     document.addEventListener("visibilitychange", () => {
-      if (!ctx) return;
-      if (document.hidden) ctx.suspend();
-      else ctx.resume();
+      if (document.hidden) {
+        audio.pause();
+        if (ctx) ctx.suspend();
+      } else {
+        if (started) audio.play().catch(() => {});
+        if (ctx) ctx.resume();
+      }
     });
 
-    // Build the audio graph early (on finger-down) so the tap itself stays light
+    // Build the effects graph early (on finger-down) so the tap itself stays light
     function warm() {
+      setSession();
       if (AC && !ctx) build();
     }
 
@@ -945,41 +849,77 @@ const CONTENT = {
       lfo.stop(t + 1.7);
     }
 
-    return { warm, start, setMuted, gliss, chime, meow, purr, get muted() { return muted; } };
+    // Tufo's hiss: a burst of filtered noise
+    function hiss() {
+      warm();
+      if (!ctx || muted) return;
+      if (ctx.state === "suspended") ctx.resume();
+      const t = ctx.currentTime + 0.02;
+      const len = Math.floor(ctx.sampleRate * 0.8);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const hp = ctx.createBiquadFilter();
+      hp.type = "highpass";
+      hp.frequency.value = 2200;
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.setValueAtTime(4200, t);
+      bp.frequency.linearRampToValueAtTime(5600, t + 0.6);
+      bp.Q.value = 0.8;
+      const amp = ctx.createGain();
+      amp.gain.setValueAtTime(0.0001, t);
+      amp.gain.exponentialRampToValueAtTime(0.9, t + 0.05);
+      amp.gain.setValueAtTime(0.9, t + 0.35);
+      amp.gain.exponentialRampToValueAtTime(0.0001, t + 0.75);
+      src.connect(hp);
+      hp.connect(bp);
+      bp.connect(amp);
+      amp.connect(sendBus(2.2));
+      src.start(t);
+      src.stop(t + 0.8);
+    }
+
+    return { warm, start, setMuted, gliss, chime, meow, purr, hiss, get muted() { return muted; } };
   })();
 
-  /* ---------- Mei, the cat ---------- */
+  /* ---------- The cats: shared body, separate personalities ---------- */
 
-  const Mei = (() => {
-    const wrap = $("[data-mei-wrap]");
-    const button = $("[data-mei]");
-    const bubble = $("[data-mei-bubble]");
-    const look = $(".mei__look", wrap);
-    const text = CONTENT.mei;
-    button.setAttribute("aria-label", text.label);
+  // On a phone the two speech bubbles would overlap, so the cats take turns
+  const Chatter = { until: 0 };
+
+  function makeCat(name) {
+    const wrap = $(`[data-cat="${name}"]`);
+    const button = $("[data-cat-button]", wrap);
+    const bubble = $("[data-cat-bubble]", wrap);
+    const look = $(".cat__look", wrap);
+    const STATES = ["is-happy", "is-meowing", "is-purring", "is-jumping", "is-twitching", "is-excited", "is-hissing", "is-swatting", "is-startled"];
 
     let x = -120;
-    let side = "left";
-    let petted = 0;
     let bubbleTimer = 0;
+    let speakTimer = 0;
     let stateTimer = 0;
-    let hintTimer = 0;
-    let lastLine = -1;
+    let page = 0; // bumps on every page change so stale lines never play late
 
     const width = () => wrap.offsetWidth || 76;
 
-    // She sits a little way off to one side of the plant, never at the far edge of a big screen
-    function spotFor(which) {
+    // A little way off to one side of the plant, never at the far edge of a big screen
+    function spotFor(side) {
       const vw = document.documentElement.clientWidth;
       const w = width();
       const reach = Math.min(vw / 2 - w / 2 - 12, 250);
-      return vw / 2 - w / 2 + (which === "left" ? -reach : reach);
+      return vw / 2 - w / 2 + (side === "left" ? -reach : reach);
     }
 
-    function place(target, walk) {
-      const facingRight = target > x;
+    function face(right) {
+      wrap.classList.toggle("is-facing-right", right);
+    }
+
+    function place(target, walk, pace = 5.5) {
       const dist = Math.abs(target - x);
-      wrap.classList.toggle("is-facing-right", facingRight);
+      face(target > x);
       wrap.classList.toggle("is-right", target > document.documentElement.clientWidth / 2);
 
       if (!walk || reducedMotion() || dist < 4) {
@@ -988,7 +928,7 @@ const CONTENT = {
         x = target;
         return Promise.resolve();
       }
-      const ms = Math.max(700, Math.min(2200, dist * 5.5));
+      const ms = Math.max(700, Math.min(2600, dist * pace));
       wrap.classList.add("is-walking");
       wrap.style.transition = `transform ${ms}ms cubic-bezier(.45, .05, .55, .95)`;
       wrap.style.transform = `translate3d(${target}px, 0, 0)`;
@@ -1001,14 +941,36 @@ const CONTENT = {
 
     function say(line, ms = 2600) {
       if (!line) return;
-      clearTimeout(bubbleTimer);
-      bubble.textContent = line;
-      bubble.classList.add("is-showing");
-      bubbleTimer = setTimeout(() => bubble.classList.remove("is-showing"), ms);
+      const now = performance.now();
+      const narrow = document.documentElement.clientWidth < 700;
+      const wait = narrow && Chatter.until > now && Chatter.owner !== name ? Chatter.until - now + 150 : 0;
+      Chatter.until = now + wait + ms;
+      Chatter.owner = name;
+      clearTimeout(speakTimer);
+      speakTimer = setTimeout(() => {
+        clearTimeout(bubbleTimer);
+        // open the bubble toward the middle of the screen, wherever she actually is now
+        const r = wrap.getBoundingClientRect();
+        wrap.classList.toggle("is-right", r.left + r.width / 2 > document.documentElement.clientWidth / 2);
+        bubble.textContent = line;
+        bubble.classList.add("is-showing");
+        bubbleTimer = setTimeout(() => bubble.classList.remove("is-showing"), ms);
+      }, wait);
     }
 
+    // new page: drop anything queued or showing, and hand out a fresh token
+    function hush() {
+      clearTimeout(speakTimer);
+      clearTimeout(bubbleTimer);
+      bubble.classList.remove("is-showing");
+      if (Chatter.owner === name) Chatter.until = 0;
+      page += 1;
+      return page;
+    }
+    const current = (token) => token === page;
+
     function mood(cls, ms) {
-      wrap.classList.remove("is-happy", "is-meowing", "is-purring", "is-jumping", "is-twitching", "is-excited");
+      wrap.classList.remove(...STATES);
       void wrap.offsetWidth; // restart the keyframes
       clearTimeout(stateTimer);
       wrap.classList.add(...cls);
@@ -1016,9 +978,10 @@ const CONTENT = {
     }
 
     function hearts(n = 4) {
+      const made = [];
       for (let i = 0; i < n; i++) {
         const h = document.createElement("span");
-        h.className = "mei__heart";
+        h.className = "cat__heart";
         h.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart"/></svg>';
         wrap.appendChild(h);
         const dx = (Math.random() - 0.5) * 70;
@@ -1031,43 +994,12 @@ const CONTENT = {
             { opacity: 0, transform: `translate3d(${dx}px, ${-rise}px, 0) scale(.8) rotate(${dx / 3}deg)` },
           ], { duration: 1300 + Math.random() * 500, delay: i * 110, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "both" });
         a.onfinish = () => h.remove();
+        made.push(h);
       }
+      return made;
     }
 
-    // Tap / click: a little rotation of reactions
-    const REACTIONS = [
-      () => { mood(["is-happy", "is-purring"], 1600); Music.purr(); hearts(5); say(text.purr); },
-      () => { mood(["is-meowing", "is-jumping"], 700); Music.meow(1); hearts(2); sayRandom(); },
-      () => { mood(["is-happy", "is-twitching"], 1300); say(text.blink); },
-      () => { mood(["is-meowing", "is-excited"], 900); Music.meow(1.25); sayRandom(); },
-    ];
-
-    function sayRandom() {
-      let i;
-      do { i = Math.floor(Math.random() * text.lines.length); } while (i === lastLine && text.lines.length > 1);
-      lastLine = i;
-      say(text.lines[i]);
-    }
-
-    function pet() {
-      clearTimeout(hintTimer);
-      if (petted === 0) {
-        mood(["is-meowing", "is-jumping"], 700);
-        Music.meow(1.1);
-        hearts(3);
-        say(text.hello, 3000);
-      } else {
-        REACTIONS[(petted - 1) % REACTIONS.length]();
-      }
-      petted += 1;
-    }
-
-    button.addEventListener("click", pet);
-    button.addEventListener("pointerenter", (e) => {
-      if (e.pointerType === "mouse") mood(["is-twitching"], 900);
-    });
-
-    // Her eyes follow you (or the Yes button, on the question page)
+    // Eyes follow the pointer
     let eyeRaf = 0;
     let target = null;
     function lookAt(px, py) {
@@ -1092,47 +1024,254 @@ const CONTENT = {
       lookAt(r.left + r.width / 2, r.top + r.height / 2);
     }
 
-    // Follows along: a new spot on every page, sometimes with a comment
+    const pick = (list, avoid) => {
+      if (!Array.isArray(list)) return list;
+      let i;
+      do { i = Math.floor(Math.random() * list.length); } while (i === avoid.last && list.length > 1);
+      avoid.last = i;
+      return list[i];
+    };
+
+    return {
+      wrap, button, width, spotFor, place, face, say, hush, current, mood, hearts, lookAt, lookAtEl, pick,
+      get x() { return x; },
+      get rect() { return button.getBoundingClientRect(); },
+    };
+  }
+
+  const sideFor = (index) => (index % 2 === 0 ? "left" : "right");
+  const otherSide = (side) => (side === "left" ? "right" : "left");
+
+  /* ---------- Mei: sweet, follows you everywhere ---------- */
+
+  const Mei = (() => {
+    const cat = makeCat("mei");
+    const text = CONTENT.mei;
+    cat.button.setAttribute("aria-label", text.label);
+    let side = "left";
+    let petted = 0;
+    let hintTimer = 0;
+    const memo = {};
+
+    const REACTIONS = [
+      () => { cat.mood(["is-happy", "is-purring"], 1600); Music.purr(); cat.hearts(5); cat.say(text.purr); },
+      () => { cat.mood(["is-meowing", "is-jumping"], 700); Music.meow(1); cat.hearts(2); cat.say(cat.pick(text.lines, memo)); },
+      () => { cat.mood(["is-happy", "is-twitching"], 1300); cat.say(text.blink); },
+      () => { cat.mood(["is-meowing", "is-excited"], 900); Music.meow(1.25); cat.say(cat.pick(text.lines, memo)); },
+    ];
+
+    function pet() {
+      clearTimeout(hintTimer);
+      if (petted === 0) {
+        cat.mood(["is-meowing", "is-jumping"], 700);
+        Music.meow(1.1);
+        cat.hearts(3);
+        cat.say(text.hello, 3000);
+      } else {
+        REACTIONS[(petted - 1) % REACTIONS.length]();
+      }
+      petted += 1;
+      Tufo.jealous();
+    }
+
+    cat.button.addEventListener("click", pet);
+    cat.button.addEventListener("pointerenter", (e) => {
+      if (e.pointerType === "mouse") cat.mood(["is-twitching"], 900);
+    });
+
     function onPage(index, page) {
       clearTimeout(hintTimer);
-      side = index % 2 === 0 ? "left" : "right";
+      const token = cat.hush();
+      side = sideFor(index);
       const line = text.pages[index];
-      place(spotFor(side), true).then(() => {
+      cat.place(cat.spotFor(side), true).then(() => {
+        if (!cat.current(token)) return;
         if (page.matches(".page--question")) {
-          lookAtEl($('[data-action="yes"]', page));
-          mood(["is-excited"], 2400);
+          cat.lookAtEl($('[data-action="yes"]', page));
+          cat.mood(["is-excited"], 2400);
         }
         if (page.matches(".page--yay")) {
-          mood(["is-happy", "is-jumping", "is-excited"], 700);
-          hearts(8);
-          setTimeout(() => { mood(["is-happy", "is-jumping"], 700); hearts(5); }, 750);
+          cat.mood(["is-happy", "is-jumping", "is-excited"], 700);
+          cat.hearts(8);
+          setTimeout(() => { cat.mood(["is-happy", "is-jumping"], 700); cat.hearts(5); }, 750);
         }
-        if (line) setTimeout(() => say(line, 3200), 250);
+        if (line) setTimeout(() => { if (cat.current(token)) cat.say(line, 3200); }, 250);
       });
     }
 
-    // When the No button runs, Mei has opinions
     let dodges = 0;
     function onDodge() {
       dodges += 1;
       if (dodges === 1 || dodges % 4 === 0) {
-        mood(["is-meowing", "is-twitching"], 800);
-        say(text.dodge[Math.floor(dodges / 4) % text.dodge.length], 2000);
+        cat.mood(["is-meowing", "is-twitching"], 800);
+        cat.say(text.dodge[Math.floor(dodges / 4) % text.dodge.length], 2000);
+      }
+    }
+
+    // Tufo hissed at her
+    function startle() {
+      cat.mood(["is-startled", "is-meowing"], 600);
+      Music.meow(1.45);
+      cat.say(text.startled, 1600);
+    }
+
+    function init() {
+      cat.place(-cat.width() - 20, false);
+      setTimeout(() => {
+        cat.place(cat.spotFor("left"), true).then(() => {
+          hintTimer = setTimeout(() => { if (!petted) cat.say(text.hint, 3200); }, 3500);
+        });
+      }, 1400);
+      window.addEventListener("resize", () => cat.place(cat.spotFor(side), false));
+    }
+
+    return { init, onPage, onDodge, startle, get rect() { return cat.rect; }, get x() { return cat.x; } };
+  })();
+
+  /* ---------- Tufo: white, pink-eyed, and mean about it ---------- */
+
+  const Tufo = (() => {
+    const cat = makeCat("tufo");
+    const text = CONTENT.tufo;
+    cat.button.setAttribute("aria-label", text.label);
+    let side = "right";
+    let touched = 0;
+    let lastJealous = 0;
+    let introTimer = 0;
+    const memo = {};
+
+    const hiss = (line) => {
+      cat.mood(["is-hissing", "is-meowing"], 900);
+      Music.hiss();
+      cat.say(line || cat.pick(text.hiss, memo), 2000);
+    };
+    const swat = (line) => {
+      cat.mood(["is-swatting"], 600);
+      Music.meow(0.7);
+      if (line) cat.say(line, 2000);
+    };
+
+    // Knock something a little crooked, on purpose
+    function knock(el, line) {
+      if (!el) return;
+      swat();
+      const dir = cat.x > el.getBoundingClientRect().left ? -1 : 1;
+      el.animate(reducedMotion()
+        ? [{ rotate: "0deg" }, { rotate: `${dir * 1.6}deg`, translate: `${dir * 3}px 1px` }]
+        : [
+          { rotate: "0deg", translate: "0 0" },
+          { rotate: `${dir * 4}deg`, translate: `${dir * 10}px 2px`, offset: 0.25 },
+          { rotate: `${dir * -1}deg`, translate: `${dir * 2}px 0`, offset: 0.55 },
+          { rotate: `${dir * 1.6}deg`, translate: `${dir * 3}px 1px` },
+        ], { duration: 700, delay: 180, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "forwards" });
+      if (line) {
+        const token = cat.hush() ;
+        setTimeout(() => { if (cat.current(token)) cat.say(line, 2400); }, 500);
+      }
+    }
+
+    const REACTIONS = [
+      () => hiss(),
+      () => swat(cat.pick(text.swat, memo)),
+      () => {
+        cat.face(!cat.wrap.classList.contains("is-facing-right")); // turns his back
+        cat.mood(["is-happy"], 1800);
+        cat.say(text.ignore, 2200);
+      },
+      () => { cat.mood(["is-twitching"], 900); Music.meow(0.72); cat.say(cat.pick(text.rude, memo), 2400); },
+    ];
+
+    function touch() {
+      clearTimeout(introTimer);
+      touched += 1;
+      if (touched === 1) {
+        hiss(text.hello);
+      } else if (touched % 6 === 0) {
+        // allows exactly one pet… then swats the love away
+        cat.mood(["is-happy", "is-purring"], 1100);
+        Music.purr();
+        const [heart] = cat.hearts(1);
+        cat.say(text.allow, 1400);
+        setTimeout(() => {
+          swat(text.allowAfter);
+          if (heart && heart.isConnected) heart.remove();
+        }, 1000);
+      } else {
+        REACTIONS[(touched - 2) % REACTIONS.length]();
+      }
+    }
+
+    cat.button.addEventListener("click", touch);
+    cat.button.addEventListener("pointerenter", (e) => {
+      if (e.pointerType === "mouse") cat.mood(["is-hissing"], 500);
+    });
+
+    // Someone petted Mei
+    function jealous() {
+      const now = performance.now();
+      if (now - lastJealous < 6000 || Math.random() > 0.45) return;
+      lastJealous = now;
+      setTimeout(() => {
+        if (Math.random() < 0.5) {
+          cat.face(Mei.x > cat.x);
+          hiss(text.hissAtMei);
+          setTimeout(() => Mei.startle(), 250);
+        } else {
+          cat.mood(["is-twitching"], 900);
+          cat.say(cat.pick(text.jealous, memo), 2400);
+        }
+      }, 900);
+    }
+
+    function onPage(index, page) {
+      clearTimeout(introTimer);
+      const token = cat.hush();
+      side = otherSide(sideFor(index));
+      const line = text.pages[index];
+      // follows… reluctantly: later and slower than Mei
+      setTimeout(() => {
+        if (!cat.current(token)) return;
+        cat.place(cat.spotFor(side), true, 8).then(() => {
+          if (!cat.current(token)) return;
+          if (page.matches(".page--question")) cat.lookAtEl($("[data-no]"));
+          if (index === 2) {
+            knock($(".card", page), text.knock);
+            return;
+          }
+          if (page.matches(".page--yay")) {
+            cat.mood(["is-happy"], 2600);
+            setTimeout(() => cat.hearts(1), 1400);
+          }
+          if (line) setTimeout(() => { if (cat.current(token)) cat.say(line, 3000); }, 900);
+        });
+      }, reducedMotion() ? 0 : 600);
+    }
+
+    // A love-list item was revealed: he swats the second one crooked
+    function onLove(li, i) {
+      if (i === 1) setTimeout(() => knock(li, text.knockLove), 500);
+    }
+
+    let dodges = 0;
+    function onDodge() {
+      dodges += 1;
+      if (dodges === 2 || (dodges > 2 && dodges % 4 === 2)) {
+        cat.mood(["is-happy"], 1200);
+        cat.say(text.dodge[Math.floor(dodges / 4) % text.dodge.length], 2200);
       }
     }
 
     function init() {
-      place(-width() - 20, false);
-      // she wanders in once the intro has arrived
+      cat.place(document.documentElement.clientWidth + 20, false);
       setTimeout(() => {
-        place(spotFor("left"), true).then(() => {
-          hintTimer = setTimeout(() => { if (!petted) say(text.hint, 3200); }, 3500);
+        cat.place(cat.spotFor("right"), true, 8).then(() => {
+          introTimer = setTimeout(() => { if (!touched) cat.say(text.intro, 3000); }, 5200);
         });
-      }, 1400);
-      window.addEventListener("resize", () => place(spotFor(side), false));
+      }, 2600);
+      window.addEventListener("resize", () => cat.place(cat.spotFor(side), false));
     }
 
-    return { init, onPage, onDodge, get rect() { return button.getBoundingClientRect(); } };
+    return { init, onPage, onLove, onDodge, jealous, get rect() { return cat.rect; } };
   })();
 
   /* ---------- Sound toggle ---------- */
@@ -1143,7 +1282,7 @@ const CONTENT = {
     const sync = () => {
       button.setAttribute("aria-pressed", String(Music.muted));
       label.textContent = Music.muted ? CONTENT.sound.unmute : CONTENT.sound.mute;
-      button.title = label.textContent;
+      button.title = label.textContent + " · " + CONTENT.music.credit;
     };
     button.addEventListener("click", () => {
       Music.setMuted(!Music.muted);
@@ -1655,6 +1794,7 @@ const CONTENT = {
   renderContent();
   Pages.init();
   Mei.init();
+  Tufo.init();
 
   // decode the last photo early so it doesn't hitch the celebration
   setTimeout(() => {
