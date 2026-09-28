@@ -66,6 +66,25 @@ const CONTENT = {
     unmute: "Play music",
   },
 
+  // Mei the cat: everything she says
+  mei: {
+    label: "Mei the cat. Tap to pet her.",
+    hint: "psst… you can pet me",
+    hello: "hi! I'm Mei",
+    purr: "prrrrrr…",
+    blink: "*slow blink* (that means I love you)",
+    lines: ["mrrp?", "meow!", "Mei approves of you", "again. pet me again.", "you smell like shawarma", "I'm on your side"],
+    // things she says when a page opens (by page number, starting at 0)
+    pages: {
+      1: "ooh, I remember this",
+      3: "I would've eaten that shawarma",
+      4: "all true, I checked",
+      5: "psst… say yes",
+      6: "welcome to the family!",
+    },
+    dodge: ["hehe, nope", "that button's shy", "try the big one"],
+  },
+
   progress: "Page {n} of {total}",
 };
 
@@ -256,6 +275,7 @@ const CONTENT = {
         index = next;
         Plant.set(index, pages.length);
         arrive(to);
+        Mei.onPage(index, to);
 
         const heading = $("h1, h2", to);
         if (heading) heading.focus({ preventScroll: true });
@@ -308,6 +328,7 @@ const CONTENT = {
     const label = $("[data-reveal-label]");
     let shown = 0;
 
+    const LOVE_ICONS = ["icon-laugh", "icon-ladybug", "icon-planet"];
     const done = () => shown >= CONTENT.loves.items.length;
 
     function updateLabel() {
@@ -322,8 +343,9 @@ const CONTENT = {
       }
       const li = document.createElement("li");
       li.className = "is-new";
+      const icon = LOVE_ICONS[shown] || "leaf-bullet";
       li.innerHTML =
-        '<svg aria-hidden="true" focusable="false"><use href="#leaf-bullet"/></svg><span>' +
+        '<svg aria-hidden="true" focusable="false"><use href="#' + icon + '"/></svg><span>' +
         format(CONTENT.loves.items[shown]) +
         "</span>";
       list.appendChild(li);
@@ -403,7 +425,7 @@ const CONTENT = {
       const maxX = Math.max(MARGIN, vw - bw - MARGIN);
       const maxY = Math.max(MARGIN, vh - bh - MARGIN);
 
-      const avoid = [inflate(yesTargetRect(), 18), inflate(soundToggle.getBoundingClientRect(), 10)];
+      const avoid = [inflate(yesTargetRect(), 18), inflate(soundToggle.getBoundingClientRect(), 10), inflate(Mei.rect, 8)];
       const prefer = [inflate(question.getBoundingClientRect(), 6)]; // try not to cover the question
       const current = { left: pos.x, top: pos.y, right: pos.x + bw, bottom: pos.y + bh };
       const reach = Math.max(bw, bh) / 2 + 56;
@@ -464,6 +486,7 @@ const CONTENT = {
       yes.style.setProperty("--yes-scale", yesScale.toFixed(3));
 
       place(pickSpot());
+      Mei.onDodge();
     }
 
     function rememberPointer(e) {
@@ -844,7 +867,272 @@ const CONTENT = {
       if (AC && !ctx) build();
     }
 
-    return { warm, start, setMuted, gliss, chime, get muted() { return muted; } };
+    // Mei's voice: a sawtooth through two vowel formants sliding "mee-ow"
+    function meow(pitch = 1) {
+      warm();
+      if (!ctx || muted) return;
+      if (ctx.state === "suspended") ctx.resume();
+      const t = ctx.currentTime + 0.02;
+      const bus = sendBus(3.2);
+      const osc = ctx.createOscillator();
+      const vib = ctx.createOscillator();
+      const vibAmt = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(560 * pitch, t);
+      osc.frequency.linearRampToValueAtTime(860 * pitch, t + 0.14);
+      osc.frequency.linearRampToValueAtTime(720 * pitch, t + 0.32);
+      osc.frequency.exponentialRampToValueAtTime(440 * pitch, t + 0.58);
+      vib.frequency.value = 7;
+      vibAmt.gain.value = 10 * pitch;
+      vib.connect(vibAmt);
+      vibAmt.connect(osc.frequency);
+
+      const amp = ctx.createGain();
+      amp.gain.setValueAtTime(0.0001, t);
+      amp.gain.exponentialRampToValueAtTime(0.5, t + 0.06);
+      amp.gain.linearRampToValueAtTime(0.36, t + 0.36);
+      amp.gain.exponentialRampToValueAtTime(0.0001, t + 0.62);
+      [[1000, 2000, 1100, 5], [2600, 3300, 2200, 7]].forEach(([a, b, c, q]) => {
+        const f = ctx.createBiquadFilter();
+        f.type = "bandpass";
+        f.Q.value = q;
+        f.frequency.setValueAtTime(a * pitch, t);
+        f.frequency.linearRampToValueAtTime(b * pitch, t + 0.16);
+        f.frequency.exponentialRampToValueAtTime(c * pitch, t + 0.55);
+        osc.connect(f);
+        f.connect(amp);
+      });
+      amp.connect(bus);
+      osc.start(t);
+      vib.start(t);
+      osc.stop(t + 0.7);
+      vib.stop(t + 0.7);
+    }
+
+    // A soft purr: a low buzz pulsing ~24 times a second
+    function purr() {
+      warm();
+      if (!ctx || muted) return;
+      if (ctx.state === "suspended") ctx.resume();
+      const t = ctx.currentTime + 0.02;
+      const bus = sendBus(2.6);
+      const osc = ctx.createOscillator();
+      const lp = ctx.createBiquadFilter();
+      const pulse = ctx.createGain();
+      const lfo = ctx.createOscillator();
+      const depth = ctx.createGain();
+      const amp = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.value = 52;
+      lp.type = "lowpass";
+      lp.frequency.value = 420;
+      lfo.frequency.value = 24;
+      depth.gain.value = 0.5;
+      pulse.gain.value = 0.5;
+      lfo.connect(depth);
+      depth.connect(pulse.gain);
+      amp.gain.setValueAtTime(0.0001, t);
+      amp.gain.exponentialRampToValueAtTime(0.7, t + 0.2);
+      amp.gain.setValueAtTime(0.7, t + 1.1);
+      amp.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+      osc.connect(lp);
+      lp.connect(pulse);
+      pulse.connect(amp);
+      amp.connect(bus);
+      osc.start(t);
+      lfo.start(t);
+      osc.stop(t + 1.7);
+      lfo.stop(t + 1.7);
+    }
+
+    return { warm, start, setMuted, gliss, chime, meow, purr, get muted() { return muted; } };
+  })();
+
+  /* ---------- Mei, the cat ---------- */
+
+  const Mei = (() => {
+    const wrap = $("[data-mei-wrap]");
+    const button = $("[data-mei]");
+    const bubble = $("[data-mei-bubble]");
+    const look = $(".mei__look", wrap);
+    const text = CONTENT.mei;
+    button.setAttribute("aria-label", text.label);
+
+    let x = -120;
+    let side = "left";
+    let petted = 0;
+    let bubbleTimer = 0;
+    let stateTimer = 0;
+    let hintTimer = 0;
+    let lastLine = -1;
+
+    const width = () => wrap.offsetWidth || 76;
+
+    // She sits a little way off to one side of the plant, never at the far edge of a big screen
+    function spotFor(which) {
+      const vw = document.documentElement.clientWidth;
+      const w = width();
+      const reach = Math.min(vw / 2 - w / 2 - 12, 250);
+      return vw / 2 - w / 2 + (which === "left" ? -reach : reach);
+    }
+
+    function place(target, walk) {
+      const facingRight = target > x;
+      const dist = Math.abs(target - x);
+      wrap.classList.toggle("is-facing-right", facingRight);
+      wrap.classList.toggle("is-right", target > document.documentElement.clientWidth / 2);
+
+      if (!walk || reducedMotion() || dist < 4) {
+        wrap.style.transition = "none";
+        wrap.style.transform = `translate3d(${target}px, 0, 0)`;
+        x = target;
+        return Promise.resolve();
+      }
+      const ms = Math.max(700, Math.min(2200, dist * 5.5));
+      wrap.classList.add("is-walking");
+      wrap.style.transition = `transform ${ms}ms cubic-bezier(.45, .05, .55, .95)`;
+      wrap.style.transform = `translate3d(${target}px, 0, 0)`;
+      x = target;
+      return new Promise((resolve) => setTimeout(() => {
+        wrap.classList.remove("is-walking");
+        resolve();
+      }, ms));
+    }
+
+    function say(line, ms = 2600) {
+      if (!line) return;
+      clearTimeout(bubbleTimer);
+      bubble.textContent = line;
+      bubble.classList.add("is-showing");
+      bubbleTimer = setTimeout(() => bubble.classList.remove("is-showing"), ms);
+    }
+
+    function mood(cls, ms) {
+      wrap.classList.remove("is-happy", "is-meowing", "is-purring", "is-jumping", "is-twitching", "is-excited");
+      void wrap.offsetWidth; // restart the keyframes
+      clearTimeout(stateTimer);
+      wrap.classList.add(...cls);
+      stateTimer = setTimeout(() => wrap.classList.remove(...cls), ms);
+    }
+
+    function hearts(n = 4) {
+      for (let i = 0; i < n; i++) {
+        const h = document.createElement("span");
+        h.className = "mei__heart";
+        h.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart"/></svg>';
+        wrap.appendChild(h);
+        const dx = (Math.random() - 0.5) * 70;
+        const rise = 50 + Math.random() * 40;
+        const a = h.animate(reducedMotion()
+          ? [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }]
+          : [
+            { opacity: 0, transform: "translate3d(0, 0, 0) scale(.3)" },
+            { opacity: 1, transform: `translate3d(${dx * 0.4}px, ${-rise * 0.4}px, 0) scale(1)`, offset: 0.3 },
+            { opacity: 0, transform: `translate3d(${dx}px, ${-rise}px, 0) scale(.8) rotate(${dx / 3}deg)` },
+          ], { duration: 1300 + Math.random() * 500, delay: i * 110, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "both" });
+        a.onfinish = () => h.remove();
+      }
+    }
+
+    // Tap / click: a little rotation of reactions
+    const REACTIONS = [
+      () => { mood(["is-happy", "is-purring"], 1600); Music.purr(); hearts(5); say(text.purr); },
+      () => { mood(["is-meowing", "is-jumping"], 700); Music.meow(1); hearts(2); sayRandom(); },
+      () => { mood(["is-happy", "is-twitching"], 1300); say(text.blink); },
+      () => { mood(["is-meowing", "is-excited"], 900); Music.meow(1.25); sayRandom(); },
+    ];
+
+    function sayRandom() {
+      let i;
+      do { i = Math.floor(Math.random() * text.lines.length); } while (i === lastLine && text.lines.length > 1);
+      lastLine = i;
+      say(text.lines[i]);
+    }
+
+    function pet() {
+      clearTimeout(hintTimer);
+      if (petted === 0) {
+        mood(["is-meowing", "is-jumping"], 700);
+        Music.meow(1.1);
+        hearts(3);
+        say(text.hello, 3000);
+      } else {
+        REACTIONS[(petted - 1) % REACTIONS.length]();
+      }
+      petted += 1;
+    }
+
+    button.addEventListener("click", pet);
+    button.addEventListener("pointerenter", (e) => {
+      if (e.pointerType === "mouse") mood(["is-twitching"], 900);
+    });
+
+    // Her eyes follow you (or the Yes button, on the question page)
+    let eyeRaf = 0;
+    let target = null;
+    function lookAt(px, py) {
+      target = { x: px, y: py };
+      if (eyeRaf) return;
+      eyeRaf = requestAnimationFrame(() => {
+        eyeRaf = 0;
+        const r = button.getBoundingClientRect();
+        const cx = r.left + r.width * 0.46;
+        const cy = r.top + r.height * 0.47;
+        const ang = Math.atan2(target.y - cy, target.x - cx);
+        const d = Math.min(1, Math.hypot(target.x - cx, target.y - cy) / 200);
+        const flip = wrap.classList.contains("is-facing-right") ? -1 : 1;
+        look.setAttribute("transform", `translate(${(Math.cos(ang) * 2 * d * flip).toFixed(2)} ${(Math.sin(ang) * 1.6 * d).toFixed(2)})`);
+      });
+    }
+    window.addEventListener("pointermove", (e) => lookAt(e.clientX, e.clientY), { passive: true });
+
+    function lookAtEl(el) {
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      lookAt(r.left + r.width / 2, r.top + r.height / 2);
+    }
+
+    // Follows along: a new spot on every page, sometimes with a comment
+    function onPage(index, page) {
+      clearTimeout(hintTimer);
+      side = index % 2 === 0 ? "left" : "right";
+      const line = text.pages[index];
+      place(spotFor(side), true).then(() => {
+        if (page.matches(".page--question")) {
+          lookAtEl($('[data-action="yes"]', page));
+          mood(["is-excited"], 2400);
+        }
+        if (page.matches(".page--yay")) {
+          mood(["is-happy", "is-jumping", "is-excited"], 700);
+          hearts(8);
+          setTimeout(() => { mood(["is-happy", "is-jumping"], 700); hearts(5); }, 750);
+        }
+        if (line) setTimeout(() => say(line, 3200), 250);
+      });
+    }
+
+    // When the No button runs, Mei has opinions
+    let dodges = 0;
+    function onDodge() {
+      dodges += 1;
+      if (dodges === 1 || dodges % 4 === 0) {
+        mood(["is-meowing", "is-twitching"], 800);
+        say(text.dodge[Math.floor(dodges / 4) % text.dodge.length], 2000);
+      }
+    }
+
+    function init() {
+      place(-width() - 20, false);
+      // she wanders in once the intro has arrived
+      setTimeout(() => {
+        place(spotFor("left"), true).then(() => {
+          hintTimer = setTimeout(() => { if (!petted) say(text.hint, 3200); }, 3500);
+        });
+      }, 1400);
+      window.addEventListener("resize", () => place(spotFor(side), false));
+    }
+
+    return { init, onPage, onDodge, get rect() { return button.getBoundingClientRect(); } };
   })();
 
   /* ---------- Sound toggle ---------- */
@@ -1366,6 +1654,7 @@ const CONTENT = {
 
   renderContent();
   Pages.init();
+  Mei.init();
 
   // decode the last photo early so it doesn't hitch the celebration
   setTimeout(() => {
