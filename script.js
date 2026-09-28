@@ -185,8 +185,10 @@ const CONTENT = {
     $$("[data-photo]").forEach((img) => {
       const photo = CONTENT.photos[img.dataset.photo];
       if (!photo) return;
-      img.src = photo.src;
       img.alt = photo.alt;
+      // photos for later pages wait, so the first photo gets the whole connection
+      if (img.hasAttribute("data-late")) img.dataset.src = photo.src;
+      else img.src = photo.src;
     });
     document.title = CONTENT.pageTitle;
   }
@@ -585,9 +587,13 @@ const CONTENT = {
     // iPhones mute Web Audio when the silent switch is on, and browsers silence
     // media routed through Web Audio when the page is opened from disk.
     const audio = new Audio();
+    // don't compete with the first photo and fonts: start buffering once the page has loaded
+    audio.preload = "none";
     audio.src = TRACK.src;
     audio.loop = true;
-    audio.preload = "auto";
+    const preloadSong = () => { audio.preload = "auto"; };
+    if (document.readyState === "complete") setTimeout(preloadSong, 300);
+    else window.addEventListener("load", () => setTimeout(preloadSong, 300), { once: true });
     audio.setAttribute("playsinline", "");
     audio.volume = 0;
     audio.addEventListener("error", () => {
@@ -653,8 +659,9 @@ const CONTENT = {
       const from = audio.volume;
       const t0 = performance.now();
       const step = (now) => {
-        const p = Math.min(1, (now - t0) / ms);
-        audio.volume = from + (to - from) * p;
+        // rAF's timestamp can land a hair before t0: clamp, or a negative volume throws
+        const p = Math.min(1, Math.max(0, (now - t0) / ms));
+        audio.volume = Math.min(1, Math.max(0, from + (to - from) * p));
         if (p < 1) fadeRaf = requestAnimationFrame(step);
       };
       fadeRaf = requestAnimationFrame(step);
@@ -1890,11 +1897,18 @@ const CONTENT = {
   Mei.init();
   Tufo.init();
 
-  // decode the last photo early so it doesn't hitch the celebration
-  setTimeout(() => {
-    const img = $('[data-photo="celebration"]');
-    if (img && img.decode) img.decode().catch(() => {});
-  }, 4000);
+  // Later photos start downloading once the page has fully loaded, then get
+  // decoded ahead of time so the celebration doesn't hitch
+  const loadLatePhotos = () => {
+    $$("img[data-late]").forEach((img) => {
+      if (!img.dataset.src) return;
+      img.src = img.dataset.src;
+      delete img.dataset.src;
+      if (img.decode) img.decode().catch(() => {});
+    });
+  };
+  if (document.readyState === "complete") setTimeout(loadLatePhotos, 500);
+  else window.addEventListener("load", () => setTimeout(loadLatePhotos, 500), { once: true });
 
   // the engine is built the moment a finger or key goes down on "Tap to begin"
   const beginButton = $('[data-action="begin"]');
