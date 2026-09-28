@@ -110,16 +110,23 @@ const CONTENT = {
       6: "ugh. fine. welcome, I guess",
     },
     dodge: ["HA. coward button", "even No is scared of you", "just press it. oh wait."],
+    // when he chases Mei around (like he does at home)
+    chase: {
+      start: ["zoomies.", "RUN, Mei.", "tag. you're it."],
+      end: ["that's cardio.", "she started it", "I let her win"],
+      meiStart: "not again!!",
+      meiEnd: "he does this EVERY day",
+    },
   },
 
   progress: "Page {n} of {total}",
 
   // Background music. Swap the file in /audio and change src to use another song.
   music: {
-    src: "audio/there-is-romance.m4a",
+    src: "audio/gymnopedie.m4a",
     volume: 1,     // 0–1 (the file itself is already mixed soft; iPhones ignore this and play at 1)
     startAt: 0,    // seconds into the song to begin from
-    credit: "Music: “There is Romance” by Kevin MacLeod (incompetech.com), CC BY 4.0",
+    credit: "Music: Gymnopédie No. 1 by Erik Satie, performed by Michael Laucke (public domain)",
   },
 };
 
@@ -571,7 +578,7 @@ const CONTENT = {
     const AC = window.AudioContext || window.webkitAudioContext;
     const TRACK = CONTENT.music;
     const SFX_VOLUME = 0.1;
-    const KEY = -5; // the flourishes were written in F; the track is in C
+    const KEY = -3; // the flourishes were written in F; Gymnopédie No. 1 is in D
     const mtof = (m) => 440 * Math.pow(2, (m + KEY - 69) / 12);
 
     // The song plays through a plain <audio> element, never through Web Audio:
@@ -918,6 +925,8 @@ const CONTENT = {
     }
 
     function place(target, walk, pace = 5.5) {
+      const vw = document.documentElement.clientWidth;
+      target = Math.max(8, Math.min(vw - width() - 8, target)); // never off screen
       const dist = Math.abs(target - x);
       face(target > x);
       wrap.classList.toggle("is-right", target > document.documentElement.clientWidth / 2);
@@ -928,13 +937,15 @@ const CONTENT = {
         x = target;
         return Promise.resolve();
       }
-      const ms = Math.max(700, Math.min(2600, dist * pace));
+      const running = pace < 4;
+      const ms = Math.max(running ? 420 : 700, Math.min(2600, dist * pace));
       wrap.classList.add("is-walking");
+      wrap.classList.toggle("is-running", running);
       wrap.style.transition = `transform ${ms}ms cubic-bezier(.45, .05, .55, .95)`;
       wrap.style.transform = `translate3d(${target}px, 0, 0)`;
       x = target;
       return new Promise((resolve) => setTimeout(() => {
-        wrap.classList.remove("is-walking");
+        wrap.classList.remove("is-walking", "is-running");
         resolve();
       }, ms));
     }
@@ -949,9 +960,8 @@ const CONTENT = {
       clearTimeout(speakTimer);
       speakTimer = setTimeout(() => {
         clearTimeout(bubbleTimer);
-        // open the bubble toward the middle of the screen, wherever she actually is now
-        const r = wrap.getBoundingClientRect();
-        wrap.classList.toggle("is-right", r.left + r.width / 2 > document.documentElement.clientWidth / 2);
+        // open the bubble toward the middle of the screen, from where the cat is (or is heading)
+        wrap.classList.toggle("is-right", x + width() / 2 > document.documentElement.clientWidth / 2);
         bubble.textContent = line;
         bubble.classList.add("is-showing");
         bubbleTimer = setTimeout(() => bubble.classList.remove("is-showing"), ms);
@@ -1125,7 +1135,20 @@ const CONTENT = {
       window.addEventListener("resize", () => cat.place(cat.spotFor(side), false));
     }
 
-    return { init, onPage, onDodge, startle, get rect() { return cat.rect; }, get x() { return cat.x; } };
+    // Being chased by her brother: run somewhere, leaping over him partway
+    function run(target, pace, leapAt) {
+      if (leapAt != null) setTimeout(() => cat.mood(["is-jumping", "is-meowing"], 620), leapAt);
+      return cat.place(target, true, pace);
+    }
+
+    return {
+      init, onPage, onDodge, startle, run,
+      say: (line, ms) => cat.say(line, ms),
+      spotFor: (s) => cat.spotFor(s),
+      get side() { return side; },
+      get rect() { return cat.rect; },
+      get x() { return cat.x; },
+    };
   })();
 
   /* ---------- Tufo: white, pink-eyed, and mean about it ---------- */
@@ -1138,7 +1161,67 @@ const CONTENT = {
     let touched = 0;
     let lastJealous = 0;
     let introTimer = 0;
+    let chaseTimer = 0;
+    let chasing = false;
+    let chases = 0;
+    let pageToken = 0;
     const memo = {};
+
+    // Like at home: he goes after his sister, she leaps over him and bolts, he follows
+    function chase() {
+      if (chasing || reducedMotion()) return;
+      chasing = true;
+      chases += 1;
+      const token = pageToken;
+      const alive = () => token === pageToken;
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const meiHome = Mei.side;
+      const far = otherSide(meiHome);
+      const RUN = 2.6;   // his pace (ms per px, lower = faster)
+      const FLEE = 2.2;  // hers
+
+      cat.mood(["is-excited", "is-meowing"], 700);
+      Music.meow(0.8);
+      cat.say(cat.pick(text.chase.start, memo), 1600);
+
+      const lap = async (toSide) => {
+        const target = Mei.spotFor(toSide);
+        // he charges at her, stopping just short on his side…
+        const approach = Mei.x > cat.x ? 1 : -1;
+        const charge = cat.place(Mei.x - approach * 64, true, RUN);
+        await wait(380);
+        if (!alive()) return false;
+        // …she leaps over him and bolts to the other side
+        const dist = Math.abs(target - Mei.x);
+        const fleeing = Mei.run(target, FLEE, Math.max(120, Math.min(dist * FLEE * 0.35, 520)));
+        await charge;
+        if (!alive()) return false;
+        await wait(120);
+        // …then turns around and follows, stopping just short of her again
+        const follow = target > cat.x ? 1 : -1;
+        await cat.place(target - follow * 62, true, RUN);
+        await fleeing;
+        return alive();
+      };
+
+      (async () => {
+        await wait(500);
+        if (alive() && await lap(far)) {
+          Mei.say(text.chase.meiStart, 1600);
+          await wait(350);
+          if (alive() && await lap(meiHome)) {
+            await wait(300);
+            cat.mood(["is-happy"], 2200);
+            cat.say(cat.pick(text.chase.end, memo), 2400);
+            await wait(900);
+            if (alive()) Mei.say(text.chase.meiEnd, 2600);
+            await wait(700);
+            if (alive()) await cat.place(cat.spotFor(side), true, 8); // strolls back like nothing happened
+          }
+        }
+        chasing = false;
+      })();
+    }
 
     const hiss = (line) => {
       cat.mood(["is-hissing", "is-meowing"], 900);
@@ -1212,7 +1295,10 @@ const CONTENT = {
       if (now - lastJealous < 6000 || Math.random() > 0.45) return;
       lastJealous = now;
       setTimeout(() => {
-        if (Math.random() < 0.5) {
+        const page = document.querySelector(".page:not([hidden])");
+        if (Math.random() < 0.3 && !(page && page.matches(".page--question"))) {
+          chase();
+        } else if (Math.random() < 0.5) {
           cat.face(Mei.x > cat.x);
           hiss(text.hissAtMei);
           setTimeout(() => Mei.startle(), 250);
@@ -1225,6 +1311,9 @@ const CONTENT = {
 
     function onPage(index, page) {
       clearTimeout(introTimer);
+      clearTimeout(chaseTimer);
+      pageToken += 1;
+      chasing = false;
       const token = cat.hush();
       side = otherSide(sideFor(index));
       const line = text.pages[index];
@@ -1243,6 +1332,11 @@ const CONTENT = {
             setTimeout(() => cat.hearts(1), 1400);
           }
           if (line) setTimeout(() => { if (cat.current(token)) cat.say(line, 3000); }, 900);
+          // on the memory and love pages he sometimes goes after Mei (always the first time)
+          if (index >= 1 && index <= 4 && chases < 4 && (chases === 0 || Math.random() < 0.4)) {
+            const mine = pageToken;
+            chaseTimer = setTimeout(() => { if (mine === pageToken) chase(); }, 5200 + Math.random() * 2500);
+          }
         });
       }, reducedMotion() ? 0 : 600);
     }

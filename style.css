@@ -549,6 +549,8 @@ em { font-style: italic; }
   50% { transform: scale(1.012, 1.028); }
 }
 .cat-wrap.is-walking .cat__hop { animation: cat-hop 380ms ease-in-out infinite; }
+.cat-wrap.is-running .cat__hop { animation: cat-hop 220ms ease-in-out infinite; }
+.cat-wrap.is-running .cat__tail { animation-duration: .28s; }
 @keyframes cat-hop {
   0%, 100% { transform: translateY(0) scale(1.04, .95); }
   45% { transform: translateY(-9px) scale(.97, 1.04); }
