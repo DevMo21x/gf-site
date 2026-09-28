@@ -1,7 +1,7 @@
 /* ==========================================================================
    ✏️  EDIT THE WORDS HERE
    Everything she reads lives in this one object.
-   Wrap a word in *asterisks* to make it italic + terracotta, e.g. "*angel*".
+   Wrap a word in *asterisks* to make it red, e.g. "*angel*".
    ========================================================================== */
 
 const CONTENT = {
@@ -51,8 +51,8 @@ const CONTENT = {
   },
 
   celebration: {
-    title: "Welcome to the *family*.",
-    body: "You'll meet all 200 cousins at the next gathering. Name tags not provided.",
+    title: "Sand person *achievement unlocked*",
+    body: "Got the girl. Now the real mistakes begin.",
     signoff: "Mohaimen, your new owner :)",
   },
 
@@ -64,6 +64,12 @@ const CONTENT = {
   sound: {
     mute: "Mute music",
     unmute: "Play music",
+  },
+
+  // The clock in the corner: one day on the farm, a little later on every page
+  hud: {
+    day: "Sat.",
+    times: ["6:10am", "9:00am", "12:30pm", "3:40pm", "6:50pm", "10:20pm", "11:50pm"],
   },
 
   // Mei the cat: everything she says
@@ -80,7 +86,7 @@ const CONTENT = {
       3: "I would've eaten that shawarma",
       4: "all true, I checked",
       5: "psst… say yes",
-      6: "welcome to the family!",
+      6: "achievement unlocked!",
     },
     dodge: ["hehe, nope", "that button's shy", "try the big one"],
     startled: "eep!",
@@ -139,6 +145,20 @@ const CONTENT = {
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const reducedMotion = () => reducedMotionQuery.matches;
+  const root = document.documentElement;
+  const cssNumber = (name, fallback) => parseFloat(getComputedStyle(root).getPropertyValue(name)) || fallback;
+  const PX = () => cssNumber("--px", 3);          // one art pixel, in CSS pixels
+  const groundH = () => cssNumber("--ground-h", 100);
+  const artSize = () => {
+    const px = PX();
+    return { px, W: Math.ceil(window.innerWidth / px) + 1, H: Math.ceil(window.innerHeight / px) + 1 };
+  };
+  const fitCanvas = (canvas, { px, W, H }) => {
+    canvas.width = W;
+    canvas.height = H;
+    canvas.style.width = W * px + "px";
+    canvas.style.height = H * px + "px";
+  };
 
   /* ---------- Content ---------- */
 
@@ -172,16 +192,96 @@ const CONTENT = {
     });
   }
 
+  /* ---------- Typewriter dialogue ---------- */
+
+  const Typer = (() => {
+    const SPEED = 26; // ms per letter
+    const runs = new Map();
+
+    function wrapLetters(node) {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === 1) { wrapLetters(child); return; }
+        if (child.nodeType !== 3) return;
+        const frag = document.createDocumentFragment();
+        for (const ch of child.textContent) {
+          if (/\s/.test(ch)) { frag.appendChild(document.createTextNode(ch)); continue; }
+          const span = document.createElement("span");
+          span.className = "ch";
+          span.textContent = ch;
+          frag.appendChild(span);
+        }
+        node.replaceChild(frag, child);
+      });
+    }
+
+    // the sentence is read aloud whole; the letters are only for eyes
+    function prepare(el) {
+      const html = el.innerHTML;
+      el.innerHTML = `<span class="visually-hidden">${html}</span><span class="typed" aria-hidden="true">${html}</span>`;
+      wrapLetters($(".typed", el));
+    }
+
+    function stop(el) {
+      const run = runs.get(el);
+      if (!run) return;
+      clearTimeout(run.timer);
+      cancelAnimationFrame(run.raf);
+      runs.delete(el);
+    }
+
+    function finish(el) {
+      stop(el);
+      el.classList.add("is-typed");
+      const box = el.closest("[data-dialog]");
+      if (box) box.classList.add("has-typed");
+    }
+
+    // returns when (ms from now) the last letter lands
+    function play(el, delay = 0) {
+      stop(el);
+      const chars = $$(".typed .ch", el);
+      if (reducedMotion() || !chars.length) { finish(el); return 0; }
+      const run = { timer: 0, raf: 0 };
+      runs.set(el, run);
+      let shown = 0;
+      run.timer = setTimeout(() => {
+        const t0 = performance.now();
+        const step = (now) => {
+          const due = Math.min(chars.length, Math.floor((now - t0) / SPEED) + 1);
+          while (shown < due) {
+            chars[shown].classList.add("on");
+            if (shown % 3 === 0) Music.blip();
+            shown += 1;
+          }
+          if (shown < chars.length) run.raf = requestAnimationFrame(step);
+          else finish(el);
+        };
+        run.raf = requestAnimationFrame(step);
+      }, delay);
+      return delay + chars.length * SPEED;
+    }
+
+    // a tap on a dialogue box finishes its sentences at once
+    document.addEventListener("click", (e) => {
+      const box = e.target.closest("[data-dialog]");
+      if (box && !e.target.closest("button")) $$("[data-type], .love__text", box).forEach(finish);
+    });
+
+    return { prepare, play, finish };
+  })();
+
   function renderContent() {
     $$("[data-text]").forEach((el) => {
       const value = lookup(el.dataset.text);
       if (typeof value === "string") el.innerHTML = format(value);
     });
-    // headings rise word by word from behind a mask
-    $$(".display, .card__title, .question__ask").forEach((el) => {
-      el.setAttribute("aria-label", el.textContent);
+    // headings arrive word by word; screen readers get the whole line
+    $$(".dialog__title, .question__ask, .achievement__title").forEach((el) => {
+      const text = el.textContent;
       splitWords(el);
+      el.insertAdjacentHTML("afterbegin", `<span class="visually-hidden">${escapeHTML(text)}</span>`);
     });
+    $$("[data-type]").forEach(Typer.prepare);
     $$("[data-photo]").forEach((img) => {
       const photo = CONTENT.photos[img.dataset.photo];
       if (!photo) return;
@@ -193,37 +293,128 @@ const CONTENT = {
     document.title = CONTENT.pageTitle;
   }
 
-  /* ---------- Plant (progress) ---------- */
+  /* ---------- The farm: sky and time of day ---------- */
+
+  const Scene = (() => {
+    const TIMES = ["dawn", "morning", "noon", "afternoon", "sunset", "night", "festival"];
+    const skies = $$("[data-sky]");
+    const clouds = $("[data-clouds]");
+    const flies = $("[data-flies]");
+    const meta = $('meta[name="theme-color"]');
+    let front = 0;
+    let time = TIMES[0];
+
+    function paint(canvas) {
+      const info = Pixel.scene(canvas, time, PX(), groundH());
+      root.style.setProperty("--sky", info.sky);
+      if (meta) meta.content = info.sky;
+    }
+
+    function set(index) {
+      const next = TIMES[Math.min(index, TIMES.length - 1)];
+      if (next === time) return;
+      time = next;
+      const back = 1 - front;
+      paint(skies[back]);
+      skies[back].classList.add("is-front");
+      skies[front].classList.remove("is-front");
+      front = back;
+      document.body.dataset.time = time;
+    }
+
+    function makeClouds() {
+      const px = PX();
+      [0.07, 0.19, 0.31].forEach((top, i) => {
+        const g = Pixel.cloud(i);
+        const el = document.createElement("i");
+        el.className = "cloud";
+        el.style.top = top * 100 + "%";
+        el.style.width = g.w * px + "px";
+        el.style.height = g.h * px + "px";
+        el.style.backgroundImage = `url("${g.url()}")`;
+        const dur = 120 + i * 45;
+        el.style.setProperty("--dur", dur + "s");
+        el.style.setProperty("--delay", -(dur * (0.15 + i * 0.3)) + "s");
+        clouds.appendChild(el);
+      });
+    }
+
+    function makeFlies() {
+      const rand = Pixel.seeded(11);
+      for (let i = 0; i < 9; i++) {
+        const el = document.createElement("i");
+        el.className = "fly";
+        el.style.setProperty("--x", (4 + rand() * 88).toFixed(1) + "%");
+        el.style.setProperty("--y", (38 + rand() * 44).toFixed(1) + "%");
+        el.style.setProperty("--d", (3 + rand() * 4).toFixed(1) + "s");
+        el.style.animationDelay = (-rand() * 6).toFixed(1) + "s";
+        flies.appendChild(el);
+      }
+    }
+
+    let resizeTimer = 0;
+    function init() {
+      paint(skies[0]);
+      document.body.dataset.time = time;
+      makeClouds();
+      makeFlies();
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => paint(skies[front]), 150);
+      });
+    }
+
+    return { init, set };
+  })();
+
+  /* ---------- The clock in the corner ---------- */
+
+  const Clock = (() => {
+    const time = $("[data-clock-time]");
+    const ctx = $("[data-clock-icon]").getContext("2d");
+    const sun = Pixel.sun();
+    const moon = Pixel.moon();
+
+    function set(index) {
+      time.textContent = CONTENT.hud.times[index] || "";
+      (index >= 5 ? moon : sun).paint(ctx);
+    }
+    return { set };
+  })();
+
+  /* ---------- The crop (progress) ---------- */
 
   const Plant = (() => {
-    const root = $("[data-plant]");
-    const leaves = $$("[data-leaf]", root);
-    const bud = $(".plant__bud", root);
-    const flower = $(".plant__flower", root);
+    const holder = $("[data-plant]");
+    const canvas = $("[data-plant-canvas]");
+    const ctx = canvas.getContext("2d");
+    const stages = Array.from({ length: 7 }, (_, i) => Pixel.crop(i));
+    let current = -1;
 
     function set(stage, total) {
-      root.dataset.stage = String(stage);
-      root.setAttribute(
+      holder.setAttribute(
         "aria-label",
         CONTENT.progress.replace("{n}", stage + 1).replace("{total}", total)
       );
-      leaves.forEach((leaf) => leaf.classList.toggle("is-grown", Number(leaf.dataset.leaf) <= stage));
-      const blooming = stage >= total - 1;
-      bud.classList.toggle("is-grown", stage === total - 2);
-      bud.classList.toggle("is-gone", blooming);
-      flower.classList.toggle("is-grown", blooming);
+      const s = Math.min(stages.length - 1, Math.round((stage / Math.max(1, total - 1)) * (stages.length - 1)));
+      if (s === current) return;
+      const first = current < 0;
+      current = s;
+      stages[s].paint(ctx);
+      if (!first && !reducedMotion()) {
+        const P = PX();
+        canvas.animate([
+          { transform: "translateY(0)" },
+          { transform: `translateY(${-P * 3}px)` },
+          { transform: "translateY(0)" },
+        ], { duration: 360, easing: "steps(3, end)" });
+      }
     }
 
     return { set };
   })();
 
   /* ---------- Pages & choreography ---------- */
-
-  const EASE = {
-    out: "cubic-bezier(.16, 1, .3, 1)",      // long, soft landing
-    in: "cubic-bezier(.55, 0, .75, .25)",    // lift off
-    settle: "cubic-bezier(.34, 1.4, .64, 1)", // tiny overshoot, like paper settling
-  };
 
   const animate = (el, frames, opts) =>
     el && el.animate ? el.animate(frames, Object.assign({ fill: "both" }, opts)) : null;
@@ -235,67 +426,72 @@ const CONTENT = {
     return a;
   };
 
-  // Everything on a page arrives in order: the page is set down, the photo is
-  // tossed on, the heading rises word by word, then the rest, then the sprigs.
+  // Everything moves in whole pixel steps, like the game: frames drop in,
+  // boxes pop open, words appear, then the dialogue types itself out.
   function arrive(page) {
+    const typed = $$("[data-type]", page);
     if (reducedMotion()) {
       animateIn(page, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" });
+      typed.forEach(Typer.finish);
       return 200;
     }
+    const P = PX();
 
-    animateIn(page, [
-      { opacity: 0, transform: "translate3d(0, 34px, 0) rotate(1.8deg) scale(1.025)" },
-      { opacity: 1, offset: 0.35 },
-      { opacity: 1, transform: "none" },
-    ], { duration: 1100, easing: EASE.out });
+    animateIn(page, [{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "steps(2, end)" });
 
-    const print = $(".print", page);
-    animateIn(print, [
-      { opacity: 0, translate: "46px -38px", rotate: "14deg", scale: "1.12" },
-      { opacity: 1, offset: 0.3 },
-      { opacity: 1, translate: "0 0", rotate: "0deg", scale: "1" },
-    ], { duration: 1300, delay: 120, easing: EASE.settle });
+    $$(".frame", page).forEach((el, i) => {
+      animateIn(el, [
+        { opacity: 0, transform: `translateY(${-P * 14}px)` },
+        { opacity: 1, transform: `translateY(${P * 2}px)`, offset: 0.7 },
+        { opacity: 1, transform: "none" },
+      ], { duration: 520, delay: 60 + i * 120, easing: "steps(6, end)" });
+    });
+
+    $$(".found", page).forEach((el) => {
+      animateIn(el, [
+        { opacity: 0, transform: `translateY(${P * 12}px) scale(.5)` },
+        { opacity: 1, transform: `translateY(${-P * 5}px) scale(1.1)`, offset: 0.6 },
+        { opacity: 1, transform: "none" },
+      ], { duration: 560, delay: 260, easing: "steps(6, end)" });
+    });
+
+    $$(".achievement, .meter, .dialog", page).forEach((el, i) => {
+      animateIn(el, [
+        { opacity: 0, transform: "scale(.9)" },
+        { opacity: 1, transform: "scale(1.02)", offset: 0.6 },
+        { opacity: 1, transform: "none" },
+      ], { duration: 300, delay: 80 + i * 100, easing: "steps(3, end)" });
+    });
 
     const words = $$(".wi", page);
-    const wordStart = print ? 380 : 220;
+    const wordStart = 260;
     words.forEach((w, i) => {
       animateIn(w, [
-        { transform: "translate3d(0, 108%, 0) rotate(5deg)", opacity: 0 },
-        { opacity: 1, offset: 0.25 },
-        { transform: "none", opacity: 1 },
-      ], { duration: 1000, delay: wordStart + i * 55, easing: EASE.out });
+        { opacity: 0, transform: `translateY(${P * 2}px)` },
+        { opacity: 1, transform: "none" },
+      ], { duration: 160, delay: wordStart + i * 50, easing: "steps(2, end)" });
     });
-    const afterWords = wordStart + words.length * 55;
+    const afterWords = wordStart + words.length * 50 + 120;
 
-    $$(".lede, .card__body, .signoff, .answers, [data-action]", page)
-      .filter((el) => !el.closest(".answers") || el.matches(".answers"))
-      .forEach((el, i) => {
-        animateIn(el, [
-          { opacity: 0, transform: "translate3d(0, 18px, 0)" },
-          { opacity: 1, transform: "none" },
-        ], { duration: 900, delay: afterWords + 60 + i * 110, easing: EASE.out });
-      });
+    typed.forEach((el) => Typer.play(el, afterWords));
 
-    $$(".doodle", page).forEach((d, i) => {
-      animateIn(d, [
-        { opacity: 0, scale: "0.25", rotate: "-38deg" },
-        { opacity: 1, scale: "1", rotate: "0deg" },
-      ], { duration: 1200, delay: 300 + i * 160, easing: EASE.settle });
+    $$(".dialog__actions, .answers, .btn--begin, .signoff", page).forEach((el, i) => {
+      animateIn(el, [
+        { opacity: 0, transform: `translateY(${P * 3}px)` },
+        { opacity: 1, transform: "none" },
+      ], { duration: 240, delay: afterWords + 120 + i * 90, easing: "steps(3, end)" });
     });
 
-    return afterWords + 900;
+    return afterWords + 400;
   }
 
-  // The current page is picked up and slid off the table.
   function depart(page) {
-    if (reducedMotion()) {
-      const a = animate(page, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: "linear" });
-      return a ? a.finished.catch(() => {}) : Promise.resolve();
-    }
-    const a = animate(page, [
-      { opacity: 1, transform: "none" },
-      { opacity: 0, transform: "translate3d(-4%, -30px, 0) rotate(-3.5deg) scale(.96)" },
-    ], { duration: 560, easing: EASE.in });
+    const a = reducedMotion()
+      ? animate(page, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: "linear" })
+      : animate(page, [
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "scale(.96)" },
+      ], { duration: 240, easing: "steps(3, end)" });
     return a ? a.finished.catch(() => {}) : Promise.resolve();
   }
 
@@ -312,6 +508,8 @@ const CONTENT = {
       const to = pages[next];
       from.inert = true;
       const leaving = depart(from);
+      Scene.set(next);
+      Clock.set(next);
 
       setTimeout(() => {
         to.hidden = false;
@@ -327,7 +525,7 @@ const CONTENT = {
         window.scrollTo({ top: 0, behavior: "auto" });
 
         if (onShown) onShown(to);
-      }, reducedMotion() ? 80 : 300);
+      }, reducedMotion() ? 80 : 260);
 
       leaving.then(() => {
         from.hidden = true;
@@ -345,6 +543,7 @@ const CONTENT = {
         if (i !== 0) page.inert = true;
       });
       Plant.set(0, pages.length);
+      Clock.set(0);
 
       // wait for the fonts and the first photo (max 700ms) so the entrance
       // starts on a clean frame instead of fighting the first paint
@@ -365,20 +564,34 @@ const CONTENT = {
     return { init, next, show, get index() { return index; }, get busy() { return busy; } };
   })();
 
-  /* ---------- Things I love about you ---------- */
+  /* ---------- Things I love about you: the heart meter fills ---------- */
 
   const Loves = (() => {
     const list = $("[data-loves]");
     const button = $('[data-action="reveal"]');
     const label = $("[data-reveal-label]");
+    const hearts = $$("[data-meter] i");
     let shown = 0;
+    let filled = 0;
 
-    const LOVE_ICONS = ["icon-laugh", "icon-ladybug", "icon-planet"];
     const done = () => shown >= CONTENT.loves.items.length;
 
     function updateLabel() {
       const { revealButton, moreButton, doneButton } = CONTENT.loves;
       label.textContent = done() ? doneButton : shown === 0 ? revealButton : moreButton;
+    }
+
+    function fillTo(n) {
+      const from = filled;
+      filled = n;
+      for (let i = from; i < n; i++) {
+        const heart = hearts[i];
+        setTimeout(() => {
+          heart.classList.add("is-full", "is-new");
+          Music.blip(2);
+          setTimeout(() => heart.classList.remove("is-new"), 450);
+        }, reducedMotion() ? 0 : 200 + (i - from) * 120);
+      }
     }
 
     function reveal() {
@@ -388,12 +601,12 @@ const CONTENT = {
       }
       const li = document.createElement("li");
       li.className = "is-new";
-      const icon = LOVE_ICONS[shown] || "leaf-bullet";
-      li.innerHTML =
-        '<svg aria-hidden="true" focusable="false"><use href="#' + icon + '"/></svg><span>' +
-        format(CONTENT.loves.items[shown]) +
-        "</span>";
+      li.innerHTML = '<span class="love__text">' + format(CONTENT.loves.items[shown]) + "</span>";
       list.appendChild(li);
+      const text = $(".love__text", li);
+      Typer.prepare(text);
+      Typer.play(text, 60);
+      fillTo(Math.round(((shown + 1) / CONTENT.loves.items.length) * hearts.length));
       Tufo.onLove(li, shown);
       shown += 1;
       updateLabel();
@@ -411,7 +624,9 @@ const CONTENT = {
     const slot = $("[data-no-slot]");
     const layer = $("[data-dodge-layer]");
     const soundToggle = $("[data-sound-toggle]");
+    const clock = $("[data-clock]");
     const question = $(".question");
+    const questionBox = $(".dialog--question");
     const labels = CONTENT.question.no;
 
     const MARGIN = 12;
@@ -469,10 +684,23 @@ const CONTENT = {
       const bw = no.offsetWidth;
       const bh = no.offsetHeight;
       const maxX = Math.max(MARGIN, vw - bw - MARGIN);
-      const maxY = Math.max(MARGIN, vh - bh - MARGIN);
+      // stay above the grass, where the cats and their speech bubbles live
+      const maxY = Math.max(MARGIN, Math.min(vh - bh - MARGIN, vh - groundH() - bh));
 
-      const avoid = [inflate(yesTargetRect(), 18), inflate(soundToggle.getBoundingClientRect(), 10), inflate(Mei.rect, 8), inflate(Tufo.rect, 8)];
+      const avoid = [
+        inflate(yesTargetRect(), 18),
+        inflate(soundToggle.getBoundingClientRect(), 10),
+        inflate(clock.getBoundingClientRect(), 10),
+        inflate(Mei.rect, 8),
+        inflate(Tufo.rect, 8),
+      ];
       const prefer = [inflate(question.getBoundingClientRect(), 6)]; // try not to cover the question
+      // never park on the question box's wooden border: fully inside it or clear of it
+      const frame = questionBox.getBoundingClientRect();
+      const outer = inflate(frame, 8);
+      const inner = inflate(frame, -(PX() * 7 + 8));
+      const onBorder = (r) => overlaps(r, outer) &&
+        !(r.left >= inner.left && r.right <= inner.right && r.top >= inner.top && r.bottom <= inner.bottom);
       const current = { left: pos.x, top: pos.y, right: pos.x + bw, bottom: pos.y + bh };
       const reach = Math.max(bw, bh) / 2 + 56;
       const near = pointer
@@ -485,7 +713,7 @@ const CONTENT = {
         const x = MARGIN + Math.random() * (maxX - MARGIN);
         const y = MARGIN + Math.random() * (maxY - MARGIN);
         const rect = { left: x, top: y, right: x + bw, bottom: y + bh };
-        if (avoid.some((a) => overlaps(rect, a))) continue;
+        if (avoid.some((a) => overlaps(rect, a)) || onBorder(rect)) continue;
         let score = Math.hypot(x - pos.x, y - pos.y);
         if (overlaps(rect, current)) score -= 10000;
         if (near && overlaps(rect, near)) score -= 5000;
@@ -495,15 +723,17 @@ const CONTENT = {
       }
       if (best) return best;
 
-      // Fallback: the viewport corner furthest from Yes
-      const y0 = yesTargetRect();
+      // Fallback: a viewport corner clear of Yes (and, if possible, of everything else)
+      const box = (c) => ({ left: c.x, top: c.y, right: c.x + bw, bottom: c.y + bh });
       const corners = [
         { x: MARGIN, y: MARGIN + 60 },
         { x: maxX, y: maxY },
         { x: MARGIN, y: maxY },
         { x: maxX, y: MARGIN + 60 },
-      ].filter((c) => !overlaps({ left: c.x, top: c.y, right: c.x + bw, bottom: c.y + bh }, y0));
-      return corners[Math.floor(Math.random() * corners.length)] || { x: MARGIN, y: maxY };
+      ].filter((c) => !overlaps(box(c), inflate(yesTargetRect(), 18)));
+      const clean = corners.filter((c) => !avoid.some((a) => overlaps(box(c), a)) && !onBorder(box(c)));
+      const pool = clean.length ? clean : corners;
+      return pool[Math.floor(Math.random() * pool.length)] || { x: MARGIN, y: MARGIN + 60 };
     }
 
     function place(spot) {
@@ -573,8 +803,8 @@ const CONTENT = {
 
   /* ---------- Music ----------
      The background track is a real recording (see CONTENT.music), played
-     from a local file. Little sound effects (harp, chime, Mei) are still
-     made live with Web Audio, tuned to the track's key. */
+     from a local file. Little sound effects (harp, chime, text blips, the
+     cats) are made live with Web Audio, tuned to the track's key. */
 
   const Music = (() => {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -732,7 +962,7 @@ const CONTENT = {
       return bus;
     }
 
-    // A harp glissando as the lilies open
+    // A harp glissando as the flowers open
     function gliss() {
       if (!ctx || muted) return;
       const bus = sendBus(0.5);
@@ -766,6 +996,27 @@ const CONTENT = {
       });
       const tChord = t0 + notes.length * 0.085;
       [65, 69, 72, 77].forEach((note) => pluck(note, tChord, 0.16, bus));
+    }
+
+    // The little square-wave blip under typing text, in the song's key
+    const BLIPS = [77, 79, 81, 84, 86];
+    let lastBlip = 0;
+    function blip(octave = 1) {
+      if (!ctx || muted || !started || ctx.state !== "running") return;
+      const t = ctx.currentTime;
+      if (t - lastBlip < 0.045) return;
+      lastBlip = t;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.value = mtof(BLIPS[Math.floor(Math.random() * BLIPS.length)]) * octave;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.16, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+      osc.connect(g);
+      g.connect(sfx);
+      osc.start(t);
+      osc.stop(t + 0.06);
     }
 
     // pause while the phone is locked / tab hidden
@@ -896,10 +1147,84 @@ const CONTENT = {
       src.stop(t + 0.8);
     }
 
-    return { warm, start, setMuted, gliss, chime, meow, purr, hiss, get muted() { return muted; } };
+    return { warm, start, setMuted, gliss, chime, blip, meow, purr, hiss, get muted() { return muted; } };
   })();
 
-  /* ---------- The cats: shared body, separate personalities ---------- */
+  /* ---------- The cats: pixel sprites driven by their mood classes ---------- */
+
+  function catSprite(wrap, canvas, kind) {
+    const ctx = canvas.getContext("2d");
+    const cache = new Map();
+    const has = (c) => wrap.classList.contains(c);
+    let look = 0;
+    let tail = 0;
+    let blink = 0;
+    let step = 0;
+    let twitch = 0;
+    let tick = 0;
+    let swat = [];
+    let wasSwatting = false;
+    let last = "";
+
+    function pose() {
+      const hissing = has("is-hissing");
+      let eyes = "open";
+      if (has("is-happy") || has("is-purring")) eyes = "happy";
+      else if (has("is-startled")) eyes = "wide";
+      else if (blink > 0) eyes = "blink";
+      return {
+        eyes,
+        look,
+        mouth: hissing ? "hiss" : has("is-meowing") ? "meow" : "closed",
+        ears: hissing ? "back" : has("is-twitching") && twitch ? "twitch" : "up",
+        tail,
+        paw: swat.length ? swat[0] : 0,
+        step: has("is-walking") ? step : -1,
+      };
+    }
+
+    function draw() {
+      const p = pose();
+      const key = [p.eyes, p.look, p.mouth, p.ears, p.tail, p.paw, p.step].join();
+      if (key === last) return;
+      last = key;
+      let g = cache.get(key);
+      if (!g) {
+        g = Pixel.cat(kind, p);
+        cache.set(key, g);
+      }
+      g.paint(ctx);
+    }
+
+    // a slow heartbeat: tail swishes, blinks, walking feet
+    function loop() {
+      tick += 1;
+      const walking = has("is-walking");
+      if (!reducedMotion()) {
+        if (walking || has("is-excited")) tail = tick % 2;
+        else if (kind === "mei") { if (tick % 9 === 0) tail ^= 1; }
+        else { const ph = tick % 28; tail = ph === 18 || ph === 20 ? 1 : 0; } // Tufo: irritated flicks
+        step = walking ? tick % 2 : 0;
+      }
+      if (blink > 0) blink -= 1;
+      else if (Math.random() < (kind === "mei" ? 0.03 : 0.014)) blink = 2;
+      twitch = has("is-twitching") ? (tick >> 1) % 2 : 0;
+      if (swat.length) swat.shift();
+      draw();
+      setTimeout(loop, document.hidden ? 600 : 100);
+    }
+    setTimeout(loop, 100);
+
+    new MutationObserver(() => {
+      const swatting = has("is-swatting");
+      if (swatting && !wasSwatting) swat = [1, 2, 2, 2, 1];
+      wasSwatting = swatting;
+      draw();
+    }).observe(wrap, { attributes: true, attributeFilter: ["class"] });
+
+    draw();
+    return { look(v) { if (v !== look) { look = v; draw(); } } };
+  }
 
   // On a phone the two speech bubbles would overlap, so the cats take turns
   const Chatter = { until: 0 };
@@ -908,18 +1233,18 @@ const CONTENT = {
     const wrap = $(`[data-cat="${name}"]`);
     const button = $("[data-cat-button]", wrap);
     const bubble = $("[data-cat-bubble]", wrap);
-    const look = $(".cat__look", wrap);
+    const sprite = catSprite(wrap, $("[data-cat-canvas]", wrap), name);
     const STATES = ["is-happy", "is-meowing", "is-purring", "is-jumping", "is-twitching", "is-excited", "is-hissing", "is-swatting", "is-startled"];
 
-    let x = -120;
+    let x = -140;
     let bubbleTimer = 0;
     let speakTimer = 0;
     let stateTimer = 0;
     let page = 0; // bumps on every page change so stale lines never play late
 
-    const width = () => wrap.offsetWidth || 76;
+    const width = () => wrap.offsetWidth || 78;
 
-    // A little way off to one side of the plant, never at the far edge of a big screen
+    // A little way off to one side of the crop, never at the far edge of a big screen
     function spotFor(side) {
       const vw = document.documentElement.clientWidth;
       const w = width();
@@ -948,7 +1273,7 @@ const CONTENT = {
       const ms = Math.max(running ? 420 : 700, Math.min(2600, dist * pace));
       wrap.classList.add("is-walking");
       wrap.classList.toggle("is-running", running);
-      wrap.style.transition = `transform ${ms}ms cubic-bezier(.45, .05, .55, .95)`;
+      wrap.style.transition = `transform ${ms}ms linear`;
       wrap.style.transform = `translate3d(${target}px, 0, 0)`;
       x = target;
       return new Promise((resolve) => setTimeout(() => {
@@ -996,27 +1321,28 @@ const CONTENT = {
 
     function hearts(n = 4) {
       const made = [];
+      const P = PX();
       for (let i = 0; i < n; i++) {
         const h = document.createElement("span");
         h.className = "cat__heart";
-        h.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-heart"/></svg>';
         wrap.appendChild(h);
-        const dx = (Math.random() - 0.5) * 70;
-        const rise = 50 + Math.random() * 40;
+        // whole-pixel drift, stepped like the rest of the world
+        const dx = Math.round(((Math.random() - 0.5) * 70) / P) * P;
+        const rise = Math.round((50 + Math.random() * 40) / P) * P;
         const a = h.animate(reducedMotion()
           ? [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }]
           : [
-            { opacity: 0, transform: "translate3d(0, 0, 0) scale(.3)" },
-            { opacity: 1, transform: `translate3d(${dx * 0.4}px, ${-rise * 0.4}px, 0) scale(1)`, offset: 0.3 },
-            { opacity: 0, transform: `translate3d(${dx}px, ${-rise}px, 0) scale(.8) rotate(${dx / 3}deg)` },
-          ], { duration: 1300 + Math.random() * 500, delay: i * 110, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "both" });
+            { opacity: 0, transform: "translate3d(0, 0, 0)" },
+            { opacity: 1, transform: `translate3d(${dx * 0.4}px, ${-rise * 0.4}px, 0)`, offset: 0.3 },
+            { opacity: 0, transform: `translate3d(${dx}px, ${-rise}px, 0)` },
+          ], { duration: 1300 + Math.random() * 500, delay: i * 110, easing: "steps(10, end)", fill: "both" });
         a.onfinish = () => h.remove();
         made.push(h);
       }
       return made;
     }
 
-    // Eyes follow the pointer
+    // Eyes follow the pointer, one pixel at a time
     let eyeRaf = 0;
     let target = null;
     function lookAt(px, py) {
@@ -1025,12 +1351,9 @@ const CONTENT = {
       eyeRaf = requestAnimationFrame(() => {
         eyeRaf = 0;
         const r = button.getBoundingClientRect();
-        const cx = r.left + r.width * 0.46;
-        const cy = r.top + r.height * 0.47;
-        const ang = Math.atan2(target.y - cy, target.x - cx);
-        const d = Math.min(1, Math.hypot(target.x - cx, target.y - cy) / 200);
+        const dx = target.x - (r.left + r.width * 0.46);
         const flip = wrap.classList.contains("is-facing-right") ? -1 : 1;
-        look.setAttribute("transform", `translate(${(Math.cos(ang) * 2 * d * flip).toFixed(2)} ${(Math.sin(ang) * 1.6 * d).toFixed(2)})`);
+        sprite.look(Math.abs(dx) < 40 ? 0 : Math.sign(dx) * flip);
       });
     }
     window.addEventListener("pointermove", (e) => lookAt(e.clientX, e.clientY), { passive: true });
@@ -1253,9 +1576,9 @@ const CONTENT = {
           { rotate: `${dir * 4}deg`, translate: `${dir * 10}px 2px`, offset: 0.25 },
           { rotate: `${dir * -1}deg`, translate: `${dir * 2}px 0`, offset: 0.55 },
           { rotate: `${dir * 1.6}deg`, translate: `${dir * 3}px 1px` },
-        ], { duration: 700, delay: 180, easing: "cubic-bezier(.16, 1, .3, 1)", fill: "forwards" });
+        ], { duration: 700, delay: 180, easing: "steps(5, end)", fill: "forwards" });
       if (line) {
-        const token = cat.hush() ;
+        const token = cat.hush();
         setTimeout(() => { if (cat.current(token)) cat.say(line, 2400); }, 500);
       }
     }
@@ -1331,7 +1654,7 @@ const CONTENT = {
           if (!cat.current(token)) return;
           if (page.matches(".page--question")) cat.lookAtEl($("[data-no]"));
           if (index === 2) {
-            knock($(".card", page), text.knock);
+            knock($(".dialog", page), text.knock);
             return;
           }
           if (page.matches(".page--yay")) {
@@ -1392,80 +1715,42 @@ const CONTENT = {
     sync();
   })();
 
-  /* ---------- Falling leaves & petals ---------- */
+  /* ---------- Falling hearts & confetti ---------- */
 
   const Petals = (() => {
     const canvas = $("[data-petals]");
     const ctx = canvas.getContext("2d");
-    const COLORS = {
-      leaf: ["#8A9A5B", "#5E6B3A", "#8A9A5B", "#A6B27A"],
-      petal: ["#D8A48F", "#C2693F", "#D8A48F", "#E6BCA9"],
-    };
-    const DURATION = 6000;
-    const SPAWN_FOR = 4200;
+    const heart = Pixel.heartSmall().canvas();
+    const COLORS = ["#e0304e", "#f6c23e", "#7fcdf2", "#8fd05a", "#f58aa8", "#fff3d1", "#b79af0"];
+    const DURATION = 7000;
+    const SPAWN_FOR = 4800;
     let raf = 0;
+    let size = null;
 
-    function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = Math.round(window.innerWidth * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function make(w, burst) {
-      const kind = Math.random() < 0.5 ? "leaf" : "petal";
-      const palette = COLORS[kind];
+    function make(W, H, burst) {
       return {
-        kind,
-        color: palette[Math.floor(Math.random() * palette.length)],
-        x: Math.random() * w,
-        y: burst ? -20 - Math.random() * window.innerHeight * 0.6 : -24,
-        size: (kind === "leaf" ? 9 : 7) + Math.random() * 8,
-        vy: 55 + Math.random() * 70,
-        sway: 18 + Math.random() * 36,
-        swaySpeed: 0.8 + Math.random() * 1.4,
+        heart: Math.random() < 0.3,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        x: Math.random() * W,
+        y: burst ? -Math.random() * H * 0.6 : -8,
+        vy: 12 + Math.random() * 16,
+        sway: 2 + Math.random() * 4,
+        swaySpeed: 1 + Math.random() * 1.6,
         phase: Math.random() * Math.PI * 2,
-        rot: Math.random() * Math.PI * 2,
-        spin: (Math.random() - 0.5) * 2.4,
         flip: Math.random() * Math.PI * 2,
-        flipSpeed: 1.5 + Math.random() * 2.5,
+        flipSpeed: 3 + Math.random() * 4,
       };
-    }
-
-    function drawLeaf(p) {
-      const s = p.size;
-      ctx.beginPath();
-      ctx.moveTo(0, -s);
-      ctx.bezierCurveTo(s * 0.7, -s * 0.5, s * 0.6, s * 0.5, 0, s);
-      ctx.bezierCurveTo(-s * 0.6, s * 0.5, -s * 0.7, -s * 0.5, 0, -s);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(0, -s * 0.8);
-      ctx.lineTo(0, s * 1.25);
-      ctx.strokeStyle = "rgba(74, 53, 38, 0.35)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    function drawPetal(p) {
-      const s = p.size;
-      ctx.beginPath();
-      ctx.moveTo(0, s);
-      ctx.bezierCurveTo(s * 0.9, s * 0.3, s * 0.7, -s * 0.9, 0, -s * 0.7);
-      ctx.bezierCurveTo(-s * 0.7, -s * 0.9, -s * 0.9, s * 0.3, 0, s);
-      ctx.fillStyle = p.color;
-      ctx.fill();
     }
 
     function run() {
       if (reducedMotion()) return;
       cancelAnimationFrame(raf);
-      resize();
-      const w = window.innerWidth;
-      const count = Math.round(Math.min(90, Math.max(50, w / 10)));
-      const flakes = Array.from({ length: Math.round(count * 0.35) }, () => make(w, true));
-      const spawnRate = (count * 0.65) / SPAWN_FOR; // per ms
+      size = artSize();
+      fitCanvas(canvas, size);
+      const { W, H } = size;
+      const count = Math.round(Math.min(90, Math.max(50, W / 2)));
+      const bits = Array.from({ length: Math.round(count * 0.35) }, () => make(W, H, true));
+      const spawnRate = (count * 0.65) / SPAWN_FOR;
       let spawned = 0;
       const start = performance.now();
       let last = start;
@@ -1474,28 +1759,27 @@ const CONTENT = {
         const dt = Math.min(0.05, (now - last) / 1000);
         last = now;
         const elapsed = now - start;
-
         const due = Math.min(count * 0.65, elapsed * spawnRate);
-        while (spawned < due) { flakes.push(make(window.innerWidth, false)); spawned += 1; }
+        while (spawned < due) { bits.push(make(W, H, false)); spawned += 1; }
 
         const fade = elapsed > DURATION - 900 ? Math.max(0, (DURATION - elapsed) / 900) : 1;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = Math.ceil(fade * 4) / 4; // fades in steps too
 
-        for (const p of flakes) {
+        for (const p of bits) {
           p.y += p.vy * dt;
           p.phase += p.swaySpeed * dt;
-          p.rot += p.spin * dt;
           p.flip += p.flipSpeed * dt;
-          const x = p.x + Math.sin(p.phase) * p.sway;
-          if (p.y > window.innerHeight + 30) continue;
-
-          ctx.save();
-          ctx.globalAlpha = 0.92 * fade;
-          ctx.translate(x, p.y);
-          ctx.rotate(p.rot);
-          ctx.scale(Math.max(0.18, Math.abs(Math.cos(p.flip))), 1); // tumbling
-          if (p.kind === "leaf") drawLeaf(p); else drawPetal(p);
-          ctx.restore();
+          if (p.y > H + 8) continue;
+          const x = Math.round(p.x + Math.sin(p.phase) * p.sway);
+          const y = Math.round(p.y);
+          if (p.heart) {
+            ctx.drawImage(heart, x, y);
+          } else {
+            const wide = Math.cos(p.flip) > 0;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(x, y, wide ? 2 : 1, wide ? 1 : 2);
+          }
         }
 
         if (elapsed < DURATION) {
@@ -1508,390 +1792,263 @@ const CONTENT = {
       raf = requestAnimationFrame(frame);
     }
 
-    window.addEventListener("resize", () => { if (raf) resize(); });
     return { run };
   })();
 
-  /* ---------- A screen full of lilies ---------- */
+  /* ---------- Fireworks over the festival ---------- */
+
+  const Fireworks = (() => {
+    const canvas = $("[data-fireworks]");
+    const ctx = canvas.getContext("2d");
+    const COLORS = ["#ff6b6b", "#ffd84a", "#6bd0ff", "#9bff7a", "#ff9df0", "#fff3d1"];
+    const END = 16000;
+    let raf = 0;
+
+    // Patches of sky no box covers, in art pixels: bursts aim there so they are seen
+    function openSky(px) {
+      const boxes = $$(".page:not([hidden]) :is(.achievement, .frame, .meter, .dialog), .hud > *")
+        .map((el) => el.getBoundingClientRect());
+      const floor = window.innerHeight - groundH();
+      const R = 10 * px;
+      const spots = [];
+      for (let y = R; y < floor - R; y += R / 2) {
+        for (let x = R; x < window.innerWidth - R; x += R / 2) {
+          const hit = boxes.some((b) => x - R < b.right && x + R > b.left && y - R < b.bottom && y + R > b.top);
+          if (!hit) spots.push({ x: x / px, y: y / px });
+        }
+      }
+      return spots;
+    }
+
+    // a few spots, as far apart as possible
+    function spread(spots, n) {
+      const picked = [];
+      while (picked.length < n && spots.length) {
+        let best = spots[0];
+        let bestD = -1;
+        for (const s of spots) {
+          const d = picked.length ? Math.min(...picked.map((p) => Math.hypot(p.x - s.x, p.y - s.y))) : -s.y;
+          if (d > bestD) { bestD = d; best = s; }
+        }
+        picked.push(best);
+      }
+      return picked;
+    }
+
+    // with reduced motion the festival still gets its fireworks, frozen mid-burst
+    function still(W, H, spots) {
+      const bursts = spots.length
+        ? spread(spots, 3).map((s, i) => [s.x / W, s.y / H, i * 2])
+        : [[0.22, 0.14, 0], [0.74, 0.1, 2], [0.52, 0.26, 4]];
+      bursts.forEach(([fx, fy, c]) => {
+        const x = Math.round(W * fx);
+        const y = Math.round(H * fy);
+        [[9, 18, COLORS[c]], [5, 12, COLORS[c + 1]]].forEach(([r, n, color]) => {
+          ctx.fillStyle = color;
+          for (let k = 0; k < n; k++) {
+            const a = (k / n) * Math.PI * 2;
+            ctx.fillRect(Math.round(x + Math.cos(a) * r), Math.round(y + Math.sin(a) * r), 1, 1);
+          }
+        });
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(x, y, 1, 1);
+      });
+    }
+
+    function run() {
+      cancelAnimationFrame(raf);
+      const size = artSize();
+      fitCanvas(canvas, size);
+      const { W, H, px } = size;
+      const spots = openSky(px);
+      if (reducedMotion()) { still(W, H, spots); return; }
+      const launchY = H - Math.ceil(groundH() / px) - 6;
+      const rockets = [];
+      const sparks = [];
+      const start = performance.now();
+      let last = start;
+      let nextLaunch = start + 150;
+
+      const burst = (r) => {
+        const n = 22 + Math.floor(Math.random() * 12);
+        const speed = 16 + Math.random() * 10;
+        for (let k = 0; k < n; k++) {
+          const a = (k / n) * Math.PI * 2;
+          const s = speed * (0.75 + Math.random() * 0.35);
+          sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, age: 0, life: 1.1 + Math.random() * 0.6, color: r.color });
+        }
+      };
+
+      const frame = (now) => {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        const t = now - start;
+        if (t < END && now >= nextLaunch) {
+          const aim = spots.length ? spots[Math.floor(Math.random() * spots.length)] : null;
+          rockets.push({
+            x: aim ? aim.x : W * (0.12 + Math.random() * 0.76),
+            y: launchY,
+            vy: -(60 + Math.random() * 30),
+            top: aim ? aim.y : H * (0.06 + Math.random() * 0.26),
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          });
+          nextLaunch = now + (t < 6000 ? 380 + Math.random() * 380 : 1100 + Math.random() * 1200);
+        }
+
+        ctx.clearRect(0, 0, W, H);
+        for (let i = rockets.length - 1; i >= 0; i--) {
+          const r = rockets[i];
+          r.y += r.vy * dt;
+          ctx.fillStyle = "#fff3d1";
+          ctx.fillRect(Math.round(r.x), Math.round(r.y), 1, 2);
+          ctx.fillStyle = "#f6c23e88";
+          ctx.fillRect(Math.round(r.x), Math.round(r.y) + 2, 1, 2);
+          if (r.y <= r.top) { rockets.splice(i, 1); burst(r); }
+        }
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          const s = sparks[i];
+          s.age += dt;
+          if (s.age > s.life) { sparks.splice(i, 1); continue; }
+          s.vy += 20 * dt;
+          s.vx *= 0.985;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+          if (s.age > s.life * 0.65 && Math.random() < 0.5) continue; // crackle as it dies
+          const big = s.age < s.life * 0.4 ? 2 : 1;
+          ctx.fillStyle = s.age < 0.12 ? "#ffffff" : s.color;
+          ctx.fillRect(Math.round(s.x), Math.round(s.y), big, big);
+        }
+
+        if (t < END || rockets.length || sparks.length) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          canvas.width = canvas.height = 0;
+          raf = 0;
+        }
+      };
+      raf = requestAnimationFrame(frame);
+    }
+
+    return { run };
+  })();
+
+  /* ---------- A screen full of pixel flowers ---------- */
 
   const Lilies = (() => {
     const canvas = $("[data-lilies]");
     const ctx = canvas.getContext("2d");
-
-    // Petal colours: throat → middle → tip, plus speckles
-    const VARIANTS = [
-      { throat: "#E4AE97", mid: "#FBF6EC", tip: "#F8EEE2", edge: "#D8A48F", rib: "#D8A48F", speck: "#C2693F" },
-      { throat: "#C2693F", mid: "#D8A48F", tip: "#F3DCCF", edge: "#B8704F", rib: "#FBF6EC", speck: "#A9582F" },
-      { throat: "#C9CE9E", mid: "#FBF6EC", tip: "#F6E6D8", edge: "#D9C3AE", rib: "#B9C08F", speck: null },
-      { throat: "#A9582F", mid: "#CF8565", tip: "#EBB9A2", edge: "#A9582F", rib: "#F3D9CC", speck: "#8C4726" },
-      { throat: "#E9C3B2", mid: "#F9EDE3", tip: "#FBF6EC", edge: "#DDB3A0", rib: "#E4AE97", speck: "#C2693F" },
-    ];
-    const FRAMES = 9;
-    const R = 120;            // sprite radius in sprite pixels
-    const SIZE = R * 2 + 32;  // room for the shadow
-    const MAX_DPR = 1.5;      // a full-screen flourish doesn't need retina fill cost
-    let sprites = null;
-    let leafSprites = null;
+    const SCALE = 2;       // each flower is drawn at 2x its art size
+    const STAGE = 170;     // ms per growth stage: bud, half open, open
+    let flowers = null;
+    let leaves = null;
     let raf = 0;
-    let ready = false;
-    let bake = null;          // settled flowers are painted here once
-    let bakeCtx = null;
 
-    // tiny seeded random so each sprite is drawn the same way every time
-    const seeded = (seed) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-
-    function petal(g, len, wid, curl, v, rand) {
-      const grad = g.createLinearGradient(0, 0, 0, -len);
-      grad.addColorStop(0, v.throat);
-      grad.addColorStop(0.42, v.mid);
-      grad.addColorStop(1, v.tip);
-
-      g.beginPath();
-      g.moveTo(0, 0);
-      g.bezierCurveTo(wid * 1.05, -len * 0.22, wid * 0.95, -len * 0.72, curl, -len);
-      g.bezierCurveTo(-wid * 0.8, -len * 0.74, -wid * 1.05, -len * 0.24, 0, 0);
-      g.fillStyle = grad;
-      g.fill();
-      g.lineWidth = 1.4;
-      g.strokeStyle = v.edge;
-      g.globalAlpha = 0.55;
-      g.stroke();
-      g.globalAlpha = 1;
-
-      // the groove down the middle
-      g.beginPath();
-      g.moveTo(0, -len * 0.04);
-      g.quadraticCurveTo(wid * 0.12, -len * 0.5, curl * 0.8, -len * 0.9);
-      g.strokeStyle = v.rib;
-      g.lineWidth = 2;
-      g.globalAlpha = 0.6;
-      g.stroke();
-      g.globalAlpha = 1;
-
-      if (v.speck) {
-        g.fillStyle = v.speck;
-        for (let i = 0; i < 9; i++) {
-          const d = len * (0.1 + rand() * 0.36);
-          const side = (rand() - 0.5) * wid * 0.9 * (d / (len * 0.5));
-          g.globalAlpha = 0.55 + rand() * 0.4;
-          g.beginPath();
-          g.ellipse(side, -d, 1.6 + rand() * 1.6, 2.2 + rand() * 2, 0, 0, Math.PI * 2);
-          g.fill();
-        }
-        g.globalAlpha = 1;
-      }
-    }
-
-    function drawLily(g, open, v, seed) {
-      const rand = seeded(seed);
-      const jitter = Array.from({ length: 6 }, () => (rand() - 0.5) * 0.22);
-      const curls = Array.from({ length: 6 }, () => (rand() - 0.5) * 16);
-
-      g.save();
-      g.translate(SIZE / 2, SIZE / 2);
-      g.shadowColor = "rgba(74, 53, 38, 0.28)";
-      g.shadowBlur = 11;
-      g.shadowOffsetY = 5;
-
-      // outer three behind, inner three on top
-      [0, 2, 4, 1, 3, 5].forEach((k) => {
-        const outer = k % 2 === 0;
-        const len = R * (outer ? 1 : 0.9) * (0.3 + 0.7 * open);
-        const wid = len * (outer ? 0.3 : 0.25) * (0.7 + 0.3 * open);
-        g.save();
-        g.rotate((k / 6) * Math.PI * 2 + jitter[k] + (1 - open) * 0.5);
-        if (k === 1) g.shadowColor = "rgba(74, 53, 38, 0.18)";
-        petal(g, len, wid, curls[k] * open, v, rand);
-        g.restore();
-      });
-      g.shadowColor = "transparent";
-
-      // stamens and pistil appear as she opens
-      if (open > 0.35) {
-        const t = (open - 0.35) / 0.65;
-        g.lineCap = "round";
-        for (let i = 0; i < 6; i++) {
-          const a = (i / 6) * Math.PI * 2 + 0.5 + jitter[i];
-          const l = R * 0.46 * t;
-          const x = Math.cos(a) * l;
-          const y = Math.sin(a) * l;
-          g.beginPath();
-          g.moveTo(0, 0);
-          g.quadraticCurveTo(x * 0.5 + y * 0.12, y * 0.5 - x * 0.12, x, y);
-          g.strokeStyle = "#8A9A5B";
-          g.lineWidth = 2;
-          g.stroke();
-          g.save();
-          g.translate(x, y);
-          g.rotate(a + Math.PI / 2);
-          g.fillStyle = "#A9582F";
-          g.beginPath();
-          g.ellipse(0, 0, 3.4 * t + 1, 8 * t + 1, 0, 0, Math.PI * 2);
-          g.fill();
-          g.restore();
-        }
-        g.beginPath();
-        g.moveTo(0, 0);
-        g.lineTo(R * 0.18 * t, -R * 0.5 * t);
-        g.strokeStyle = "#5E6B3A";
-        g.lineWidth = 2.6;
-        g.stroke();
-        g.fillStyle = "#5E6B3A";
-        g.beginPath();
-        g.arc(R * 0.18 * t, -R * 0.5 * t, 4.4 * t + 0.5, 0, Math.PI * 2);
-        g.fill();
-      }
-
-      // soft throat glow
-      const glow = g.createRadialGradient(0, 0, 0, 0, 0, R * 0.26);
-      glow.addColorStop(0, "rgba(94, 107, 58, 0.35)");
-      glow.addColorStop(1, "rgba(94, 107, 58, 0)");
-      g.fillStyle = glow;
-      g.beginPath();
-      g.arc(0, 0, R * 0.26, 0, Math.PI * 2);
-      g.fill();
-      g.restore();
-    }
-
-    function drawLeaf(g, color) {
-      g.save();
-      g.translate(SIZE / 2, SIZE / 2 + R * 0.9);
-      g.shadowColor = "rgba(74, 53, 38, 0.22)";
-      g.shadowBlur = 10;
-      g.shadowOffsetY = 4;
-      g.beginPath();
-      g.moveTo(0, 0);
-      g.bezierCurveTo(R * 0.34, -R * 0.5, R * 0.22, -R * 1.3, 0, -R * 1.8);
-      g.bezierCurveTo(-R * 0.22, -R * 1.3, -R * 0.34, -R * 0.5, 0, 0);
-      g.fillStyle = color;
-      g.fill();
-      g.shadowColor = "transparent";
-      g.beginPath();
-      g.moveTo(0, -R * 0.05);
-      g.lineTo(0, -R * 1.7);
-      g.strokeStyle = "rgba(251, 246, 236, 0.45)";
-      g.lineWidth = 2;
-      g.stroke();
-      g.restore();
-    }
-
-    function makeCanvas() {
-      const c = document.createElement("canvas");
-      c.width = c.height = SIZE;
-      return c;
-    }
-
-    function renderVariant(vi) {
-      sprites[vi] = Array.from({ length: FRAMES }, (_, f) => {
-        const c = makeCanvas();
-        const open = f / (FRAMES - 1);
-        drawLily(c.getContext("2d"), 0.12 + 0.88 * open, VARIANTS[vi], 97 + vi * 131);
-        return c;
-      });
-    }
-
-    function renderLeaves() {
-      leafSprites = ["#8A9A5B", "#5E6B3A", "#A6B27A"].map((color) => {
-        const c = makeCanvas();
-        drawLeaf(c.getContext("2d"), color);
-        return c;
-      });
-    }
-
-    // One small job per idle slot, so preparing never stutters the intro
-    function prepareInChunks() {
-      if (sprites) return;
-      sprites = new Array(VARIANTS.length);
-      const jobs = VARIANTS.map((_, vi) => () => renderVariant(vi)).concat(renderLeaves);
-      const idle = window.requestIdleCallback || ((fn) => setTimeout(() => fn({ timeRemaining: () => 8 }), 60));
-      const step = () => {
-        const job = jobs.shift();
-        if (job) job();
-        if (jobs.length) idle(step, { timeout: 500 });
-        else ready = true;
-      };
-      idle(step, { timeout: 500 });
-    }
-
-    // If she taps before the idle work finished, finish it now
-    function prepareNow() {
-      if (!sprites) sprites = new Array(VARIANTS.length);
-      for (let i = 0; i < VARIANTS.length; i++) if (!sprites[i]) renderVariant(i);
-      if (!leafSprites) renderLeaves();
-      ready = true;
-    }
-
-    function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-      const w = Math.round(window.innerWidth * dpr);
-      const h = Math.round(window.innerHeight * dpr);
-      canvas.width = w;
-      canvas.height = h;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      bake = document.createElement("canvas");
-      bake.width = w;
-      bake.height = h;
-      bakeCtx = bake.getContext("2d");
-      bakeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    function prepare() {
+      if (flowers) return;
+      flowers = Array.from({ length: Pixel.FLOWER_COUNT }, (_, v) => [0, 1, 2].map((s) => Pixel.flower(v, s).canvas()));
+      leaves = [0, 1, 2].map((i) => Pixel.leafSprite(i).canvas());
     }
 
     function release() {
       canvas.width = canvas.height = 0; // hand the GPU memory back
-      bake = bakeCtx = null;
       canvas.classList.remove("is-fading");
-    }
-
-    // Fill the screen on a jittered grid, blooming outward from the tap
-    function layout(origin) {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const diameter = Math.max(120, Math.min(250, Math.min(w, h) * 0.36));
-      const step = diameter * 0.6;
-      const cols = Math.ceil((w + step) / step);
-      const rows = Math.ceil((h + step) / step);
-      const maxDist = Math.hypot(Math.max(origin.x, w - origin.x), Math.max(origin.y, h - origin.y));
-      const flowers = [];
-      const leaves = [];
-
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const x = (c - 0.25 + (r % 2) * 0.5) * step + (Math.random() - 0.5) * step * 0.7;
-          const y = (r - 0.2) * step + (Math.random() - 0.5) * step * 0.7;
-          const dist = Math.hypot(x - origin.x, y - origin.y) / maxDist;
-          const base = {
-            x, y,
-            delay: dist * 1300 + Math.random() * 300,
-            rot: Math.random() * Math.PI * 2,
-            spin: (Math.random() - 0.5) * 0.25,
-            fadeDelay: 2900 + dist * 700 + Math.random() * 900,
-          };
-          flowers.push(Object.assign({}, base, {
-            size: diameter * (0.72 + Math.random() * 0.5),
-            variant: Math.floor(Math.random() * VARIANTS.length),
-          }));
-          if (Math.random() < 0.55) {
-            leaves.push(Object.assign({}, base, {
-              x: x + (Math.random() - 0.5) * step,
-              y: y + (Math.random() - 0.5) * step,
-              size: diameter * (0.6 + Math.random() * 0.4),
-              delay: base.delay * 0.8,
-              sprite: Math.floor(Math.random() * leafSprites.length),
-            }));
-          }
-        }
-      }
-      // a scattering of smaller blooms on top for depth
-      const extras = Math.round(flowers.length * 0.2);
-      for (let i = 0; i < extras; i++) {
-        const x = Math.random() * w;
-        const y = Math.random() * h;
-        const dist = Math.hypot(x - origin.x, y - origin.y) / maxDist;
-        flowers.push({
-          x, y,
-          delay: 250 + dist * 1200 + Math.random() * 400,
-          rot: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 0.3,
-          fadeDelay: 2700 + dist * 700 + Math.random() * 900,
-          size: diameter * (0.45 + Math.random() * 0.3),
-          variant: Math.floor(Math.random() * VARIANTS.length),
-        });
-      }
-      return { flowers, leaves };
-    }
-
-    const easeOutBack = (t) => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
-    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
-    const BLOOM = 1100;
-    const HOLD = 450;
-
-    function drawSprite(g, img, x, y, size, rot, alpha) {
-      if (alpha <= 0.01 || size <= 1) return;
-      const s = size * (SIZE / (R * 2));
-      const cos = Math.cos(rot);
-      const sin = Math.sin(rot);
-      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-      g.globalAlpha = alpha;
-      g.setTransform(cos * dpr, sin * dpr, -sin * dpr, cos * dpr, x * dpr, y * dpr);
-      g.drawImage(img, -s / 2, -s / 2, s, s);
     }
 
     // Returns the ms at which the screen is fully covered
     function bloom(origin) {
-      if (!ready) prepareNow();
-      resize();
+      prepare();
       cancelAnimationFrame(raf);
-      canvas.classList.remove("is-fading");
+      canvas.classList.remove("is-fading", "is-quick");
+      const size = artSize();
+      fitCanvas(canvas, size);
+      const { W, H, px } = size;
+      ctx.imageSmoothingEnabled = false;
+
+      const ox = origin.x / px;
+      const oy = origin.y / px;
+      const fw = 15 * SCALE;
+      const lw = 13 * SCALE;
+      const step = 13;
+      const maxDist = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
+      const blooms = [];
+      const greens = [];
+      for (let row = 0, y = -step / 2; y < H + step; y += step, row++) {
+        for (let x = -step / 2 + (row % 2) * (step / 2); x < W + step; x += step) {
+          const jx = x + (Math.random() - 0.5) * step * 0.6;
+          const jy = y + (Math.random() - 0.5) * step * 0.6;
+          const dist = Math.hypot(jx - ox, jy - oy) / maxDist;
+          blooms.push({
+            x: Math.round(jx - fw / 2),
+            y: Math.round(jy - fw / 2),
+            delay: dist * 1300 + Math.random() * 250,
+            v: Math.floor(Math.random() * flowers.length),
+          });
+          if (Math.random() < 0.5) {
+            greens.push({
+              x: Math.round(jx - lw / 2 + (Math.random() - 0.5) * step),
+              y: Math.round(jy - lw / 2 + (Math.random() - 0.5) * step),
+              delay: dist * 1100,
+              s: Math.floor(Math.random() * leaves.length),
+            });
+          }
+        }
+      }
+      blooms.sort((a, b) => a.y - b.y);
+      const covered = Math.max(...blooms.map((b) => b.delay)) + STAGE * 3;
       const reduced = reducedMotion();
-      const { flowers, leaves } = layout(origin);
-      const items = leaves
-        .map((l) => Object.assign(l, { img: leafSprites[l.sprite], leaf: true }))
-        .concat(flowers.map((f) => Object.assign(f, { frames: sprites[f.variant] })));
-      const last = FRAMES - 1;
 
       const fadeOut = (after) => {
         setTimeout(() => {
           canvas.classList.add("is-fading");
-          setTimeout(release, reduced ? 800 : 3000);
+          setTimeout(release, reduced ? 700 : 1900);
         }, after);
       };
 
+      const draw = (t) => {
+        ctx.clearRect(0, 0, W, H);
+        for (const l of greens) {
+          if (t < l.delay) continue;
+          ctx.drawImage(leaves[l.s], l.x, l.y, lw, lw);
+        }
+        for (const b of blooms) {
+          const p = t - b.delay;
+          if (p < 0) continue;
+          ctx.drawImage(flowers[b.v][Math.min(2, Math.floor(p / STAGE))], b.x, b.y, fw, fw);
+        }
+      };
+
       if (reduced) {
-        items.forEach((it) => drawSprite(ctx, it.leaf ? it.img : it.frames[last], it.x, it.y, it.size, it.rot, 1));
+        draw(Infinity);
         canvas.classList.add("is-quick");
         fadeOut(1500);
         return 500;
       }
-      canvas.classList.remove("is-quick");
 
-      let active = items.slice();
       const start = performance.now();
-
       const frame = (now) => {
         const t = now - start;
-
-        // 1. flowers that finished opening are painted once into the bake layer
-        const still = [];
-        for (const it of active) {
-          if ((t - it.delay) / BLOOM < 1) { still.push(it); continue; }
-          bakeCtx.globalCompositeOperation = it.leaf ? "destination-over" : "source-over"; // leaves tuck underneath
-          drawSprite(bakeCtx, it.leaf ? it.img : it.frames[last], it.x, it.y, it.size, it.rot, 1);
-        }
-        bakeCtx.globalCompositeOperation = "source-over";
-        active = still;
-
-        // 2. one blit for everything settled, then only the flowers still opening
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.globalAlpha = 1;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(bake, 0, 0);
-        for (const it of active) {
-          const p = (t - it.delay) / BLOOM;
-          if (p <= 0) continue;
-          const img = it.leaf ? it.img : it.frames[Math.min(last, Math.floor(easeOut(p) * last))];
-          const rot = it.rot - (1 - easeOut(p)) * 0.9;
-          drawSprite(ctx, img, it.x, it.y, it.size * easeOutBack(p), rot, Math.min(1, p * 3));
-        }
-
-        if (active.length) {
+        draw(t);
+        if (t < covered) {
           raf = requestAnimationFrame(frame);
         } else {
           raf = 0;
-          fadeOut(HOLD); // the rest is a compositor-only fade: no more redraws
+          fadeOut(450);
         }
       };
       raf = requestAnimationFrame(frame);
-      return Math.max(...items.map((it) => it.delay)) + BLOOM;
+      return covered;
     }
 
     // Draw the sprites while she's still reading the intro, so the tap is instant
-    // start after the intro has finished arriving
-    setTimeout(prepareInChunks, 2200);
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 60));
+    setTimeout(() => idle(prepare, { timeout: 800 }), 2200);
 
     return { bloom };
   })();
 
   /* ---------- Wiring ---------- */
 
+  Scene.init();
   renderContent();
   Pages.init();
   Mei.init();
@@ -1932,7 +2089,7 @@ const CONTENT = {
         ? { x: e.clientX, y: e.clientY }
         : { x: r.left + r.width / 2, y: r.top + r.height / 2 };
       const covered = Lilies.bloom(origin);
-      // swap pages underneath while the lilies cover everything
+      // swap pages underneath while the flowers cover everything
       setTimeout(() => Pages.next(), covered + 300);
     } else if (action === "next") {
       Pages.next();
@@ -1940,7 +2097,10 @@ const CONTENT = {
       Dodge.retire();
       Music.start();
       Music.chime();
-      Pages.next(() => setTimeout(Petals.run, reducedMotion() ? 0 : 250));
+      Pages.next(() => {
+        Fireworks.run();
+        setTimeout(Petals.run, reducedMotion() ? 0 : 250);
+      });
     }
   });
 })();

@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T22:42:44+00:00",
+  "title": "Design System: For Gabrielle",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "neutral",
+        "displayName": "Farmhouse Ink",
+        "canonical": "#3b1d0b",
+        "tonalRamp": [
+          "oklch(15% 0.019 50)",
+          "oklch(26% 0.034 50)",
+          "oklch(38% 0.048 50)",
+          "oklch(49% 0.055 50)",
+          "oklch(61% 0.055 50)",
+          "oklch(72% 0.055 50)",
+          "oklch(84% 0.047 50)",
+          "oklch(95% 0.032 50)"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "#5a3216",
+        "tonalRamp": [
+          "oklch(15% 0.025 53)",
+          "oklch(26% 0.044 53)",
+          "oklch(38% 0.063 53)",
+          "oklch(49% 0.071 53)",
+          "oklch(61% 0.071 53)",
+          "oklch(72% 0.071 53)",
+          "oklch(84% 0.060 53)",
+          "oklch(95% 0.041 53)"
+        ]
+      },
+      "parchment": {
+        "role": "neutral",
+        "displayName": "Parchment",
+        "canonical": "#fbe4a8",
+        "tonalRamp": [
+          "oklch(15% 0.028 89)",
+          "oklch(26% 0.050 89)",
+          "oklch(38% 0.071 89)",
+          "oklch(49% 0.081 89)",
+          "oklch(61% 0.081 89)",
+          "oklch(72% 0.081 89)",
+          "oklch(84% 0.068 89)",
+          "oklch(95% 0.047 89)"
+        ]
+      },
+      "parchment-deep": {
+        "role": "neutral",
+        "displayName": "Deep Parchment",
+        "canonical": "#efcd84",
+        "tonalRamp": [
+          "oklch(15% 0.035 85)",
+          "oklch(26% 0.061 85)",
+          "oklch(38% 0.088 85)",
+          "oklch(49% 0.099 85)",
+          "oklch(61% 0.099 85)",
+          "oklch(72% 0.099 85)",
+          "oklch(84% 0.084 85)",
+          "oklch(95% 0.058 85)"
+        ]
+      },
+      "wood": {
+        "role": "neutral",
+        "displayName": "Plank Wood",
+        "canonical": "#b0602a",
+        "tonalRamp": [
+          "oklch(15% 0.043 51)",
+          "oklch(26% 0.076 51)",
+          "oklch(38% 0.109 51)",
+          "oklch(49% 0.123 51)",
+          "oklch(61% 0.123 51)",
+          "oklch(72% 0.123 51)",
+          "oklch(84% 0.105 51)",
+          "oklch(95% 0.072 51)"
+        ]
+      },
+      "wood-dark": {
+        "role": "neutral",
+        "displayName": "Dark Wood",
+        "canonical": "#7a3b12",
+        "tonalRamp": [
+          "oklch(15% 0.036 49)",
+          "oklch(26% 0.063 49)",
+          "oklch(38% 0.090 49)",
+          "oklch(49% 0.102 49)",
+          "oklch(61% 0.102 49)",
+          "oklch(72% 0.102 49)",
+          "oklch(84% 0.086 49)",
+          "oklch(95% 0.059 49)"
+        ]
+      },
+      "wood-bevel": {
+        "role": "neutral",
+        "displayName": "Wood Bevel",
+        "canonical": "#e8a04e",
+        "tonalRamp": [
+          "oklch(15% 0.045 67)",
+          "oklch(26% 0.080 67)",
+          "oklch(38% 0.115 67)",
+          "oklch(49% 0.130 67)",
+          "oklch(61% 0.130 67)",
+          "oklch(72% 0.130 67)",
+          "oklch(84% 0.110 67)",
+          "oklch(95% 0.076 67)"
+        ]
+      },
+      "heart-red": {
+        "role": "primary",
+        "displayName": "Heart Red",
+        "canonical": "#e0304e",
+        "tonalRamp": [
+          "oklch(15% 0.073 18)",
+          "oklch(26% 0.129 18)",
+          "oklch(38% 0.185 18)",
+          "oklch(49% 0.209 18)",
+          "oklch(61% 0.209 18)",
+          "oklch(72% 0.209 18)",
+          "oklch(84% 0.178 18)",
+          "oklch(95% 0.122 18)"
+        ]
+      },
+      "text-red": {
+        "role": "primary",
+        "displayName": "Text Red",
+        "canonical": "#c8243f",
+        "tonalRamp": [
+          "oklch(15% 0.069 19)",
+          "oklch(26% 0.121 19)",
+          "oklch(38% 0.174 19)",
+          "oklch(49% 0.197 19)",
+          "oklch(61% 0.197 19)",
+          "oklch(72% 0.197 19)",
+          "oklch(84% 0.167 19)",
+          "oklch(95% 0.115 19)"
+        ]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Harvest Gold",
+        "canonical": "#f6c23e",
+        "tonalRamp": [
+          "oklch(15% 0.053 86)",
+          "oklch(26% 0.094 86)",
+          "oklch(38% 0.135 86)",
+          "oklch(49% 0.153 86)",
+          "oklch(61% 0.153 86)",
+          "oklch(72% 0.153 86)",
+          "oklch(84% 0.130 86)",
+          "oklch(95% 0.089 86)"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "#fff3d1",
+        "tonalRamp": [
+          "oklch(15% 0.016 91)",
+          "oklch(26% 0.028 91)",
+          "oklch(38% 0.041 91)",
+          "oklch(49% 0.046 91)",
+          "oklch(61% 0.046 91)",
+          "oklch(72% 0.046 91)",
+          "oklch(84% 0.039 91)",
+          "oklch(95% 0.027 91)"
+        ]
+      },
+      "dawn-sky": {
+        "role": "neutral",
+        "displayName": "Dawn Sky",
+        "canonical": "#5a78c8",
+        "tonalRamp": [
+          "oklch(15% 0.045 267)",
+          "oklch(26% 0.079 267)",
+          "oklch(38% 0.113 267)",
+          "oklch(49% 0.128 267)",
+          "oklch(61% 0.128 267)",
+          "oklch(72% 0.128 267)",
+          "oklch(84% 0.109 267)",
+          "oklch(95% 0.075 267)"
+        ]
+      },
+      "leaf": {
+        "role": "tertiary",
+        "displayName": "Leaf Green",
+        "canonical": "#5ea83e",
+        "tonalRamp": [
+          "oklch(15% 0.056 138)",
+          "oklch(26% 0.098 138)",
+          "oklch(38% 0.141 138)",
+          "oklch(49% 0.159 138)",
+          "oklch(61% 0.159 138)",
+          "oklch(72% 0.159 138)",
+          "oklch(84% 0.135 138)",
+          "oklch(95% 0.093 138)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The question itself, once."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Dialogue and achievement titles; clamp(1.75rem, 1rem + 2vw, 2.5rem) from 760px."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Button labels; 1.5rem from 760px, begin plank 1.5rem / 1.75rem."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Dialogue text, max 36ch; 1.4375rem from 760px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Clock and photo plaque; speech bubbles use 600 at 1.0625rem."
+      }
+    },
+    "shadows": [
+      {
+        "name": "raised-control",
+        "value": "drop-shadow(0 var(--px) 0 #3b1d0b)",
+        "purpose": "Buttons, sound toggle, inventory slot. Removed on :active."
+      },
+      {
+        "name": "panel",
+        "value": "drop-shadow(0 calc(var(--px) * 2) 0 rgb(40 18 6 / .38))",
+        "purpose": "Dialogue boxes, photo frames, achievement banner."
+      },
+      {
+        "name": "small-panel",
+        "value": "drop-shadow(0 var(--px) 0 rgb(40 18 6 / .38))",
+        "purpose": "Heart meter; speech bubble at .3."
+      },
+      {
+        "name": "label-emboss",
+        "value": "0 2px 0 #7a3b12",
+        "purpose": "text-shadow on cream wooden-button labels (#7e1427 on Yes)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "art-pixel-step",
+        "value": "var(--px)",
+        "purpose": "Every offset and bob moves in whole art pixels."
+      },
+      {
+        "name": "two-frame-loop",
+        "value": "steps(1, end)",
+        "purpose": "Bobs and nudges: arrow 800ms, hand 700ms, star 1400ms, cat hop 280ms (run 180ms)."
+      },
+      {
+        "name": "pop",
+        "value": "300ms steps(3, end)",
+        "purpose": "Panels open: scale .9 to 1.02 to 1."
+      },
+      {
+        "name": "drop",
+        "value": "520ms steps(6, end)",
+        "purpose": "Picture frames drop in; found items rise at 560ms."
+      },
+      {
+        "name": "word-rise",
+        "value": "160ms steps(2, end), 50ms stagger",
+        "purpose": "Headline words rise one by one."
+      },
+      {
+        "name": "depart",
+        "value": "240ms steps(3, end)",
+        "purpose": "Page leaves: scale .96 and fade."
+      },
+      {
+        "name": "typewriter",
+        "value": "26ms per letter",
+        "purpose": "Dialogue types out; square-wave blip every third letter in the song's key; tap to finish."
+      },
+      {
+        "name": "sky-crossfade",
+        "value": "1400ms steps(7, end)",
+        "purpose": "Time-of-day scene change between pages."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "linear 200ms fade",
+        "purpose": "prefers-reduced-motion: loops stop, text appears whole."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tiny",
+        "value": "max-width: 349px"
+      },
+      {
+        "name": "short-phone",
+        "value": "max-height: 640px and max-width: 759px"
+      },
+      {
+        "name": "desktop",
+        "value": "min-width: 760px"
+      }
+    ],
+    "scenePalettes": {
+      "dawn": {
+        "sky": [
+          "#5a78c8",
+          "#8497d8",
+          "#c3a2cf",
+          "#f2b8a4",
+          "#fde0b0"
+        ],
+        "far": "#7c9fa0",
+        "near": "#4f8a4a",
+        "tree": "#2f6b3a",
+        "grass": "#6aa84a",
+        "fence": "#b07a44",
+        "soil": "#8a5a2b"
+      },
+      "morning": {
+        "sky": [
+          "#4a90e2",
+          "#5ea0ea",
+          "#78b4f2",
+          "#98caf7",
+          "#bfe2fc"
+        ],
+        "far": "#86b86c",
+        "near": "#5c9e44",
+        "tree": "#3a7a35",
+        "grass": "#78b84a",
+        "fence": "#bf8248",
+        "soil": "#8a5a2b"
+      },
+      "noon": {
+        "sky": [
+          "#3a86e0",
+          "#4c95e8",
+          "#63a8ef",
+          "#82bdf5",
+          "#aad6fb"
+        ],
+        "far": "#8cc070",
+        "near": "#62a646",
+        "tree": "#3d8038",
+        "grass": "#7cc04c",
+        "fence": "#c4884c",
+        "soil": "#8f5d2d"
+      },
+      "afternoon": {
+        "sky": [
+          "#4a86d8",
+          "#6a9ee0",
+          "#94b8e2",
+          "#e6cf9c",
+          "#f6dba6"
+        ],
+        "far": "#90b068",
+        "near": "#6a9c42",
+        "tree": "#44763a",
+        "grass": "#80b448",
+        "fence": "#c4884c",
+        "soil": "#8f5d2d"
+      },
+      "sunset": {
+        "sky": [
+          "#2e2f73",
+          "#5a3f88",
+          "#a8508a",
+          "#e8795a",
+          "#f8ae5a"
+        ],
+        "far": "#7a5a78",
+        "near": "#4f5e3c",
+        "tree": "#2e3d2a",
+        "grass": "#5f7c3a",
+        "fence": "#8c5530",
+        "soil": "#6e4526"
+      },
+      "night": {
+        "sky": [
+          "#0b0f2e",
+          "#10173f",
+          "#16204f",
+          "#1d295f",
+          "#26346f"
+        ],
+        "far": "#20305a",
+        "near": "#1a3a3c",
+        "tree": "#10262a",
+        "grass": "#24493a",
+        "fence": "#48404e",
+        "soil": "#3a2a26"
+      },
+      "festival": {
+        "sky": [
+          "#0d0b2e",
+          "#18123f",
+          "#261a52",
+          "#34205e",
+          "#44286a"
+        ],
+        "far": "#2a2a5a",
+        "near": "#1c3a40",
+        "tree": "#10262a",
+        "grass": "#26503c",
+        "fence": "#55464e",
+        "soil": "#3a2a26"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Wooden Plank Button",
+      "kind": "button",
+      "refersTo": "button-wood",
+      "description": "The primary action: Next, Tap to begin, reveal. Swaps to a lighter plank on hover and presses down one art pixel.",
+      "html": "<button class=\"ds-btn-wood\" type=\"button\">Next <i class=\"ds-btn-arrow\" aria-hidden=\"true\"></i></button>",
+      "css": ".ds-btn-wood { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 52px; min-height: 52px; padding: 0 calc(var(--px, 3px) * 4); background: none; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.3125rem; font-weight: 700; line-height: 1; cursor: pointer; filter: drop-shadow(0 var(--px, 3px) 0 #3b1d0b); border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJPJhojxXDFYMYi4Nk8WKw4mGlEObzOC0erBhrWOILcABvAKN1PdDsmAAAAABJRU5ErkJggg==\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; color: #fff3d1; text-shadow: 0 2px 0 #7a3b12; } .ds-btn-wood:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJfNocgxXDFYMYu1PU8WKw4mGlEObzbANerBhrWOILcAD5eq+TcwOqzQAAAABJRU5ErkJggg==\"); } .ds-btn-wood:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; } .ds-btn-wood:active { transform: translateY(var(--px, 3px)); filter: none; } .ds-btn-arrow { width: calc(var(--px, 3px) * 4); height: calc(var(--px, 3px) * 7); background: #fff3d1; clip-path: polygon(0 0, 100% 50%, 0 100%); filter: drop-shadow(0 2px 0 #7a3b12); }"
+    },
+    {
+      "name": "Yes Button",
+      "kind": "button",
+      "refersTo": "button-yes",
+      "description": "The red plank for the one answer that matters; grows in steps as No escapes.",
+      "html": "<button class=\"ds-btn-yes\" type=\"button\">Yes</button>",
+      "css": ".ds-btn-yes { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 52px; min-height: 52px; padding: 0 calc(var(--px, 3px) * 4); background: none; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.3125rem; font-weight: 700; line-height: 1; cursor: pointer; filter: drop-shadow(0 var(--px, 3px) 0 #3b1d0b); border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJ/O+ahRXDFYMY5/W98GKw4mGlEObzOhF1rBhrWOILcABxWLElPDbUAQAAAABJRU5ErkJggg==\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; min-width: 140px; min-height: 60px; font-size: 1.625rem; color: #fff3d1; text-shadow: 0 2px 0 #7e1427; } .ds-btn-yes:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJ/F+8ASuGKwYxHjhE4cVgxcNKIcznPTIGWDHWsMQX4AClt7xZUkaihgAAAABJRU5ErkJggg==\"); } .ds-btn-yes:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; } .ds-btn-yes:active { transform: translateY(var(--px, 3px)); filter: none; }"
+    },
+    {
+      "name": "No Button",
+      "kind": "button",
+      "refersTo": "button-no",
+      "description": "Parchment plank, ink label, no emboss. The quiet option that runs away.",
+      "html": "<button class=\"ds-btn-no\" type=\"button\">No</button>",
+      "css": ".ds-btn-no { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 52px; min-height: 52px; padding: 0 calc(var(--px, 3px) * 4); background: none; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.3125rem; font-weight: 700; line-height: 1; cursor: pointer; filter: drop-shadow(0 var(--px, 3px) 0 #3b1d0b); border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANUlEQVR42mNggAJrWe7/2DADMgAJ/P94EiuGKwYxvl7twYvBioeVQpjPT87ywoqxhiW+AAcAP6PtAZABAp0AAAAASUVORK5CYII=\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; min-width: 100px; font-size: 1.1875rem; color: #3b1d0b; } .ds-btn-no:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANUlEQVR42mNggAJrWe7/2DADMgAJ/P/1ASuGKwYxfj9ZgReDFQ8rhTCfX1sZhRVjDUt8AQ4AY6b4WWFJkqcAAAAASUVORK5CYII=\"); } .ds-btn-no:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; } .ds-btn-no:active { transform: translateY(var(--px, 3px)); filter: none; }"
+    },
+    {
+      "name": "Dialogue Box",
+      "kind": "card",
+      "refersTo": "dialog-box",
+      "description": "The one container: thick bevelled wood around parchment, 2-art-pixel panel shadow, red bobbing arrow once text has typed.",
+      "html": "<div class=\"ds-dialog\"><h2 class=\"ds-dialog-title\">Hey my sweet beautiful <em>angel</em>...</h2><p class=\"ds-dialog-body\">I made you a little something. Turn your sound on if you can.</p><i class=\"ds-dialog-more\" aria-hidden=\"true\"></i></div>",
+      "css": ".ds-dialog { position: relative; max-width: 34rem; padding: calc(var(--px, 3px) * 2) calc(var(--px, 3px) * 3) calc(var(--px, 3px) * 3); border: calc(var(--px, 3px) * 7) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAi0lEQVR42mNggAJrWe7/5GAGZAASeLHAjywMNwxmyIYELbJwlbUQxDBsBk0LkCeaj9MgkAQhfLLKFL9BIJtgEvgwyCCYq/C6CCT2/mwLBv79ZAXcIKK8BjMIpBEd09cg5DAiZBBJYTTwXkOWIBT9RIURSCEhTDCMqJZFyM60sBKAmDyGDWMtkygp2ACgMZYDP7NHVAAAAABJRU5ErkJggg==\") 7 fill / calc(var(--px, 3px) * 7) round; image-rendering: pixelated; color: #3b1d0b; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.1875rem; font-weight: 500; line-height: 1.35; filter: drop-shadow(0 calc(var(--px, 3px) * 2) 0 rgb(40 18 6 / .38)); } .ds-dialog-title { margin: 0 0 .5rem; font-size: clamp(1.5rem, 1.05rem + 2vw, 2.125rem); font-weight: 700; line-height: 1.12; text-wrap: balance; } .ds-dialog-title em { font-style: normal; color: #c8243f; } .ds-dialog-body { margin: 0; max-width: 36ch; } .ds-dialog-more { position: absolute; right: 0; bottom: calc(var(--px, 3px) * -1); width: calc(var(--px, 3px) * 7); height: calc(var(--px, 3px) * 4); background: #e0304e; clip-path: polygon(0 0, 100% 0, 50% 100%); animation: ds-bob 800ms steps(1, end) infinite; } @keyframes ds-bob { 50% { transform: translateY(var(--px, 3px)); } } @media (prefers-reduced-motion: reduce) { .ds-dialog-more { animation: none; } }"
+    },
+    {
+      "name": "Wooden Plate",
+      "kind": "custom",
+      "refersTo": "wooden-plate",
+      "description": "Small wood-and-parchment plate for the HUD clock, photo plaque and heart meter.",
+      "html": "<div class=\"ds-plate\"><span class=\"ds-plate-day\">Sat.</span><span class=\"ds-plate-time\">6:10am</span></div>",
+      "css": ".ds-plate { display: inline-grid; align-items: center; min-height: 52px; padding: 0 4px; border: calc(var(--px, 3px) * 4) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAASElEQVR42mNggAJrWe7/+DADMgAJvFjghxfDNcEUb0jQwourrIUgmpA14HIOXg2/n6xAwUNRA0meJipYYXEBEsCHscY2MUkDAGzxDcxe5zXXAAAAAElFTkSuQmCC\") 4 fill / calc(var(--px, 3px) * 4) stretch; image-rendering: pixelated; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1rem; font-weight: 700; line-height: 1; color: #3b1d0b; font-variant-numeric: tabular-nums; } .ds-plate-time { font-weight: 600; color: #5a3216; }"
+    },
+    {
+      "name": "Inventory Slot",
+      "kind": "custom",
+      "refersTo": "inventory-slot",
+      "description": "24-art-pixel slot holding a found memory item; raised with a 1-art-pixel ink shadow.",
+      "html": "<span class=\"ds-slot\"><i class=\"ds-slot-item\" aria-hidden=\"true\"></i></span>",
+      "css": ".ds-slot { display: inline-grid; place-items: center; width: calc(var(--px, 3px) * 24); height: calc(var(--px, 3px) * 24); border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQUlEQVR42mNggIIqa6H/2DADMgAJHG+xwYrhimGKnm9Lx8Bfrkz7///jSYhiZIUgCXQ8pBTCfA4SwIaxhiW+AAcAzijyIfMwUqoAAAAASUVORK5CYII=\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; filter: drop-shadow(0 var(--px, 3px) 0 #3b1d0b); } .ds-slot-item { width: calc(var(--px, 3px) * 10); height: calc(var(--px, 3px) * 10); background: #e0304e; box-shadow: 0 0 0 var(--px, 3px) #3b1d0b; }"
+    },
+    {
+      "name": "Speech Bubble",
+      "kind": "custom",
+      "refersTo": "speech-bubble",
+      "description": "The cats' voice: white pixel bubble, ink outline, 600 weight, soft 1-art-pixel shadow.",
+      "html": "<p class=\"ds-bubble\">psst… say yes</p>",
+      "css": ".ds-bubble { display: inline-block; margin: 0; max-width: 230px; padding: 2px 6px 3px; border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAKElEQVR42mNggAJrWe7/yJgBGYAE/v/9hoLhirBJoiiigwKCjiTkTQA69ZnJCCqfCQAAAABJRU5ErkJggg==\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.0625rem; font-weight: 600; line-height: 1.2; color: #3b1d0b; filter: drop-shadow(0 var(--px, 3px) 0 rgb(40 18 6 / .3)); }"
+    },
+    {
+      "name": "Achievement Banner",
+      "kind": "custom",
+      "refersTo": "achievement",
+      "description": "Gold-framed parchment toast with a bobbing star; the reward moment.",
+      "html": "<div class=\"ds-achievement\"><i class=\"ds-star\" aria-hidden=\"true\"></i><h2 class=\"ds-achievement-title\">Sand person <em>achievement unlocked</em></h2></div>",
+      "css": ".ds-achievement { display: flex; align-items: center; gap: 12px; max-width: 34rem; padding: calc(var(--px, 3px) * 2) calc(var(--px, 3px) * 3); border: calc(var(--px, 3px) * 6) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcElEQVR42mNggAJrWe7/pGAGZAAS+P9hAUkYbghM87dDdiThHQ0yEEOwGfBgqRZePl4DCPkdrwEgm0D892dbMPDvJyvAcjDX4HUBTAM6JuiCgTcAOQxwGUCfMCA7GqmSkEhOyrD8ABIgBWPNkeRkZwBN72JBXdt0xgAAAABJRU5ErkJggg==\") 6 fill / calc(var(--px, 3px) * 6) round; image-rendering: pixelated; color: #3b1d0b; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; filter: drop-shadow(0 calc(var(--px, 3px) * 2) 0 rgb(40 18 6 / .38)); } .ds-achievement-title { margin: 0; font-size: clamp(1.375rem, 1rem + 2vw, 2.125rem); font-weight: 700; line-height: 1.1; } .ds-achievement-title em { font-style: normal; color: #c8243f; } .ds-star { flex: none; width: calc(var(--px, 3px) * 11); height: calc(var(--px, 3px) * 11); background: #f6c23e; clip-path: polygon(50% 0, 62% 38%, 100% 38%, 69% 60%, 80% 100%, 50% 76%, 20% 100%, 31% 60%, 0 38%, 38% 38%); animation: ds-shine 1400ms steps(1, end) infinite; } @keyframes ds-shine { 50% { transform: translateY(calc(var(--px, 3px) * -1)); } } @media (prefers-reduced-motion: reduce) { .ds-star { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "One Saturday on the Farm",
+    "overview": "The site is a game she plays, not a page she reads. Every surface is a piece of cozy farming-game UI rebuilt from scratch: chunky wooden dialogue boxes around parchment, inventory slots, a heart meter, a choice menu, an achievement toast. Behind it all a banded, dithered sky owns the viewport and moves through one in-game day, dawn to festival night, one time of day per page. The inspiration is a well-loved farming sim, pinned by the user; the execution is entirely original pixel art drawn in code, and never the game's own assets, fonts, logo, music, or name.\n\nThe medium is the art pixel. One art pixel is one `--px` (3px on phones, 4px from 760px up), and every frame, sprite, sky band, shadow offset, and motion step is a whole multiple of it. Frames are generated at runtime as 9-slice PNGs and applied with `border-image`; sprites are drawn into small canvases and scaled up with `image-rendering: pixelated`. The two real photographs are the only rasters shipped and they are the one thing allowed to stay smooth.\n\nDensity is low and centered: one dialogue-driven moment per viewport, a HUD in the top-right corner, and a grass strip along the bottom where the crop grows and the two cats live. Motion is stepped, never tweened: things drop, pop and type in whole-pixel jumps, and text types out with a square-wave blip.",
+    "keyCharacteristics": [
+      "One art-pixel unit (`--px`) governs size, offset, shadow and motion.",
+      "Wood-framed parchment is the only container; the sky is the only background.",
+      "Pixelify Sans everywhere, at weights 500 to 700; no second face.",
+      "Hard, zero-blur drop shadows, stepped (notched) corners, no radius anywhere.",
+      "Motion in `steps()` easings only; a typewriter with sound is the signature.",
+      "Time of day is the color story: seven scene palettes, one per page."
+    ],
+    "rules": [
+      {
+        "name": "The Two Reds Rule",
+        "body": "Heart Red (#e0304e) is for pixels, Text Red (#c8243f) is for type. Never swap them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sky Owns The Page Rule",
+        "body": "No flat or gradient page background: the dithered, banded scene sky is the backdrop, and it changes only when the page (the hour) changes.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Ligatures Rule",
+        "body": "Ligatures stay off (`\"liga\" 0, \"clig\" 0`): Pixelify's \"fi\" ligature renders as a block letter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Color-Not-Italic Rule",
+        "body": "`*word*` in copy becomes an `em` rendered upright in Text Red. The face has no italic and the world does not fake one.",
+        "section": "typography"
+      },
+      {
+        "name": "The Zero-Blur Rule",
+        "body": "Every shadow has a blur radius of 0 and a whole-art-pixel offset. A soft shadow does not exist in this world.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Press-Into-The-Hole Rule",
+        "body": "`:active` = `translateY(var(--px))` and `filter: none`. Nothing scales or glows on press.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Stepped Corner Rule",
+        "body": "Corners are notched in art pixels, never rounded and never sharp-square on a framed element.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Whole Pixel Rule",
+        "body": "Every drawn edge sits on the art-pixel grid, and every drawn element carries `image-rendering: pixelated`. Photos are the exception: they must render smooth.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** size, offset and animate everything in multiples of `--px` (3px phone, 4px from 760px).",
+      "**Do** draw new frames and sprites in code on the pixel grid with a 1-art-pixel ink outline, and set `image-rendering: pixelated` on them.",
+      "**Do** put every container in a wood-and-parchment 9-slice with stepped corners; use gold only for reward moments.",
+      "**Do** use `steps()` easing for every transition and animation, and a zero-blur, whole-pixel drop shadow for every raised thing.",
+      "**Do** repaint the scene from the time-of-day palette when the page (the hour) changes.",
+      "**Do** keep Pixelify Sans as the only face, ligatures off, emphasis in Text Red."
+    ],
+    "donts": [
+      "**Don't** use the actual game's assets, fonts, logo, music or name; everything is original.",
+      "**Don't** pixelate the photographs; they are the only smooth rasters.",
+      "**Don't** use border-radius, blurred shadows, gradients, glass or smooth cubic-bezier easing.",
+      "**Don't** add a second typeface or use italics.",
+      "**Don't** put Heart Red on text or Text Red in pixel art.",
+      "**Don't** set a flat page background over the scene sky."
+    ]
+  }
+}
