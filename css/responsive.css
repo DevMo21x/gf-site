@@ -106,6 +106,7 @@
   .actor.is-jumping .actor__hop,
   .actor[data-face="nervous"] .actor__hop,
   .emote.is-showing,
+  .star.is-next::before,
   .credits[open] .credits__box,
   .meter i.is-new,
   .meter i.is-lost,

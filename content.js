@@ -70,6 +70,7 @@ const CONTENT = {
        { tufo: "…", knock: true }     Tufo knocks the dialogue box crooked
        { loves: true }                He tells her the three things he loves (loves.items above)
        { plant: true }                He gives her a seed to plant (garden below). It grows all day
+       { stars: true }                She joins up stars in the night sky (stars below)
      A beat can also have place: "airport" | "docks" | "airbnb": the farm turns into that place
      for the whole beat (drawn in js/art/pixels.js, PLACES). In the Airbnb the two of them sit on the bed.
      A right answer fills a heart, a wrong one breaks one. Ten hearts and he asks the question.
@@ -132,6 +133,7 @@ const CONTENT = {
     {
       lines: [
         { mo: "Okay. Okay okay okay.", face: "nervous" },
+        { stars: true },
         { quiz: "What does Mei think of you?", answers: ["Mei approves of you", "Mei ignores you", "Mei bites you"], correct: 0,
           right: "She approves. And Mei is never wrong." },
       ],
@@ -168,6 +170,15 @@ const CONTENT = {
     planted: "Okay. Now we wait. I'm very good at waiting. I'm not.",
     mei: "I'll guard it. mostly from Tufo.",
     bloom: "Look. It grew all day. Kind of like something else did.",
+  },
+
+  // Connect the stars, at night. points: where each star sits (x, y in % of a small box
+  // in the sky), in the order she joins them. The last one joins back to the first.
+  stars: {
+    intro: "Look up. See those stars? Connect them for me. In order. I checked.",
+    label: "Star {n} of {total}",
+    done: "…yeah. That's what I see too, every time I think about you.",
+    points: [[50, 94], [18, 62], [6, 30], [26, 6], [50, 26], [74, 6], [94, 30], [82, 62]],
   },
 
   // The bouquet he gives her right before he asks (on the farm, that's how dating starts)

@@ -35,6 +35,7 @@
   <script src="js/fx/petals.js" defer></script>
   <script src="js/fx/fireworks.js" defer></script>
   <script src="js/fx/lilies.js" defer></script>
+  <script src="js/fx/stars.js" defer></script>
   <script src="js/story/actors.js" defer></script>
   <script src="js/story/portrait.js" defer></script>
   <script src="js/story/dialogue.js" defer></script>
@@ -229,6 +230,11 @@
       <span class="actor__hop"><span class="actor__flip"><canvas class="actor__px" data-actor-canvas width="22" height="42"></canvas></span></span>
     </div>
     <canvas class="garden" data-garden width="15" height="24" hidden></canvas>
+  </div>
+
+  <!-- Connect the stars, at night -->
+  <div class="constellation" data-stars role="group" hidden>
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
   </div>
 
   <!-- an invisible button over Mohaimen: tap him twice for a kiss -->

@@ -64,6 +64,17 @@ const Story = (() => {
       return;
     }
 
+    if (l.stars) {
+      const s = CONTENT.stars;
+      await Dialogue.say({ text: s.intro, face: "soft" });
+      await Dialogue.close();
+      await Stars.run();
+      Dialogue.open();
+      await wait(320);
+      await Dialogue.say({ text: s.done, face: "blush" });
+      return;
+    }
+
     if (l.loves) {
       const faces = ["blush", "soft", "happy"];
       const items = CONTENT.loves.items;

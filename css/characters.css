@@ -41,6 +41,59 @@ body[data-scene="title"] .actors { visibility: hidden; }
 .garden[hidden] { display: none; }
 body[data-place]:not([data-place=""]) .garden { visibility: hidden; } /* it stays home on the farm */
 
+/* connect the stars: a heart in the night sky, above everything but the clock */
+.constellation {
+  position: fixed;
+  z-index: 4;
+  top: calc(env(safe-area-inset-top) + 96px);
+  left: 50%;
+  translate: -50% 0;
+  width: min(300px, calc(100vw - 64px));
+  aspect-ratio: 5 / 4;
+}
+.constellation[hidden] { display: none; }
+.constellation svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.constellation line {
+  stroke: var(--gold);
+  stroke-width: 3px;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+}
+.constellation.is-done line { stroke: var(--cream); filter: drop-shadow(0 0 4px var(--gold)); }
+.star {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.star::before {
+  content: "";
+  width: calc(var(--px) * 7);
+  height: calc(var(--px) * 7);
+  background: var(--img-star) 0 0 / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  opacity: .5;
+}
+.star.is-next::before { opacity: 1; animation: twinkle 700ms steps(1, end) infinite; }
+.star.is-lit::before { opacity: 1; }
+.constellation.is-done .star::before { width: calc(var(--px) * 9); height: calc(var(--px) * 9); }
+.star:focus-visible { outline: 3px solid var(--cream); outline-offset: -6px; }
+@keyframes twinkle { 50% { scale: 1.35; } }
+
 /* tap him twice for a kiss: an invisible button over him, above the pages (like the cats) */
 .kiss-hit {
   position: fixed;
