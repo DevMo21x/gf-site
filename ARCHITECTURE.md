@@ -72,6 +72,8 @@ index.html
 
 `content.js` holds the start menu, memories, the story beats (lines, memories, quizzes, cat interjections), quiz reactions, the question, the celebration, every cat line, photo paths and the music path. The comment above `story` documents the beat format. Wrap a word in `*asterisks*` to make it red.
 
+A story beat can name a `place` (`airport`, `docks`, `airbnb`). For that beat the farm is replaced by the place where the memory happened. The places are drawn in `js/art/pixels.js` (`PLACES`, called from `Pixel.scene`), and `Scene.set(hour, place)` switches them. In the Airbnb, `Actors.sit(true)` seats Gabrielle and Mohaimen on the bed with shawarma in hand.
+
 It also holds the letter that floats down after she says yes (`letter`) and the copy for two secrets (`eggs`): tapping the moon at night sends a shooting star (`Scene` positions an invisible button over the moon, `Fireworks.star` draws the star), and typing "sand person" anywhere makes it rain sand (`Petals.sand`, wired in `main.js`).
 
 The No button on the question page shrinks from the 6th dodge. On the 10th it drops to the grass, Tufo sits on it (`Tufo.sitOn`), and it gets back up as a second Yes (`Dodge`, `SHRINK_AT` / `DROP_AT`).

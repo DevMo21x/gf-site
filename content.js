@@ -69,6 +69,8 @@ const CONTENT = {
        { mei: "…" } / { tufo: "…" }   A cat chimes in (it doesn't wait for a tap)
        { tufo: "…", knock: true }     Tufo knocks the dialogue box crooked
        { loves: true }                He tells her the three things he loves (loves.items above)
+     A beat can also have place: "airport" | "docks" | "airbnb": the farm turns into that place
+     for the whole beat (drawn in js/art/pixels.js, PLACES). In the Airbnb the two of them sit on the bed.
      A right answer fills a heart, a wrong one breaks one. Ten hearts and he asks the question.
      Zero hearts and… well. */
   story: [
@@ -82,8 +84,9 @@ const CONTENT = {
           right: "Sand person. Correct. Unfortunately." },
       ],
     },
-    // 9:00am
+    // 9:00am, at the airport
     {
+      place: "airport",
       lines: [
         { memory: 0, face: "blush" },
         { tufo: "he was SO nervous. pathetic." },
@@ -91,8 +94,9 @@ const CONTENT = {
           right: "Shaking. I'm kind of shaking right now, honestly." },
       ],
     },
-    // 12:30pm
+    // 12:30pm, on the docks of Halifax
     {
+      place: "docks",
       lines: [
         { memory: 1, face: "soft" },
         { tufo: "oops. not sorry.", knock: true },
@@ -100,8 +104,9 @@ const CONTENT = {
           right: "Halifax. I still think about it." },
       ],
     },
-    // 3:40pm
+    // 3:40pm, back at the Airbnb
     {
+      place: "airbnb",
       lines: [
         { memory: 2, face: "happy" },
         { tufo: "and nobody saved me any" },

@@ -70,7 +70,8 @@ const Story = (() => {
     Tufo.onBeat(i);
     if (i > 0) {
       await Dialogue.close();
-      Scene.set(hour);
+      Scene.set(hour, beats[i].place);
+      Actors.sit(beats[i].place === "airbnb");
       Clock.set(hour);
       Actors.mo.setFace("neutral");
       await wait(1200);
@@ -94,6 +95,7 @@ const Story = (() => {
     if (Meter.filled === 0) { Boom.run(); return; }
     // ten hearts, and he finally asks
     Scene.set(NIGHT);
+    Actors.sit(false);
     Clock.set(NIGHT);
     await Dialogue.say({ text: quiz.full, face: "soft" });
     Actors.mo.setFace("soft");
@@ -110,6 +112,7 @@ const Story = (() => {
     missed.clear();
     Meter.set(quiz.start, true);
     Scene.set(0);
+    Actors.sit(false);
     Clock.set(0);
     Actors.mo.setFace("neutral");
     Actors.gab.setFace("neutral");

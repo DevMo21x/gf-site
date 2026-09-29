@@ -13,30 +13,35 @@ const Scene = (() => {
   const moonHit = $("[data-moon]");
   let front = 0;
   let time = TIMES[0];
+  let place = "";   // a memory's place (content.js story[].place), or "" for the farm
+  // places that happened at another time of day than the clock says
+  const PLACE_TIMES = { docks: "night" };
 
   function paint(canvas) {
-    const info = Pixel.scene(canvas, time, PX(), groundH());
+    const info = Pixel.scene(canvas, time, PX(), groundH(), place, cssNumber("--stand", 29));
     root.style.setProperty("--sky", info.sky);
     if (meta) meta.content = info.sky;
   }
 
-  function set(index) {
-    const next = TIMES[Math.min(index, TIMES.length - 1)];
-    if (next === time) return;
+  function set(index, where = "") {
+    const next = PLACE_TIMES[where] || TIMES[Math.min(index, TIMES.length - 1)];
+    if (next === time && where === place) return;
     time = next;
+    place = where;
     const back = 1 - front;
     paint(skies[back]);
     skies[back].classList.add("is-front");
     skies[front].classList.remove("is-front");
     front = back;
     document.body.dataset.time = time;
+    document.body.dataset.place = place;
     placeMoon();
   }
 
   // an invisible button over the moon, so she can wish on it (same maths as Pixel.scene)
   function placeMoon() {
     const body = Pixel.TIMES[time].body;
-    moonHit.hidden = body.kind !== "moon";
+    moonHit.hidden = body.kind !== "moon" || (place !== "" && place !== "docks");
     if (moonHit.hidden) return;
     const px = PX();
     const W = Math.ceil(window.innerWidth / px) + 1;

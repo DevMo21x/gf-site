@@ -32,7 +32,9 @@
 body[data-time="dawn"] .world__clouds,
 body[data-time="sunset"] .world__clouds,
 body[data-time="night"] .world__clouds,
-body[data-time="festival"] .world__clouds { opacity: 0; }
+body[data-time="festival"] .world__clouds,
+body[data-place="airport"] .world__clouds,
+body[data-place="airbnb"] .world__clouds { opacity: 0; } /* indoors: no clouds drifting over the walls */
 
 .world__flies {
   position: absolute;
@@ -42,6 +44,7 @@ body[data-time="festival"] .world__clouds { opacity: 0; }
 }
 body[data-time="night"] .world__flies,
 body[data-time="festival"] .world__flies { opacity: 1; }
+body[data-place]:not([data-place=""]) .world__flies { opacity: 0; }
 .fly {
   position: absolute;
   left: var(--x);

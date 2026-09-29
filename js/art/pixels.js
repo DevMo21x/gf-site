@@ -494,18 +494,20 @@
   /* ---------- Gabrielle and Mohaimen, standing on the farm ---------- */
 
   // pose: { eyes: open|blink|happy|wide, look: -1..1, mouth: smile|flat|open|o,
-  //         blush, sweat, arm: down|head|up }
+  //         blush, sweat, arm: down|head|up|eat, sit }
+  // sit: seated on the edge of the Airbnb bed; arm "eat": holding a shawarma wrap at the chest
   // Both are drawn facing the viewer; the page mirrors Mohaimen so they face each other.
   const GAB = {
     skin: "#f5cfae", skinSh: "#e2ad8c", hair: "#b8814a", hairSh: "#8e5c30", hairHi: "#d9a45f",
     hat: "#5b5860", hatSh: "#45424a", hatHi: "#78747d", coat: "#7a4a2a", coatSh: "#5f3720", coatHi: "#9a6238",
-    top: "#2a2226", lace: "#6a5560", jeans: "#4a6390", jeansSh: "#36496e", shoe: "#3a2a24",
+    top: "#2a2226", lace: "#6a5560", jeans: "#4a6390", jeansSh: "#36496e", knee: "#6a83b0", shoe: "#3a2a24",
   };
   const MO = {
     skin: "#c98f68", skinSh: "#ae734f", hair: "#2b1a13", hairHi: "#4d3226", beard: "#3d2519",
     coat: "#f3ecdc", coatSh: "#d3c6aa", coatDot: "#e4dac4", shirt: "#262022",
-    jeans: "#353c4a", jeansSh: "#272c37", shoe: "#ece6da", sole: "#bdb4a6",
+    jeans: "#353c4a", jeansSh: "#272c37", knee: "#4f5868", shoe: "#ece6da", sole: "#bdb4a6",
   };
+  const WRAP = { bread: "#e9c98a", breadSh: "#c9a060", foil: "#dfe3ea", foilSh: "#9aa0ab", lettuce: "#6fb04a", sauce: "#d9433b" };
   const EYE = "#2b1d16";
   const MOUTH = "#a8433b";
   const LIP = "#7a2e28";   // a closed mouth: darker than an open one
@@ -529,14 +531,17 @@
       if (arm === "head") {
         g.line(17, 25, 19, 17, sleeve, 3);
         g.ellipse(18.5, 14.5, 1.6, 1.6, C.skin);
+      } else if (arm === "eat") {
+        g.rect(17, 23, mo ? 3 : 2, 5, sleeve); // the forearm and the wrap go on over the body, below
       } else {
         g.rect(17, 23, mo ? 3 : 2, 8, sleeve);
         g.rect(mo ? 18 : 17, 31, 2, 2, C.skin);
       }
     }
 
-    // legs and shoes
-    g.rect(6, 32, 4, 7, C.jeans).rect(12, 32, 4, 7, C.jeans);
+    // legs and shoes; seated, the thighs come toward us and the shins hang down
+    if (p.sit) g.rect(5, 32, 5, 3, C.jeans).rect(12, 32, 5, 3, C.jeans).rect(6, 35, 4, 4, C.jeans).rect(12, 35, 4, 4, C.jeans);
+    else g.rect(6, 32, 4, 7, C.jeans).rect(12, 32, 4, 7, C.jeans);
     if (mo) g.rect(5, 38, 5, 2, C.shoe).rect(12, 38, 5, 2, C.shoe);
     else g.rect(6, 38, 4, 2, C.shoe).rect(12, 38, 4, 2, C.shoe);
 
@@ -623,6 +628,18 @@
       g.rect(5, 32, 12, 1, C.coatSh);
       g.px([[6, 24], [7, 27]], C.coatHi);
       g.rect(8, 33, 1, 5, C.jeansSh).rect(14, 33, 1, 5, C.jeansSh);
+    }
+
+    if (p.sit) g.rect(5, 32, 5, 1, C.knee).rect(12, 32, 5, 1, C.knee).rect(5, 35, 5, 1, K).rect(12, 35, 5, 1, K);
+
+    if (arm === "eat") {
+      // forearm across to the chest, hand round a shawarma wrap in foil
+      g.rect(12, 26, 7, 4, K).rect(13, 27, 6, 2, sleeve);
+      g.rect(9, 21, 5, 9, K);
+      g.rect(10, 22, 3, 3, WRAP.bread).set(10, 22, WRAP.lettuce).set(11, 22, WRAP.sauce).set(12, 22, WRAP.lettuce);
+      g.rect(12, 23, 1, 2, WRAP.breadSh);
+      g.rect(10, 25, 3, 4, WRAP.foil).rect(12, 25, 1, 4, WRAP.foilSh);
+      g.rect(12, 27, 2, 2, C.skin);
     }
 
     if (p.sweat) g.px([[3, 9], [3, 10], [2, 11], [3, 11]], SWEAT).set(2, 10, K).set(4, 10, K).set(4, 11, K);
@@ -1029,7 +1046,366 @@
   const seeded = (seed) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 
   // groundCss: how tall the grass strip is, in CSS pixels
-  function scene(canvas, time, px, groundCss) {
+  /* ---------- The memory places: where each memory happened ---------- */
+
+  // a 3×5 pixel font, just the letters the signs need
+  const FONT = {
+    A: ["010", "101", "111", "101", "101"], R: ["110", "101", "110", "101", "101"],
+    I: ["111", "010", "010", "010", "111"], V: ["101", "101", "101", "101", "010"],
+    L: ["100", "100", "100", "100", "111"], S: ["011", "100", "010", "001", "110"],
+    H: ["101", "101", "111", "101", "101"], F: ["111", "100", "110", "100", "100"],
+    X: ["101", "101", "010", "101", "101"],
+  };
+  const textWidth = (str) => str.length * 4 - 1;
+  function sign(fill, str, x, y, c) {
+    [...str].forEach((ch, i) => {
+      (FONT[ch] || []).forEach((row, j) => {
+        [...row].forEach((on, k) => { if (on === "1") fill(c, x + i * 4 + k, y + j); });
+      });
+    });
+  }
+
+  // a soft round light: solid in the middle, dithered toward the edge
+  function glow(fill, cx, cy, r, c) {
+    for (let y = -r; y <= r; y++) {
+      for (let x = -r; x <= r; x++) {
+        const d = Math.hypot(x, y) / r;
+        if (d > 1 || (d > 0.6 && (x + y) % 2)) continue;
+        fill(c, cx + x, cy + y);
+      }
+    }
+  }
+
+  // Each drawer paints over the sky and returns the colour for the browser bar (null keeps the sky's).
+  // ground: where the back wall meets the floor; base: the row their feet stand on; mid: the column between them.
+  const PLACES = {
+    // The arrivals hall where they first met: a glass wall onto the tarmac
+    airport({ fill, W, H, ground, rand }) {
+      const sill = ground - 12;
+      const winTop = 12;
+      // outside: the tarmac, a taxi line and a plane at the gate
+      fill("#8a8f99", 0, sill - 16, W, 16);
+      fill("#a3a8b2", 0, sill - 16, W, 1);
+      for (let x = 2; x < W; x += 10) fill("#e8d36a", x, sill - 6, 5, 1);
+      // a plane at the gate, twice the size on a wide screen; x, y in plane pixels from its centre
+      const z = W > 300 ? 2 : 1;
+      const pcx = Math.round(W * 0.62);
+      const pcy = sill - 4;
+      const plane = (c, x, y, w = 1, h = 1) => fill(c, pcx + x * z, pcy + y * z, w * z, h * z);
+      plane("#6c7280", -40, -4, 18, 4);                         // jet bridge
+      plane("#555b69", -40, 0, 18, 1);
+      plane("#f2f4f8", -22, -5, 44, 6);                         // fuselage
+      plane("#dfe3ea", -22, 0, 44, 1);
+      plane("#f2f4f8", 22, -4, 3, 4);                           // nose
+      plane("#f2f4f8", 25, -3, 1, 2);
+      plane("#2b3140", 21, -4, 2, 1);                           // cockpit
+      plane("#f2f4f8", -22, -12, 5, 7);                         // tail
+      plane("#e0304e", -22, -12, 5, 3);
+      plane("#c9ced8", -6, -1, 16, 2);                          // wing
+      for (let x = -16; x < 18; x += 3) plane("#6bb0ff", x, -3);
+      plane("#e0304e", -20, -2, 40, 1);                         // stripe
+      plane("#2b3140", -12, 1, 2, 2);                           // wheels
+      plane("#2b3140", 14, 1, 2, 2);
+      // another one taking off, far away
+      const ox = Math.round(W * 0.2);
+      const oy = Math.round(sill * 0.45);
+      for (let k = 0; k < 9; k++) fill("#f2f4f8", ox + k, oy - Math.floor(k / 3));
+      fill("#f2f4f8", ox, oy - 3, 1, 3);
+      fill("#f2f4f8", ox + 3, oy, 3, 1);
+
+      // the hall: a light wall with tall windows cut into it
+      const WALL = "#d9dde6";
+      const FRAME = "#5d6474";
+      const n = Math.max(2, Math.floor(W / 46));
+      const pillar = 6;
+      const ww = Math.floor((W - (n + 1) * pillar) / n);
+      fill(WALL, 0, 0, W, winTop);
+      fill(WALL, 0, sill, W, ground - sill);
+      for (let i = 0; i <= n; i++) fill(WALL, i * (ww + pillar), winTop, pillar, sill - winTop);
+      fill(WALL, n * (ww + pillar), winTop, W, sill - winTop);
+      for (let i = 0; i < n; i++) {
+        const x = pillar + i * (ww + pillar);
+        fill(FRAME, x - 1, winTop - 1, ww + 2, 1);
+        fill(FRAME, x - 1, sill, ww + 2, 1);
+        fill(FRAME, x - 1, winTop, 1, sill - winTop);
+        fill(FRAME, x + ww, winTop, 1, sill - winTop);
+        fill("#8a91a1", x + Math.floor(ww / 2), winTop, 1, sill - winTop);
+        fill("#8a91a1", x, winTop + Math.floor((sill - winTop) / 3), ww, 1);
+        for (let k = 0; k < 6; k++) fill("#ffffff50", x + 3 + k, winTop + 12 - k); // glare
+      }
+      // ceiling lights
+      fill("#b9bfcc", 0, winTop - 2, W, 1);
+      for (let x = 6; x < W; x += 16) fill("#fffbe0", x, 3, 6, 2);
+
+      // the arrivals sign, hanging from the ceiling
+      const label = "ARRIVALS";
+      const sw = textWidth(label) + 10;
+      const sx = Math.max(3, Math.round(W * 0.26 - sw / 2));
+      fill(FRAME, sx + 3, 0, 1, 16);
+      fill(FRAME, sx + sw - 4, 0, 1, 16);
+      fill("#2b3140", sx, 16, sw, 9);
+      sign(fill, label, sx + 2, 18, "#ffd84a");
+      fill("#ffd84a", sx + sw - 6, 20, 3, 1);                   // arrow
+      fill("#ffd84a", sx + sw - 5, 19, 1, 3);
+
+      // the flight board
+      const bx = Math.min(W - 32, Math.round(W * 0.8));
+      fill("#1d2230", bx, 16, 26, 17);
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 5; c++) fill(rand() < 0.7 ? "#ffd84a" : "#9bff7a", bx + 2 + c * 5, 19 + r * 3, rand() < 0.5 ? 3 : 4, 1);
+      }
+
+      // floor tiles
+      fill("#c9ccd4", 0, ground, W, H - ground);
+      for (let y = ground + 4; y < H; y += 8) fill("#b3b7c1", 0, y, W, 1);
+      for (let y = ground, row = 0; y < H; y += 8, row++) {
+        for (let x = (row % 2) * 8; x < W; x += 16) fill("#b3b7c1", x, y, 1, 8);
+      }
+      fill(FRAME, 0, ground, W, 1);
+
+      // a row of blue seats on the left, a plant and a suitcase on the right
+      const seats = Math.max(2, Math.min(5, Math.floor((W * 0.3) / 10)));
+      for (let i = 0; i < seats; i++) {
+        const x = 4 + i * 10;
+        fill("#3f6fb5", x, ground - 8, 8, 5);
+        fill("#2f558c", x, ground - 3, 8, 2);
+        fill("#555b69", x + 1, ground - 1, 1, 2);
+        fill("#555b69", x + 6, ground - 1, 1, 2);
+      }
+      const plant = W - 10;
+      fill(WOOD.mid, plant - 3, ground - 6, 7, 6);
+      [[0, -12], [-3, -10], [3, -10], [-2, -15], [2, -14]].forEach(([dx, dy]) => fill(LEAF, plant + dx - 1, ground + dy, 3, 4));
+      const bag = W - 24;
+      fill("#e0304e", bag, ground - 9, 8, 9);
+      fill("#a8243c", bag, ground - 1, 8, 1);
+      fill("#2b3140", bag + 3, ground - 12, 1, 3);
+      fill("#2b3140", bag + 3, ground - 12, 3, 1);
+      fill("#2b3140", bag + 5, ground - 12, 1, 3);
+      return WALL;
+    },
+
+    // The Halifax waterfront at night: the harbour, Dartmouth's lights across it, the boardwalk.
+    // Always drawn at night (Scene forces it): that's when it happened.
+    docks({ fill, W, H, ground, horizon, rand, glowAt, moon }) {
+      const shore = horizon - 10;
+      // Dartmouth, dark across the water, windows still lit
+      for (let x = 0; x < W; x++) {
+        const top = Math.round(shore - 3 - 2 * Math.sin(x * 0.06 + 1) - Math.sin(x * 0.17));
+        fill("#1c2b3e", x, top, 1, shore - top + 2);
+      }
+      for (let x = 3; x < W - 4; x += 5 + Math.floor(rand() * 6)) {
+        const h = 2 + Math.floor(rand() * 2);
+        fill("#2e3a52", x, shore - 3 - h, 3, h + 1);
+        fill("#171f30", x, shore - 4 - h, 3, 1);
+        if (rand() < 0.7) fill(rand() < 0.8 ? "#ffd84a" : "#ffb08a", x + 1, shore - 2 - h);
+      }
+      // the harbour, dark, with the moon laid across it
+      const bands = ["#1f3563", "#1b2f59", "#172a4f", "#132444"];
+      const bandH = Math.max(1, (ground - shore) / bands.length);
+      bands.forEach((c, i) => fill(c, 0, Math.round(shore + i * bandH), W, Math.ceil(bandH) + 1));
+      for (let y = shore + 2; y < ground; y += 2) {
+        const w = 2 + Math.floor(rand() * 5);
+        fill(rand() < 0.5 ? "#f4ecc2" : "#c9c4a0", moon.x - Math.floor(w / 2) + Math.round((rand() - 0.5) * 3), y, w, 1);
+      }
+      for (let i = 0; i < (W * (ground - shore)) / 70; i++) {
+        fill("#5a78b0", Math.floor(rand() * W), shore + 2 + Math.floor(rand() * (ground - shore - 3)), 2, 1);
+      }
+      // a cruise ship in port, far across, every porthole lit
+      const cx = Math.round(W * 0.5);
+      fill("#c9cbd6", cx - 18, shore - 4, 36, 4);
+      fill("#2a3550", cx - 18, shore - 1, 36, 1);
+      fill("#c9cbd6", cx - 12, shore - 7, 24, 3);
+      for (let x = cx - 16; x < cx + 17; x += 2) fill("#ffd84a", x, shore - 3);
+      for (let x = cx - 11; x < cx + 12; x += 3) fill("#fff0a0", x, shore - 6);
+      fill("#e0304e", cx + 4, shore - 10, 3, 3);
+      // Georges Island, its lighthouse awake
+      const ix = Math.round(W * 0.28);
+      fill("#1c2b3e", ix - 7, shore + 1, 14, 2);
+      fill("#1c2b3e", ix - 4, shore, 8, 1);
+      glowAt(ix, shore - 9, 6, "#fff0a040");
+      fill("#dcd6c0", ix - 1, shore - 7, 3, 7);
+      fill("#c8243f", ix - 1, shore - 5, 3, 1);
+      fill("#c8243f", ix - 1, shore - 8, 3, 1);
+      fill("#fff0a0", ix, shore - 9);
+      // the red tugboat, running lights on
+      const tx = Math.round(W * 0.74);
+      const ty = Math.round(shore + (ground - shore) * 0.4);
+      fill("#a01d33", tx - 9, ty, 18, 3);
+      fill("#10101a", tx - 9, ty + 3, 18, 1);
+      fill("#c9cbd6", tx - 4, ty - 4, 8, 4);
+      fill("#ffd84a", tx - 2, ty - 3);
+      fill("#ffd84a", tx + 1, ty - 3);
+      fill("#10101a", tx - 1, ty - 8, 3, 4);
+      fill("#9bff7a", tx + 8, ty - 1);
+      fill("#ff6b6b", tx - 9, ty - 1);
+
+      // a wooden boat tied up by the boardwalk, a lantern on its bow
+      const rw = W > 200 ? 30 : 22;
+      // left of the two of them on a wide screen; on a phone there's only room to their right
+      const signEnd = 6 + textWidth("HALIFAX") + 10;
+      let rx = Math.round(W / 2 - 34 - rw - 10);
+      if (rx < signEnd) rx = Math.min(W - rw - 2, Math.round(W / 2 + 30));
+      const ry = ground - 3;
+      glowAt(rx + rw - 3, ry - 9, 7, "#ffd48a30");
+      fill("#10101a", rx - 1, ry - 6, rw + 2, 1);               // gunwale outline
+      fill("#6e4526", rx, ry - 5, rw, 2);                       // gunwale
+      fill("#8a5530", rx + 1, ry - 3, rw - 2, 2);               // hull planks
+      fill("#6e4526", rx + 2, ry - 1, rw - 4, 1);
+      fill("#10101a", rx + 3, ry, rw - 6, 1);                   // keel line in the water
+      fill("#10101a", rx - 1, ry - 5, 1, 2);
+      fill("#10101a", rx + rw, ry - 5, 1, 2);
+      fill("#4a2d18", rx + Math.floor(rw * 0.35), ry - 7, 2, 2); // seats
+      fill("#4a2d18", rx + Math.floor(rw * 0.65), ry - 7, 2, 2);
+      fill("#2b1a13", rx + rw - 3, ry - 14, 1, 8);               // lantern pole
+      fill("#10101a", rx + rw - 4, ry - 15, 3, 1);
+      fill("#ffd84a", rx + rw - 4, ry - 14, 3, 2);
+      for (let k = 0; k < rw; k += 3) fill("#5a78b0", rx + k, ry + 1, 2, 1); // ripples
+      for (let k = 0; k < 8; k++) fill("#c9a06a", rx - 1 - k, ry - 5 + Math.floor(k / 3)); // rope to the dock
+
+      // the boardwalk, moonlit
+      fill("#5a3d28", 0, ground, W, H - ground);
+      for (let y = ground + 3, row = 0; y < H; y += 4, row++) {
+        fill("#452d1d", 0, y, W, 1);
+        for (let x = (row * 7) % 19; x < W; x += 19) fill("#452d1d", x, y - 3, 1, 3);
+      }
+      fill("#3a2616", 0, ground, W, 2);
+      // bollards with a rope sagging between them
+      const posts = [];
+      for (let x = 5; x < W; x += 22) posts.push(x);
+      posts.forEach((x, i) => {
+        const next = posts[i + 1];
+        if (next) {
+          for (let k = 0; k <= next - x; k++) {
+            fill("#9a8060", x + 1 + k, ground - 5 + Math.round(Math.sin((k / (next - x)) * Math.PI) * 3));
+          }
+        }
+        fill("#1d2230", x, ground - 6, 3, 7);
+        fill("#3a3f4a", x, ground - 6, 3, 1);
+      });
+      // lamp posts, lit
+      [W - 12, Math.round(W / 2 + 60)].filter((x, i) => i === 0 || x < W - 30).forEach((lx) => {
+        glowAt(lx, ground - 28, 14, "#ffd48a22");
+        glowAt(lx, ground - 28, 7, "#ffd48a33");
+        fill("#10101a", lx, ground - 26, 1, 26);
+        fill("#10101a", lx - 2, ground - 29, 5, 3);
+        fill("#fff0a0", lx - 1, ground - 28, 3, 1);
+      });
+      // the sign
+      const label = "HALIFAX";
+      const sw = textWidth(label) + 6;
+      const sx = 6;
+      fill("#3a2616", sx + 3, ground - 14, 2, 14);
+      fill("#3a2616", sx + sw - 5, ground - 14, 2, 14);
+      fill("#7a4a2a", sx, ground - 22, sw, 9);
+      fill("#4a2d18", sx, ground - 14, sw, 1);
+      sign(fill, label, sx + 3, ground - 20, "#f4ecc2");
+      return null;
+    },
+
+    // The Airbnb, late at night: the bed, the TV, the shawarma
+    airbnb({ fill, W, H, ground, rand, base, mid }) {
+      const WALL = "#5e4452";
+      fill(WALL, 0, 0, W, ground);
+      for (let x = 0; x < W; x += 8) fill("#664a59", x, 0, 3, ground);
+      // fairy lights along the top of the wall
+      const warm = ["#ffd84a", "#ffb08a", "#fff0a0", "#ff9df0"];
+      for (let x = 1, i = 0; x < W; x += 5, i++) {
+        const y = 7 + Math.round(Math.sin(((x % 30) / 30) * Math.PI) * 3);
+        fill(warm[i % warm.length] + "40", x - 1, y - 1, 3, 3);
+        fill("#2a2030", x, y - 1);
+        fill(warm[i % warm.length], x, y);
+      }
+      // the window: night outside, the city still awake (a late-night memory, whatever the clock says)
+      const wx = Math.round(W * 0.8);
+      const ww = Math.max(8, Math.min(26, W - wx - 5));
+      const wy = 16;
+      const wh = Math.max(16, ground - 30 - wy);
+      fill("#10173f", wx, wy, ww, wh);
+      for (let i = 0; i < (ww * wh) / 30; i++) fill(rand() < 0.3 ? "#fff3b0" : "#dfe6ff", wx + Math.floor(rand() * ww), wy + Math.floor(rand() * wh * 0.5));
+      for (let x = wx; x < wx + ww; x += 4 + Math.floor(rand() * 3)) {
+        const h = 5 + Math.floor(rand() * Math.min(12, wh * 0.6));
+        const bw = Math.min(4, wx + ww - x);
+        fill("#1d2340", x, wy + wh - h, bw, h);
+        for (let k = 0; k < h / 3; k++) if (rand() < 0.5) fill("#ffd84a", x + 1 + Math.floor(rand() * Math.max(1, bw - 2)), wy + wh - h + 1 + k * 3);
+      }
+      fill(WOOD.dk, wx - 1, wy - 1, ww + 2, 1);
+      fill(WOOD.dk, wx - 1, wy + wh, ww + 2, 2);
+      fill(WOOD.dk, wx - 1, wy, 1, wh);
+      fill(WOOD.dk, wx + ww, wy, 1, wh);
+      fill(WOOD.dk, wx + Math.floor(ww / 2), wy, 1, wh);
+      fill("#8a2a3e", wx - 4, wy - 2, 4, wh + 5);               // curtains
+      fill("#8a2a3e", wx + ww + 1, wy - 2, 4, wh + 5);
+
+      // the floor and a rug
+      fill("#6e4a34", 0, ground, W, H - ground);
+      for (let y = ground + 3; y < H; y += 4) fill("#5a3a28", 0, y, W, 1);
+      fill("#3f2a33", 0, ground, W, 2);
+      fill("#8a5a6e", mid - 46, base - 5, 92, 6);
+      fill("#a66e85", mid - 44, base - 4, 88, 1);
+
+      // the TV on a dresser, glowing blue
+      const dx = Math.max(3, Math.round(mid - 84));
+      glow(fill, dx + 13, ground - 19, 22, "#6bb0ff14");
+      fill(WOOD.mid, dx, ground - 10, 26, 12);
+      fill(WOOD.dk, dx, ground + 1, 26, 1);
+      fill(WOOD.dk, dx + 12, ground - 10, 1, 11);
+      fill(GOLD, dx + 5, ground - 5, 2, 1);
+      fill(GOLD, dx + 19, ground - 5, 2, 1);
+      fill("#1a1a22", dx + 1, ground - 27, 24, 17);
+      fill("#3a6fd0", dx + 2, ground - 26, 22, 14);
+      fill("#5a8fe8", dx + 2, ground - 26, 22, 3);
+      fill("#1a1a22", dx + 12, ground - 10, 2, 1);
+      // a streamer mid-rant: headset, big grin, red hoodie
+      fill("#2b1a13", dx + 10, ground - 23, 5, 2);
+      fill("#f5cfae", dx + 10, ground - 22, 5, 5);
+      fill("#1a1a22", dx + 9, ground - 21, 1, 3);
+      fill("#1a1a22", dx + 15, ground - 21, 1, 3);
+      fill("#a8433b", dx + 11, ground - 18, 3, 1);
+      fill("#e0304e", dx + 8, ground - 16, 9, 4);
+
+      // the bed, right behind the two of them: they sit on its edge
+      const top = base - 11;
+      const bw = 76;
+      const bx = Math.round(mid - bw / 2);
+      fill(WOOD.dk, bx - 1, top - 26, bw + 2, 26);             // headboard
+      fill(WOOD.mid, bx + 1, top - 24, bw - 2, 22);
+      fill(WOOD.hi2, bx + 1, top - 24, bw - 2, 2);
+      fill("#fbf6ec", bx + 3, top - 7, 20, 6);                  // pillows
+      fill("#fbf6ec", bx + bw - 23, top - 7, 20, 6);
+      fill("#dcd3c0", bx + 3, top - 2, 20, 1);
+      fill("#dcd3c0", bx + bw - 23, top - 2, 20, 1);
+      fill("#b7465f", bx, top, bw, 5);                          // blanket
+      fill("#d45f7a", bx, top, bw, 1);
+      for (let x = bx + 3; x < bx + bw; x += 6) fill("#9a3a50", x, top + 2, 2, 2);
+      fill("#9a3a50", bx, top + 5, bw, 3);                      // hanging over the side
+      fill(WOOD.dk, bx, top + 8, bw, 3);                        // frame
+      fill(WOOD.dk, bx + 1, top + 11, 2, base - top - 11);      // legs
+      fill(WOOD.dk, bx + bw - 3, top + 11, 2, base - top - 11);
+
+      // nightstand and lamp, the warmest thing in the room
+      const nx = Math.min(W - 14, bx + bw + 3);
+      glow(fill, nx + 6, top - 12, 26, "#ffd48a18");
+      glow(fill, nx + 6, top - 12, 14, "#ffd48a28");
+      fill(WOOD.mid, nx, top - 2, 12, base - top + 2);
+      fill(WOOD.dk, nx, top - 2, 12, 1);
+      fill(GOLD, nx + 5, top + 4, 2, 1);
+      fill(WOOD.dk, nx + 5, top - 8, 2, 6);
+      fill("#ffe7a8", nx + 1, top - 16, 10, 8);
+      fill(GOLD, nx + 1, top - 9, 10, 1);
+
+      // the takeaway bag on the floor, already raided
+      const tx = Math.max(dx + 28, bx - 12);
+      if (tx + 9 < mid - 28) { // only where it won't sit on Gabrielle's feet
+        fill("#c9a06a", tx, base - 10, 9, 10);
+        fill("#a8814f", tx, base - 10, 9, 1);
+        fill("#e0304e", tx + 3, base - 6, 3, 3);
+      }
+      return WALL;
+    },
+  };
+
+  // place: one of PLACES, or none for the farm; stand: how far up the screen the two of them stand, in art pixels
+  function scene(canvas, time, px, groundCss, place, stand = 29) {
     const T = TIMES[time] || TIMES.morning;
     const W = Math.ceil(window.innerWidth / px) + 1;
     const H = Math.ceil(window.innerHeight / px) + 1;
@@ -1087,6 +1463,18 @@
     }
     const discCanvas = disc.canvas();
     ctx.drawImage(discCanvas, bx - r - 1, by - r - 1);
+
+    const drawPlace = place && PLACES[place];
+    if (drawPlace) {
+      const bar = drawPlace({
+        fill, W, H, ground, horizon, rand,
+        glowAt: (x, y, r, c) => glow(fill, x, y, r, c),
+        moon: { x: bx, y: by },
+        base: Math.round(window.innerHeight / px - stand),
+        mid: Math.round(window.innerWidth / px / 2),
+      });
+      return { W, H, ground, sky: bar || T.sky[0] };
+    }
 
     // far hills
     const ridge = (x, base, amp, f1, f2, ph) =>

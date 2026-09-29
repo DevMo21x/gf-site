@@ -29,12 +29,15 @@ const Actors = (() => {
     let last = "";
     let faceTimer = 0;
     let emoteTimer = 0;
+    let seated = false;     // on the Airbnb bed, shawarma in hand, eyes on the TV
 
     function draw() {
-      const p = Object.assign({ eyes: "open", mouth: "smile", look: 1, arm: "down" }, FACES[face]);
+      const rest = seated ? { arm: "eat", sit: true, look: kind === "gab" ? -1 : 1 } : {};
+      const p = Object.assign({ eyes: "open", mouth: "smile", look: 1, arm: "down" }, rest, FACES[face]);
+      if (seated) p.sit = true;
       if (blink > 0 && p.eyes === "open") p.eyes = "blink";
       if (talking && tick % 2 === 0) p.mouth = "open";
-      const key = [p.eyes, p.mouth, p.look, p.arm, p.blush, p.sweat].join();
+      const key = [p.eyes, p.mouth, p.look, p.arm, p.blush, p.sweat, p.sit].join();
       if (key === last) return;
       last = key;
       let g = cache.get(key);
@@ -83,9 +86,15 @@ const Actors = (() => {
       setTimeout(() => wrap.classList.remove("is-jumping"), 620);
     }
 
+    function sit(on) {
+      seated = on;
+      wrap.classList.toggle("is-sitting", on);
+      draw();
+    }
+
     draw();
     return {
-      setFace, emote, jump,
+      setFace, emote, jump, sit,
       talk(on) { talking = on; draw(); },
       get rect() { return $("canvas", wrap).getBoundingClientRect(); },
     };
@@ -115,5 +124,8 @@ const Actors = (() => {
     }, reducedMotion() ? 0 : t));
   }
 
-  return { gab, mo, onDodge, celebrate, rects: () => [gab.rect, mo.rect] };
+  // In the Airbnb they sit on the bed; everywhere else they stand
+  const sit = (on) => { gab.sit(on); mo.sit(on); };
+
+  return { gab, mo, sit, onDodge, celebrate, rects: () => [gab.rect, mo.rect] };
 })();
