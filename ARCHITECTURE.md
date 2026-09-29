@@ -25,11 +25,13 @@ gf-site/
     │   └── text.js       # CONTENT lookup, *red* markup, typewriter (Typer), renderContent()
     ├── world/
     │   ├── scene.js      # Sky and time of day (Scene)
-    │   └── clock.js      # Clock in the corner (Clock)
+    │   ├── clock.js      # Clock in the corner (Clock)
+    │   └── garden.js     # The seed she plants at dawn, blooming before the question (Garden)
     ├── ui/
     │   ├── pages.js      # Page transitions (Pages, arrive/depart, animate helpers)
     │   ├── meter.js      # Friendship hearts (Meter)
-    │   └── dodge.js      # The No button that runs away (Dodge)
+    │   ├── dodge.js      # The No button that runs away (Dodge)
+    │   └── achievements.js # Secret toasts and the tally in Credits (Achievements)
     ├── audio/music.js    # Background track + Web Audio sound effects (Music)
     ├── cats/
     │   ├── cat.js        # Shared cat machinery: sprite, speech bubble, moods (makeCat, Chatter)
@@ -38,7 +40,8 @@ gf-site/
     ├── fx/
     │   ├── petals.js     # Falling hearts and confetti (Petals)
     │   ├── fireworks.js  # Celebration fireworks (Fireworks)
-    │   └── lilies.js     # Flower burst after Play (Lilies)
+    │   ├── lilies.js     # Flower burst after Play (Lilies)
+    │   └── stars.js      # Connect the stars into a heart at night (Stars)
     ├── story/
     │   ├── actors.js     # Gabrielle and Mohaimen on the grass, their faces (Actors, FACES)
     │   ├── portrait.js   # Mohaimen's portrait in the boxes (Portrait)
@@ -75,6 +78,10 @@ index.html
 A story beat can name a `place` (`airport`, `docks`, `airbnb`). For that beat the farm is replaced by the place where the memory happened. The places are drawn in `js/art/pixels.js` (`PLACES`, called from `Pixel.scene`), and `Scene.set(hour, place)` switches them. In the Airbnb, `Actors.sit(true)` seats Gabrielle and Mohaimen on the bed with shawarma in hand.
 
 It also holds the letter that floats down after she says yes (`letter`) and the copy for two secrets (`eggs`): tapping the moon at night sends a shooting star (`Scene` positions an invisible button over the moon, `Fireworks.star` draws the star), and typing "sand person" anywhere makes it rain sand (`Petals.sand`, wired in `main.js`).
+
+Two more story line types: `{ plant: true }` (dawn) has her plant a seed, drawn by `Pixel.plant(stage)`; `Garden.grow` raises it a stage per beat (it is hidden in the memory places) and `Garden.bloom` opens it right before he asks. `{ stars: true }` (night) folds the dialogue box away while she joins the stars in `CONTENT.stars.points` in order (`Stars.run`). Before the question he hands her a bouquet (`CONTENT.bouquet`, item `bouquet`), and the celebration photo's plaque shows her new status.
+
+Secrets unlock achievements (`Achievements.unlock(id)`, ids in `CONTENT.achievements.list`): a toast drops in at the top, and Credits shows the tally. Unlocked ids are kept in `localStorage` (`gab-achievements`) so Play again keeps them; if storage is blocked they last for the visit only. "Caught the No button" can never unlock. Double-tapping Mohaimen is a kiss: an invisible `.kiss-hit` button sits over him above the pages (like `.moon-hit`), handled in `Actors`.
 
 The No button on the question page shrinks from the 6th dodge. On the 10th it drops to the grass, Tufo sits on it (`Tufo.sitOn`), and it gets back up as a second Yes (`Dodge`, `SHRINK_AT` / `DROP_AT`).
 
