@@ -20,10 +20,9 @@ const CONTENT = {
     loadJoke: { tufo: "no saves. you get ONE try.", mei: "just press Play!" },
     creditsTitle: "Credits",
     creditsLines: [
-      "Made by Mohaimen, nervously",
+      "Made by Mohaimen, with love <3",
       "Starring Gabrielle, Mohaimen, Mei and Tufo",
       "Tufo did not agree to be in this",
-      "Music: Gymnopédie No. 1 by Erik Satie, performed by Michael Laucke (public domain)",
     ],
     back: "Back",
   },
@@ -263,9 +262,9 @@ const CONTENT = {
 
   // Background music. Swap the file in /audio and change src to use another song.
   music: {
-    src: "audio/gymnopedie.m4a",
+    src: "audio/farm.m4a",
     volume: 1,     // 0–1 (the file itself is already mixed soft; iPhones ignore this and play at 1)
     startAt: 0,    // seconds into the song to begin from
-    credit: "Music: Gymnopédie No. 1 by Erik Satie, performed by Michael Laucke (public domain)",
+    credit: "Music: original cozy farm loop in the spirit of Stardew Valley",
   },
 };

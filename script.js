@@ -638,7 +638,7 @@
     const AC = window.AudioContext || window.webkitAudioContext;
     const TRACK = CONTENT.music;
     const SFX_VOLUME = 0.1;
-    const KEY = -3; // the flourishes were written in F; Gymnopédie No. 1 is in D
+    const KEY = 0; // the flourishes were written in F, same as the farm track
     const mtof = (m) => 440 * Math.pow(2, (m + KEY - 69) / 12);
 
     // The song plays through a plain <audio> element, never through Web Audio:
@@ -740,7 +740,7 @@
       }
     }
 
-    // Called from the "Tap to begin" tap: browsers only allow sound after one
+    // Called on her first tap or key anywhere: browsers only allow sound after one
     function start() {
       setSession();
       if (AC && !ctx) build();
@@ -854,6 +854,20 @@
       osc.start(t);
       osc.stop(t + 0.06);
     }
+
+    // Music belongs on the title screen too. Try right away (allowed if she has
+    // played before); otherwise the first tap or key anywhere starts it.
+    audio.play().then(() => {
+      if (started) return;
+      started = true;
+      audio.muted = muted;
+      fadeElement(TRACK.volume, 3000);
+    }).catch(() => {
+      if (started) return;
+      audio.pause();
+      ["pointerup", "keydown"].forEach((type) =>
+        document.addEventListener(type, start, { once: true }));
+    });
 
     // pause while the phone is locked / tab hidden
     document.addEventListener("visibilitychange", () => {

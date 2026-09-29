@@ -3,3 +3,13 @@ DESIGN.md
 PRODUCT.md
 .impeccable/surfaces/index-html.md
 .impeccable/design.json
+
+# Playwright output
+.playwright-mcp/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Graphify output
+graphify-out/
