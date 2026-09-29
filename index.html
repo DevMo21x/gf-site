@@ -111,6 +111,17 @@
           <i class="dialog__more" aria-hidden="true"></i>
         </button>
       </div>
+
+      <!-- Zero hearts: game over -->
+      <dialog class="credits" data-boom aria-labelledby="boom-title">
+        <div class="dialog credits__box">
+          <h2 class="credits__title" id="boom-title" data-text="quiz.boom.title"></h2>
+          <p data-text="quiz.boom.body"></p>
+          <div class="credits__actions">
+            <button class="btn btn--primary" type="button" data-action="try-again"><span data-text="quiz.boom.tryAgain"></span></button>
+          </div>
+        </div>
+      </dialog>
     </section>
 
     <!-- 3 · The question -->

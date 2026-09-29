@@ -61,29 +61,29 @@ const CONTENT = {
      A beat is a list of lines, played in order:
        { mo: "…", face: "…" }         Mohaimen says something. face: neutral, nervous, happy, blush, soft, shocked
        { memory: 0, face: "…" }       He shows her a memory (from memories above), with its item
-       { choose: [ … ] }              She picks what to say. Each choice: { say: "…", reply: [ lines ], emote: "heart" }
+       { quiz: "…", answers: [ … ], correct: 0 }
+                                      A question. correct is the number of the right answer (0 = first).
+                                      The answers get shuffled, so the right one isn't always first.
+                                      Add right: "…" / wrong: "…" for his own reaction, or leave them out
+                                      and he picks one from quiz.right / quiz.wrong below.
        { mei: "…" } / { tufo: "…" }   A cat chimes in (it doesn't wait for a tap)
        { tufo: "…", knock: true }     Tufo knocks the dialogue box crooked
        { loves: true }                He tells her the three things he loves (loves.items above)
-     Every choice fills a heart. After the last beat, he asks the question. */
+     A right answer fills a heart, a wrong one breaks one. Ten hearts and he asks the question.
+     Zero hearts and… well. */
   story: [
     // 6:10am
     {
       lines: [
         { mo: "Oh! Gabrielle! Hi. Hey. Good morning. Hi.", face: "nervous" },
         { mei: "psst… he's been out here since 5am" },
-        { choose: [
-          { say: "Hi, sand person.", emote: "note", reply: [
-            { mo: "Six in the morning and you're already bullying me. …I missed you too.", face: "happy" },
-          ] },
-          { say: "Why are you sweating?", emote: "dots", reply: [
-            { mo: "I'm not sweating. That's dew. Farm dew. A very normal farm thing.", face: "nervous" },
-          ] },
-          { say: "Are you okay??", emote: "exclaim", reply: [
-            { mo: "Me? Totally fine! Why wouldn't I be fine. Ha. Ha. …ha.", face: "nervous" },
-          ] },
-        ] },
-        { mo: "Okay. I have something I want to ask you. But first, can I show you a few things? It'll be quick. Probably.", face: "soft" },
+        { mo: "Okay. I'm going to ask you some questions. Every right answer, my heart gets fuller. Every wrong one… let's not talk about that.", face: "nervous" },
+        { quiz: "First one. What do you call me?", answers: ["Sand person", "Sunshine", "Farm boy"], correct: 0,
+          right: "Sand person. Correct. Unfortunately." },
+        { quiz: "What time did I get out here this morning?", answers: ["5am", "Noon", "I never went to bed"], correct: 0,
+          right: "5am. Mei told you, didn't she. Snitch." },
+        { quiz: "How far apart do we live?", answers: ["About 2000km", "About 20km", "Same street"], correct: 0,
+          right: "2000km. Way too far. Still worth it." },
       ],
     },
     // 9:00am
@@ -91,17 +91,10 @@ const CONTENT = {
       lines: [
         { memory: 0, face: "blush" },
         { tufo: "he was SO nervous. pathetic." },
-        { choose: [
-          { say: "You were SO nervous.", emote: "note", reply: [
-            { mo: "I was shaking. I'm kind of shaking right now, honestly.", face: "nervous" },
-          ] },
-          { say: "I was nervous too.", emote: "heart", reply: [
-            { mo: "Wait, really? Okay. That makes me feel so much better.", face: "happy" },
-          ] },
-          { say: "You hid it well.", emote: "dots", reply: [
-            { mo: "Thank you for lying to me. That's love.", face: "happy" },
-          ] },
-        ] },
+        { quiz: "The first time we met in person, how was I?", answers: ["So, so nervous", "Totally chill", "Asleep"], correct: 0,
+          right: "Shaking. I'm kind of shaking right now, honestly." },
+        { quiz: "Which cat is the mean one?", answers: ["Tufo", "Mei", "They're both angels"], correct: 0,
+          right: "Tufo. Obviously Tufo." },
       ],
     },
     // 12:30pm
@@ -109,17 +102,10 @@ const CONTENT = {
       lines: [
         { memory: 1, face: "soft" },
         { tufo: "oops. not sorry.", knock: true },
-        { choose: [
-          { say: "I think about it too.", emote: "heart", reply: [
-            { mo: "…Okay, you can't just say that. My heart can't take it this early in the day.", face: "blush" },
-          ] },
-          { say: "Is this about the jacket AGAIN?", emote: "dots", reply: [
-            { mo: "It's a very important jacket. It has history now.", face: "happy" },
-          ] },
-          { say: "Can I keep it?", emote: "exclaim", reply: [
-            { mo: "It's basically yours already. I'm just holding it for you.", face: "soft" },
-          ] },
-        ] },
+        { quiz: "Where was our jacket moment?", answers: ["The docks of Halifax", "A Tim Hortons", "The airport"], correct: 0,
+          right: "Halifax. I still think about it." },
+        { quiz: "And whose jacket was it?", answers: ["Mine", "Yours", "Tufo's"], correct: 0,
+          right: "Mine. Well. Basically yours now." },
       ],
     },
     // 3:40pm
@@ -127,17 +113,10 @@ const CONTENT = {
       lines: [
         { memory: 2, face: "happy" },
         { tufo: "and nobody saved me any" },
-        { choose: [
-          { say: "Best kind of night.", emote: "heart", reply: [
-            { mo: "Right?? Top three nights ever. Maybe top one.", face: "happy" },
-          ] },
-          { say: "Was CaseOh the real date?", emote: "note", reply: [
-            { mo: "He was the third wheel. A very funny third wheel.", face: "happy" },
-          ] },
-          { say: "Again tonight?", emote: "exclaim", reply: [
-            { mo: "Say less. I'm already thinking about it.", face: "blush" },
-          ] },
-        ] },
+        { quiz: "What did we eat late at night?", answers: ["Leftover shawarma", "Fresh sushi", "Cereal"], correct: 0,
+          right: "Leftover shawarma. Elite." },
+        { quiz: "Who were we watching?", answers: ["CaseOh", "MrBeast", "The news"], correct: 0,
+          right: "CaseOh. The third wheel. A very funny third wheel." },
         { mei: "I would've eaten that shawarma" },
       ],
     },
@@ -145,41 +124,48 @@ const CONTENT = {
     {
       lines: [
         { mo: "Okay. Can I tell you some things I love about you?", face: "soft" },
-        { choose: [
-          { say: "Go on…", emote: "heart", reply: [
-            { mo: "Okay. Deep breath.", face: "nervous" },
-          ] },
-          { say: "Only if they're good.", emote: "dots", reply: [
-            { mo: "They're so good. I checked them twice.", face: "happy" },
-          ] },
-          { say: "Obviously.", emote: "note", reply: [
-            { mo: "Obviously. Okay. Here we go.", face: "blush" },
-          ] },
-        ] },
         { loves: true },
         { mei: "all true, I checked" },
         { tufo: "eh. I'm funnier" },
+        { quiz: "So which one is true?", answers: ["You're the funniest girl I've ever met", "You're mid, honestly", "Tufo is funnier"], correct: 0,
+          right: "Exactly. Tufo is NOT funnier." },
+        { quiz: "What colour are Tufo's eyes?", answers: ["Pink", "Green", "Blue"], correct: 0,
+          right: "Pink. Evil pink." },
       ],
     },
     // 10:20pm
     {
       lines: [
         { mo: "Okay. Okay okay okay.", face: "nervous" },
-        { choose: [
-          { say: "Just say it, sand person.", emote: "note", reply: [
-            { mo: "Right. Yes. Saying it. Right now.", face: "nervous" },
-          ] },
-          { say: "Take your time.", emote: "heart", reply: [
-            { mo: "Thank you. You're the only person who makes me this nervous, you know that?", face: "blush" },
-          ] },
-          { say: "Are you… proposing?", emote: "exclaim", reply: [
-            { mo: "What?! No! Not THAT. Something smaller. Still big. Medium.", face: "shocked" },
-          ] },
-        ] },
-        { mo: "Gabrielle…", face: "soft" },
+        { quiz: "What does Mei think of you?", answers: ["Mei approves of you", "Mei ignores you", "Mei bites you"], correct: 0,
+          right: "She approves. And Mei is never wrong." },
+        { quiz: "What's the best kind of night?", answers: ["Shawarma and CaseOh with you", "Doing taxes", "Any night without you"], correct: 0,
+          right: "Top three nights ever. Maybe top one." },
       ],
     },
   ],
+
+  // The quiz game around the questions above
+  quiz: {
+    start: 2,   // hearts he starts with (out of 10)
+    // what he says when she's right or wrong, when a question has no right/wrong of its own
+    right: ["Yes! Correct!", "You remembered!", "That's my girl.", "See, this is why I like you."],
+    wrong: ["…no. That hurt a little.", "Wrong! My heart!", "Ouch. Okay. I'm fine. I'm fine.", "Did you forget?? Already??"],
+    // Tufo, every time she gets one wrong
+    tufo: ["HA.", "wrong. obviously.", "he's doomed", "do it again"],
+    // the day is over but the hearts aren't full: he asks the missed ones again
+    retry: "Wait. Not yet. I need a few more hearts before I ask. Let me try that one again…",
+    // ten hearts
+    full: "Ten hearts. That's all of them. Okay. Gabrielle…",
+    // zero hearts
+    boom: {
+      rush: "Zero hearts?! Gabrielle, wait, I— I'm coming over there—",
+      tufo: "worth it.",
+      title: "Mohaimen and Gabrielle have *exploded*",
+      body: "Zero hearts was too much for them both. Luckily, sand people respawn.",
+      tryAgain: "Try again",
+    },
+  },
 
   question: {
     lead: "Gabrielle Doney,",

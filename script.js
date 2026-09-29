@@ -412,7 +412,7 @@
     return { init, show, get current() { return current; } };
   })();
 
-  /* ---------- Friendship hearts: they fill as the day goes on ---------- */
+  /* ---------- Friendship hearts: right answers fill them, wrong ones break them ---------- */
 
   const Meter = (() => {
     const meter = $("[data-meter]");
@@ -423,12 +423,16 @@
       meter.setAttribute("aria-label", CONTENT.hearts.replace("{n}", filled));
     }
 
-    function fillTo(n) {
-      n = Math.min(hearts.length, n);
+    function set(n, quiet) {
+      n = Math.max(0, Math.min(hearts.length, n));
       const from = filled;
-      if (n <= from) return;
       filled = n;
       label();
+      hearts.forEach((heart, i) => {
+        heart.classList.remove("is-new", "is-lost");
+        heart.classList.toggle("is-full", i < (quiet ? n : Math.min(from, n)));
+      });
+      if (quiet) return;
       for (let i = from; i < n; i++) {
         const heart = hearts[i];
         setTimeout(() => {
@@ -437,10 +441,15 @@
           setTimeout(() => heart.classList.remove("is-new"), 450);
         }, reducedMotion() ? 0 : 200 + (i - from) * 120);
       }
+      for (let i = n; i < from; i++) {
+        hearts[i].classList.add("is-lost");
+        Music.blip(0.5);
+        setTimeout(() => hearts[i].classList.remove("is-lost"), 450);
+      }
     }
 
-    label();
-    return { fillTo, add: (n = 1) => fillTo(filled + n), get filled() { return filled; } };
+    set(CONTENT.quiz.start, true);
+    return { set, add: (n) => set(filled + n), get filled() { return filled; }, get max() { return hearts.length; } };
   })();
 
   /* ---------- The No button that won't be caught ---------- */
@@ -1695,6 +1704,57 @@
       return picked;
     }
 
+    function burst(sparks, r, speed = 16 + Math.random() * 10) {
+      const n = 22 + Math.floor(Math.random() * 12);
+      for (let k = 0; k < n; k++) {
+        const a = (k / n) * Math.PI * 2;
+        const s = speed * (0.75 + Math.random() * 0.35);
+        sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, age: 0, life: 1.1 + Math.random() * 0.6, color: r.color });
+      }
+    }
+
+    function drawSparks(sparks, dt) {
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.age += dt;
+        if (s.age > s.life) { sparks.splice(i, 1); continue; }
+        s.vy += 20 * dt;
+        s.vx *= 0.985;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        if (s.age > s.life * 0.65 && Math.random() < 0.5) continue; // crackle as it dies
+        const big = s.age < s.life * 0.4 ? 2 : 1;
+        ctx.fillStyle = s.age < 0.12 ? "#ffffff" : s.color;
+        ctx.fillRect(Math.round(s.x), Math.round(s.y), big, big);
+      }
+    }
+
+    // One big burst on the grass, at x, y in CSS pixels (Mohaimen, exploding)
+    function boom(x, y) {
+      cancelAnimationFrame(raf);
+      const size = artSize();
+      fitCanvas(canvas, size);
+      const { W, H, px } = size;
+      const at = { x: x / px, y: y / px };
+      const sparks = [];
+      [["#fff3d1", 10], ["#ffd84a", 18], ["#ff6b6b", 26], ["#ff9df0", 34]].forEach(([color, speed]) => burst(sparks, { ...at, color }, speed));
+      if (reducedMotion()) {
+        sparks.forEach((s) => { ctx.fillStyle = s.color; ctx.fillRect(Math.round(s.x + s.vx / 3), Math.round(s.y + s.vy / 3), 1, 1); });
+        setTimeout(() => { canvas.width = canvas.height = 0; }, 1500);
+        return;
+      }
+      let last = performance.now();
+      const frame = (now) => {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        ctx.clearRect(0, 0, W, H);
+        drawSparks(sparks, dt);
+        if (sparks.length) raf = requestAnimationFrame(frame);
+        else { canvas.width = canvas.height = 0; raf = 0; }
+      };
+      raf = requestAnimationFrame(frame);
+    }
+
     // with reduced motion the festival still gets its fireworks, frozen mid-burst
     function still(W, H, spots) {
       const bursts = spots.length
@@ -1729,16 +1789,6 @@
       let last = start;
       let nextLaunch = start + 150;
 
-      const burst = (r) => {
-        const n = 22 + Math.floor(Math.random() * 12);
-        const speed = 16 + Math.random() * 10;
-        for (let k = 0; k < n; k++) {
-          const a = (k / n) * Math.PI * 2;
-          const s = speed * (0.75 + Math.random() * 0.35);
-          sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, age: 0, life: 1.1 + Math.random() * 0.6, color: r.color });
-        }
-      };
-
       const frame = (now) => {
         const dt = Math.min(0.05, (now - last) / 1000);
         last = now;
@@ -1763,21 +1813,9 @@
           ctx.fillRect(Math.round(r.x), Math.round(r.y), 1, 2);
           ctx.fillStyle = "#f6c23e88";
           ctx.fillRect(Math.round(r.x), Math.round(r.y) + 2, 1, 2);
-          if (r.y <= r.top) { rockets.splice(i, 1); burst(r); }
+          if (r.y <= r.top) { rockets.splice(i, 1); burst(sparks, r); }
         }
-        for (let i = sparks.length - 1; i >= 0; i--) {
-          const s = sparks[i];
-          s.age += dt;
-          if (s.age > s.life) { sparks.splice(i, 1); continue; }
-          s.vy += 20 * dt;
-          s.vx *= 0.985;
-          s.x += s.vx * dt;
-          s.y += s.vy * dt;
-          if (s.age > s.life * 0.65 && Math.random() < 0.5) continue; // crackle as it dies
-          const big = s.age < s.life * 0.4 ? 2 : 1;
-          ctx.fillStyle = s.age < 0.12 ? "#ffffff" : s.color;
-          ctx.fillRect(Math.round(s.x), Math.round(s.y), big, big);
-        }
+        drawSparks(sparks, dt);
 
         if (t < END || rockets.length || sparks.length) {
           raf = requestAnimationFrame(frame);
@@ -1789,7 +1827,7 @@
       raf = requestAnimationFrame(frame);
     }
 
-    return { run };
+    return { run, boom };
   })();
 
   /* ---------- A screen full of pixel flowers ---------- */
@@ -2213,14 +2251,16 @@
 
   const Story = (() => {
     const beats = CONTENT.story;
+    const quiz = CONTENT.quiz;
+    const questions = beats.flatMap((b) => b.lines).filter((l) => l.quiz);
     const NIGHT = 5; // the question comes at night; the festival is saved for her answer
     const wait = (ms) => new Promise((r) => setTimeout(r, reducedMotion() ? Math.min(ms, 150) : ms));
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    const missed = new Set(); // questions she got wrong, asked again after the last beat
     let started = false;
+    let over = false;         // zero hearts or ten: the story stops where it is
 
-    // a line followed straight away by choices stays up while she chooses
-    const holds = (next) => Boolean(next && next.choose);
-
-    async function play(l, next) {
+    async function play(l) {
       if (l.mei) { Mei.say(l.mei, 2800); return; }
       if (l.tufo) { Tufo.speak(l.tufo, l.knock); return; }
 
@@ -2228,24 +2268,33 @@
         const m = CONTENT.memories[l.memory];
         if (m.item) Dialogue.showItem(m.item);
         const line = { title: m.title, text: m.body, face: l.face };
-        await (holds(next) ? Dialogue.speak(line) : Dialogue.say(line));
+        await Dialogue.say(line);
         return;
       }
 
       if (l.mo) {
-        const line = { text: l.mo, face: l.face };
-        await (holds(next) ? Dialogue.speak(line) : Dialogue.say(line));
+        await Dialogue.say({ text: l.mo, face: l.face });
         return;
       }
 
-      if (l.choose) {
-        const i = await Dialogue.ask(l.choose.map((c) => c.say));
-        const pick = l.choose[i];
-        Meter.add(1);
-        Actors.gab.emote(pick.emote || "heart");
-        Actors.gab.setFace("happy", 1600);
-        const replies = pick.reply || [];
-        for (let k = 0; k < replies.length; k++) await play(replies[k], replies[k + 1] || next);
+      if (l.quiz) {
+        await Dialogue.speak({ text: l.quiz, face: "nervous" });
+        const order = l.answers.map((_, k) => k).sort(() => Math.random() - 0.5);
+        const right = order[await Dialogue.ask(order.map((k) => l.answers[k]))] === l.correct;
+        Meter.add(right ? 1 : -1);
+        over = Meter.filled === 0 || Meter.filled === Meter.max;
+        if (right) {
+          missed.delete(l);
+          Actors.gab.emote("heart");
+          Actors.gab.setFace("happy", 1600);
+        } else {
+          missed.add(l);
+          Actors.mo.emote("sweat");
+          Actors.gab.setFace("shocked", 1600);
+          Tufo.speak(pick(quiz.tufo));
+        }
+        const reply = right ? l.right || pick(quiz.right) : l.wrong || pick(quiz.wrong);
+        await Dialogue.say({ text: reply, face: right ? "happy" : "shocked" });
         return;
       }
 
@@ -2253,7 +2302,6 @@
         const faces = ["blush", "soft", "happy"];
         const items = CONTENT.loves.items;
         for (let k = 0; k < items.length; k++) {
-          Meter.add(1);
           Actors.gab.setFace("blush");
           if (k > 0) Actors.gab.emote("heart");
           await Dialogue.say({ text: items[k], face: faces[k % faces.length] });
@@ -2275,15 +2323,24 @@
         await wait(320);
       }
       const lines = beats[i].lines;
-      for (let k = 0; k < lines.length; k++) await play(lines[k], lines[k + 1]);
+      for (let k = 0; k < lines.length && !over; k++) await play(lines[k]);
     }
 
     async function start() {
       if (started) return;
       started = true;
-      for (let i = 0; i < beats.length; i++) await beat(i);
+      for (let i = 0; i < beats.length && !over; i++) await beat(i);
+      // the day is done but the hearts aren't: the ones she missed come back
+      // (every question, if she has since fixed them all)
+      while (!over) {
+        await Dialogue.say({ text: quiz.retry, face: "soft" });
+        await play(missed.size ? missed.values().next().value : pick(questions));
+      }
+      if (Meter.filled === 0) { Boom.run(); return; }
       // ten hearts, and he finally asks
-      Meter.fillTo(10);
+      Scene.set(NIGHT);
+      Clock.set(NIGHT);
+      await Dialogue.say({ text: quiz.full, face: "soft" });
       Actors.mo.setFace("soft");
       Actors.gab.emote("exclaim");
       await wait(1100);
@@ -2291,7 +2348,75 @@
       Pages.show("question");
     }
 
-    return { start };
+    // After the explosion: a fresh morning, a fresh Mohaimen
+    async function restart() {
+      started = false;
+      over = false;
+      missed.clear();
+      Meter.set(quiz.start, true);
+      Scene.set(0);
+      Clock.set(0);
+      Actors.mo.setFace("neutral");
+      Actors.gab.setFace("neutral");
+      await wait(900);
+      Dialogue.open();
+      await wait(320);
+      start();
+    }
+
+    return { start, restart };
+  })();
+
+  /* ---------- Zero hearts: he runs to her and they both blow up ---------- */
+
+  const Boom = (() => {
+    const box = $("[data-boom]");
+    const mo = $('[data-actor="mo"]');
+    const gab = $('[data-actor="gab"]');
+    const text = CONTENT.quiz.boom;
+    box.addEventListener("cancel", (e) => e.preventDefault()); // only Try again gets him back
+
+    async function run() {
+      await Dialogue.say({ text: text.rush, face: "shocked" });
+      await Dialogue.close();
+      const from = Actors.mo.rect;
+      const to = Actors.gab.rect;
+      if (!reducedMotion()) {
+        const dx = to.left + to.width * 0.6 - from.left;
+        const P = PX();
+        await animate(mo, [
+          { transform: "none" },
+          { transform: `translate(${dx * 0.5}px, ${-P * 4}px)` },
+          { transform: `translateX(${dx}px)` },
+        ], { duration: 650, easing: "steps(8, end)" }).finished.catch(() => {});
+      }
+      // he lands on her, so the blast takes them both
+      const r = Actors.mo.rect;
+      const g = Actors.gab.rect;
+      mo.classList.add("is-gone");
+      gab.classList.add("is-gone");
+      Fireworks.boom((r.left + r.right + g.left + g.right) / 4, (r.top + r.bottom + g.top + g.bottom) / 4);
+      Music.blip(0.25);
+      if (!reducedMotion()) {
+        const P = PX();
+        animateIn($(".actors"), [0, -1, 1, -1, 1, 0].map((k) => ({ transform: `translate(${k * P * 2}px, ${-k * P}px)` })),
+          { duration: 420, easing: "steps(6, end)" });
+      }
+      setTimeout(() => Tufo.speak(text.tufo), 700);
+      await new Promise((r) => setTimeout(r, reducedMotion() ? 300 : 1400));
+      if (box.showModal) box.showModal();
+      else box.setAttribute("open", "");
+    }
+
+    function reset() {
+      box.close();
+      mo.getAnimations().forEach((a) => a.cancel());
+      mo.classList.remove("is-gone");
+      gab.classList.remove("is-gone");
+      Story.restart();
+    }
+
+    return { run, reset };
   })();
 
   /* ---------- Wiring ---------- */
@@ -2363,6 +2488,8 @@
         Fireworks.run();
         setTimeout(Petals.run, reducedMotion() ? 0 : 250);
       });
+    } else if (action === "try-again") {
+      Boom.reset();
     } else if (action === "replay") {
       window.location.reload();
     }

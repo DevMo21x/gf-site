@@ -736,6 +736,12 @@ body:not([data-scene="title"]) .stage {
 .meter i.is-full,
 .meter--full i { background-image: var(--img-heart); }
 .meter i.is-new { animation: heart-pop 420ms steps(4, end); }
+.meter i.is-lost { animation: heart-break 420ms steps(4, end); }
+@keyframes heart-break {
+  0%, 100% { transform: none; }
+  25% { transform: translateX(calc(var(--hpx) * -2)) rotate(-12deg); }
+  75% { transform: translateX(calc(var(--hpx) * 2)) rotate(12deg); }
+}
 @keyframes heart-pop {
   0% { transform: scale(1); }
   40% { transform: scale(1.5) translateY(calc(var(--hpx) * -2)); }
@@ -920,6 +926,7 @@ body[data-scene="title"] .actors { visibility: hidden; }
 .actor__px { height: calc(var(--px) * 42); }
 .actor__hop { transform-origin: 50% 100%; }
 .actor--mo .actor__flip { transform: scaleX(-1); } /* he faces her */
+.actor.is-gone { visibility: hidden; }
 
 .actor.is-jumping .actor__hop { animation: actor-jump 600ms steps(7, end); }
 @keyframes actor-jump {
@@ -1193,6 +1200,7 @@ body[data-scene="title"] .actors { visibility: hidden; }
   .emote.is-showing,
   .credits[open] .credits__box,
   .meter i.is-new,
+  .meter i.is-lost,
   .btn:hover .btn__arrow { animation: none; }
   .world__sky, .world__clouds, .world__flies { transition-duration: 300ms; }
   .btn--yes, .btn--no.is-loose, .cat__bubble { transition-duration: 1ms; }
