@@ -53,6 +53,17 @@ const Story = (() => {
       return;
     }
 
+    if (l.plant) {
+      const g = CONTENT.garden;
+      await Dialogue.say({ text: g.give, face: "soft" });
+      await Dialogue.ask([g.plant]);
+      Garden.plant();
+      Actors.gab.emote("heart");
+      setTimeout(() => Mei.say(g.mei, 2600), 600);
+      await Dialogue.say({ text: g.planted, face: "happy" });
+      return;
+    }
+
     if (l.loves) {
       const faces = ["blush", "soft", "happy"];
       const items = CONTENT.loves.items;
@@ -73,6 +84,7 @@ const Story = (() => {
       Scene.set(hour, beats[i].place);
       Actors.sit(beats[i].place === "airbnb");
       Clock.set(hour);
+      Garden.grow(i - 2); // it grows while they're away; she sees it again at sunset
       Actors.mo.setFace("neutral");
       await wait(1200);
       Dialogue.open();
@@ -97,6 +109,8 @@ const Story = (() => {
     Scene.set(NIGHT);
     Actors.sit(false);
     Clock.set(NIGHT);
+    Garden.bloom();
+    await Dialogue.say({ text: CONTENT.garden.bloom, face: "blush" });
     await Dialogue.say({ text: quiz.full, face: "soft" });
     Dialogue.showItem("bouquet");
     await Dialogue.say({ text: CONTENT.bouquet.give, face: "blush" });
@@ -112,6 +126,7 @@ const Story = (() => {
     started = false;
     over = false;
     missed.clear();
+    Garden.reset();
     Meter.set(quiz.start, true);
     Scene.set(0);
     Actors.sit(false);

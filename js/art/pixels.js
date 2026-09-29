@@ -861,6 +861,32 @@
     return g;
   }
 
+  // The seed she plants, one stage per few hours: 0 soil, 1 sprout, 2 leaves,
+  // then the flower's own stages on a stem: 3 bud, 4 opening, 5 in bloom. 15×24.
+  function plant(stage, variant = 0) {
+    const g = new Grid(15, 24);
+    const soil = "#8a5a2b";
+    g.ellipse(7, 22, 4.6, 1.6, soil);
+    if (stage >= 1) g.line(7, 20, 7, stage === 1 ? 18 : stage === 2 ? 14 : 11, LEAF);
+    if (stage === 1) g.px([[6, 17], [8, 17]], LEAF_HI);
+    if (stage >= 2) {
+      g.ellipse(5, 17, 1.8, 0.9, LEAF, 0.5);
+      g.ellipse(9, stage === 2 ? 15 : 16, 1.8, 0.9, LEAF_DK, -0.5);
+    }
+    g.outline(K);
+    g.px([[6, 22], [9, 22]], "#6b4220");
+    if (stage < 3) return g;
+    // the flower's head on top, from the same art as the Play burst
+    const head = flower(variant, stage - 3);
+    for (let y = 0; y < head.h; y++) {
+      for (let x = 0; x < head.w; x++) {
+        const c = head.get(x, y);
+        if (c) g.set(x, y, c);
+      }
+    }
+    return g;
+  }
+
   function leafSprite(i) {
     const g = new Grid(13, 13);
     const col = [LEAF, LEAF_DK, "#7cbf4a"][i % 3];
@@ -1622,7 +1648,7 @@
   }
 
   window.Pixel = {
-    Grid, fromRows, cat, person, portrait, flower, leafSprite, cloud, scene, seeded,
+    Grid, fromRows, cat, person, portrait, flower, plant, leafSprite, cloud, scene, seeded,
     heart: () => SPRITES.heart(),
     heartSmall: () => SPRITES.heartSmall(),
     sun: () => SPRITES.sun(),

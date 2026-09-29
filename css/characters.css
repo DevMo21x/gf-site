@@ -28,6 +28,19 @@ body[data-scene="title"] .actors { visibility: hidden; }
 .actor--mo .actor__flip { transform: scaleX(-1); } /* he faces her */
 .actor.is-gone { visibility: hidden; }
 
+/* the seed she plants, on the grass in front of the two of them */
+.garden {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + var(--px) * (var(--stand) - 9));
+  width: calc(var(--px) * 15);
+  height: calc(var(--px) * 24);
+  margin-left: calc(var(--px) * -7.5);
+  transform-origin: 50% 100%;
+}
+.garden[hidden] { display: none; }
+body[data-place]:not([data-place=""]) .garden { visibility: hidden; } /* it stays home on the farm */
+
 /* tap him twice for a kiss: an invisible button over him, above the pages (like the cats) */
 .kiss-hit {
   position: fixed;

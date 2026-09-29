@@ -69,6 +69,7 @@ const CONTENT = {
        { mei: "…" } / { tufo: "…" }   A cat chimes in (it doesn't wait for a tap)
        { tufo: "…", knock: true }     Tufo knocks the dialogue box crooked
        { loves: true }                He tells her the three things he loves (loves.items above)
+       { plant: true }                He gives her a seed to plant (garden below). It grows all day
      A beat can also have place: "airport" | "docks" | "airbnb": the farm turns into that place
      for the whole beat (drawn in js/art/pixels.js, PLACES). In the Airbnb the two of them sit on the bed.
      A right answer fills a heart, a wrong one breaks one. Ten hearts and he asks the question.
@@ -79,6 +80,7 @@ const CONTENT = {
       lines: [
         { mo: "Oh! Gabrielle! Hi. Hey. Good morning. Hi.", face: "nervous" },
         { mei: "psst… he's been out here since 5am. I've been out here since 5:05. for the lighting." },
+        { plant: true },
         { mo: "Okay. I'm going to ask you some questions. Every right answer, my heart gets fuller. Every wrong one… let's not talk about that.", face: "nervous" },
         { quiz: "First one. What do you call me?", answers: ["Sand person", "Sunshine", "Farm boy"], correct: 0,
           right: "Sand person. Correct. Unfortunately." },
@@ -156,6 +158,16 @@ const CONTENT = {
       body: "Zero hearts was too much for them both. Luckily, sand people respawn.",
       tryAgain: "Try again",
     },
+  },
+
+  // The seed she plants at dawn. It grows through the day and blooms right before he asks.
+  garden: {
+    variant: 0, // which flower it grows into: 0 white lily, 1 pink, 2 sunflower, 3 sweet pea, 4 blue jazz, 5 coral
+    give: "Oh, and… here. A seed. Plant it with me? Let's see what it is by tonight.",
+    plant: "Plant it",
+    planted: "Okay. Now we wait. I'm very good at waiting. I'm not.",
+    mei: "I'll guard it. mostly from Tufo.",
+    bloom: "Look. It grew all day. Kind of like something else did.",
   },
 
   // The bouquet he gives her right before he asks (on the farm, that's how dating starts)

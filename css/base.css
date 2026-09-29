@@ -98,6 +98,6 @@ em {
 .cat__px, .cat__bubble, .cat__bubble::after, .cat__heart, .world canvas, .cloud,
 .signoff__heart, .dialog__more, .petals, .lilies,
 .logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .nameplate, .choice::before,
-.credits__list li::before, .actor__px, .emote {
+.credits__list li::before, .actor__px, .emote, .garden {
   image-rendering: pixelated;
 }
