@@ -12,9 +12,10 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap">
   <link rel="stylesheet" href="style.css">
   <script src="pixels.js" defer></script>
+  <script src="content.js" defer></script>
   <script src="script.js" defer></script>
 </head>
-<body data-time="dawn">
+<body data-time="dawn" data-scene="title">
 
   <!-- The farm behind everything: sky, hills, fence, grass -->
   <div class="world" aria-hidden="true">
@@ -39,92 +40,83 @@
 
   <main class="stage">
 
-    <!-- 1 · Intro -->
-    <section class="page page--intro" data-page="0" aria-labelledby="intro-title">
-      <figure class="frame frame--intro">
-        <img data-photo="intro" src="images/us-cheek.webp" width="960" height="1280" alt="" decoding="async" fetchpriority="high">
-        <figcaption class="plaque" data-text="pageTitle"></figcaption>
-      </figure>
-      <div class="intro__side">
-        <div class="dialog" data-dialog>
-          <h1 class="dialog__title" id="intro-title" tabindex="-1" data-text="intro.title"></h1>
-          <p class="dialog__body" data-type data-text="intro.body"></p>
+    <!-- 1 · The start menu -->
+    <section class="page page--title" data-page="title" aria-labelledby="logo">
+      <div class="logo">
+        <i class="logo__rope logo__rope--l" aria-hidden="true"></i>
+        <i class="logo__rope logo__rope--r" aria-hidden="true"></i>
+        <h1 class="logo__sign" id="logo" tabindex="-1" data-text="title.logo"></h1>
+        <i class="logo__bloom logo__bloom--a" aria-hidden="true"></i>
+        <i class="logo__bloom logo__bloom--b" aria-hidden="true"></i>
+        <i class="logo__bloom logo__bloom--c" aria-hidden="true"></i>
+        <p class="logo__ribbon plaque" data-text="title.ribbon"></p>
+      </div>
+
+      <div class="title__row">
+        <figure class="frame frame--title">
+          <img data-photo="title" src="images/us-cheek.webp" width="960" height="1280" alt="" decoding="async" fetchpriority="high">
+          <figcaption class="plaque" data-text="title.plaque"></figcaption>
+        </figure>
+        <div class="dialog dialog--greeting" data-dialog>
+          <p class="dialog__body" data-type data-text="title.greeting"></p>
           <i class="dialog__more" aria-hidden="true"></i>
         </div>
-        <button class="btn btn--primary btn--begin" type="button" data-action="begin">
-          <span data-text="intro.button"></span>
+      </div>
+
+      <nav class="menu" aria-label="Menu">
+        <button class="btn btn--primary btn--play" type="button" data-action="play">
+          <span data-text="title.play"></span>
+        </button>
+        <div class="menu__row">
+          <button class="btn btn--quiet" type="button" data-action="load"><span data-text="title.load"></span></button>
+          <button class="btn btn--quiet" type="button" data-action="credits"><span data-text="title.credits"></span></button>
+        </div>
+      </nav>
+
+      <dialog class="credits" data-credits aria-labelledby="credits-title">
+        <div class="dialog credits__box">
+          <h2 class="credits__title" id="credits-title" data-text="title.creditsTitle"></h2>
+          <ul class="credits__list" data-credits-list></ul>
+          <form method="dialog" class="credits__actions">
+            <button class="btn btn--primary" type="submit"><span data-text="title.back"></span></button>
+          </form>
+        </div>
+      </dialog>
+    </section>
+
+    <!-- 2 · Talking with Mohaimen, from dawn to night -->
+    <section class="page page--talk" data-page="talk" hidden aria-label="Talking with Mohaimen">
+      <div class="found" data-found hidden aria-hidden="true">
+        <span class="slot"><i class="item" data-found-item></i></span>
+        <i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>
+      </div>
+      <div class="dialog dialog--talk" data-dialog data-talk tabindex="-1">
+        <div class="speaker">
+          <span class="portrait" aria-hidden="true"><canvas data-portrait width="36" height="36"></canvas></span>
+          <div class="speaker__meta">
+            <p class="nameplate" data-text="mohaimen.name"></p>
+            <div class="meter meter--talk" data-meter role="img">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+        </div>
+        <div class="talk__main">
+          <div class="talk__lines" aria-live="polite">
+            <h2 class="talk__title" data-talk-title hidden></h2>
+            <p class="dialog__body talk__text" data-talk-text></p>
+          </div>
+          <div class="choices" data-choices role="group" aria-label="Your reply" hidden></div>
+        </div>
+        <button class="talk__next" type="button" data-talk-next aria-label="Continue" hidden>
+          <i class="dialog__more" aria-hidden="true"></i>
         </button>
       </div>
     </section>
 
-    <!-- 2–4 · Memories: each one is an item she finds -->
-    <section class="page page--memory" data-page="1" data-memory="0" hidden aria-labelledby="m0-title">
-      <div class="found" aria-hidden="true">
-        <span class="slot"><i class="item item--nervous"></i></span>
-        <i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>
-      </div>
-      <article class="dialog" data-dialog>
-        <h2 class="dialog__title" id="m0-title" tabindex="-1" data-text="memories.0.title"></h2>
-        <p class="dialog__body" data-type data-text="memories.0.body"></p>
-        <div class="dialog__actions">
-          <button class="btn btn--primary btn--next" type="button" data-action="next">
-            <span data-text="nextButton"></span><i class="btn__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </article>
-    </section>
-
-    <section class="page page--memory" data-page="2" data-memory="1" hidden aria-labelledby="m1-title">
-      <div class="found" aria-hidden="true">
-        <span class="slot"><i class="item item--jacket"></i></span>
-        <i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>
-      </div>
-      <article class="dialog" data-dialog>
-        <h2 class="dialog__title" id="m1-title" tabindex="-1" data-text="memories.1.title"></h2>
-        <p class="dialog__body" data-type data-text="memories.1.body"></p>
-        <div class="dialog__actions">
-          <button class="btn btn--primary btn--next" type="button" data-action="next">
-            <span data-text="nextButton"></span><i class="btn__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </article>
-    </section>
-
-    <section class="page page--memory" data-page="3" data-memory="2" hidden aria-labelledby="m2-title">
-      <div class="found" aria-hidden="true">
-        <span class="slot"><i class="item item--shawarma"></i></span>
-        <i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>
-      </div>
-      <article class="dialog" data-dialog>
-        <h2 class="dialog__title" id="m2-title" tabindex="-1" data-text="memories.2.title"></h2>
-        <p class="dialog__body" data-type data-text="memories.2.body"></p>
-        <div class="dialog__actions">
-          <button class="btn btn--primary btn--next" type="button" data-action="next">
-            <span data-text="nextButton"></span><i class="btn__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </article>
-    </section>
-
-    <!-- 5 · Things I love about you: the heart meter fills -->
-    <section class="page page--loves" data-page="4" hidden aria-labelledby="loves-title">
-      <div class="meter" data-meter aria-hidden="true">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-      <article class="dialog" data-dialog>
-        <h2 class="dialog__title" id="loves-title" tabindex="-1" data-text="loves.title"></h2>
-        <ol class="loves" data-loves aria-live="polite"></ol>
-        <div class="dialog__actions">
-          <button class="btn btn--primary btn--next" type="button" data-action="reveal">
-            <span data-reveal-label></span><i class="btn__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </article>
-    </section>
-
-    <!-- 6 · The question -->
-    <section class="page page--question" data-page="5" hidden aria-labelledby="question-title">
+    <!-- 3 · The question -->
+    <section class="page page--question" data-page="question" hidden aria-labelledby="question-title">
       <div class="dialog dialog--question">
+        <span class="portrait portrait--question" aria-hidden="true"><canvas data-portrait width="36" height="36"></canvas></span>
         <h2 class="question" id="question-title" tabindex="-1">
           <span class="question__lead" data-text="question.lead"></span>
           <span class="question__ask" data-text="question.title"></span>
@@ -140,8 +132,8 @@
       </div>
     </section>
 
-    <!-- 7 · Celebration -->
-    <section class="page page--yay" data-page="6" hidden aria-labelledby="yay-title">
+    <!-- 4 · Celebration -->
+    <section class="page page--yay" data-page="yay" hidden aria-labelledby="yay-title">
       <div class="achievement">
         <i class="achievement__star" aria-hidden="true"></i>
         <h2 class="achievement__title" id="yay-title" tabindex="-1" data-text="celebration.title"></h2>
@@ -157,6 +149,11 @@
           <article class="dialog" data-dialog>
             <p class="dialog__body" data-type data-text="celebration.body"></p>
             <p class="signoff"><span data-text="celebration.signoff"></span><i class="signoff__heart" aria-hidden="true"></i></p>
+            <div class="dialog__actions">
+              <button class="btn btn--quiet btn--replay" type="button" data-action="replay">
+                <span data-text="celebration.replay"></span>
+              </button>
+            </div>
           </article>
         </div>
       </div>
@@ -164,9 +161,16 @@
 
   </main>
 
-  <!-- Progress: a crop in the soil, one growth stage per page -->
-  <div class="plant" data-plant role="img" aria-label="Page 1 of 7">
-    <canvas data-plant-canvas width="18" height="26"></canvas>
+  <!-- Gabrielle and Mohaimen, standing on the grass -->
+  <div class="actors" aria-hidden="true">
+    <div class="actor actor--gab" data-actor="gab">
+      <i class="emote" data-emote></i>
+      <span class="actor__hop"><canvas class="actor__px" data-actor-canvas width="22" height="42"></canvas></span>
+    </div>
+    <div class="actor actor--mo" data-actor="mo">
+      <i class="emote" data-emote></i>
+      <span class="actor__hop"><span class="actor__flip"><canvas class="actor__px" data-actor-canvas width="22" height="42"></canvas></span></span>
+    </div>
   </div>
 
   <!-- Mei, the cat who comes along -->
@@ -193,6 +197,6 @@
   <canvas class="lilies" data-lilies aria-hidden="true"></canvas>
   <div class="dodge-layer" data-dodge-layer></div>
 
-  <noscript><p class="noscript">This little site needs JavaScript turned on.</p></noscript>
+  <noscript><p class="noscript">This little game needs JavaScript turned on.</p></noscript>
 </body>
 </html>

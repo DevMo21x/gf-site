@@ -1,142 +1,6 @@
 /* ==========================================================================
-   ✏️  EDIT THE WORDS HERE
-   Everything she reads lives in this one object.
-   Wrap a word in *asterisks* to make it red, e.g. "*angel*".
+   The game. All the words she reads live in content.js (CONTENT).
    ========================================================================== */
-
-const CONTENT = {
-  pageTitle: "For Gabrielle",
-
-  intro: {
-    title: "Hey my sweet beautiful *angel*...",
-    body: "I made you a little something. Turn your sound on if you can.",
-    button: "Tap to begin",
-  },
-
-  memories: [
-    {
-      title: "The first time I saw you in *person*",
-      body: "Our first time meeting in person, and how nervous I was. So, so nervous. Worth every second of it.",
-    },
-    {
-      title: "Me, you, my jacket, and the docks of *Halifax*",
-      body: "Our cute, intense little moment over my jacket on the docks of Halifax. I still think about it.",
-    },
-    {
-      title: "Leftover shawarma, *late* at night",
-      body: "Eating the leftover shawarma while watching CaseOh late at night. Honestly one of my favourite kinds of night.",
-    },
-  ],
-
-  nextButton: "Next",
-
-  loves: {
-    title: "Things I love about *you*",
-    items: [
-      "You're the funniest girl I've ever met in my life.",
-      "You're kind-hearted, gentle and caring with every living organism around you.",
-      "You're thoughtful, and the most beautiful girl on this whole hooooole planet!",
-    ],
-    revealButton: "Tap to see one",
-    moreButton: "Tap for another one",
-    doneButton: "Next",
-  },
-
-  question: {
-    lead: "Gabrielle Doney,",
-    title: "Will you be my *girlfriend*?",
-    yes: "Yes",
-    // The No button cycles through these every time it runs away
-    no: ["No", "Are you sure?", "Really?", "Think again", "Nope, try Yes", "Bruh"],
-  },
-
-  celebration: {
-    title: "Sand person *achievement unlocked*",
-    body: "Got the girl. Now the real mistakes begin.",
-    signoff: "Mohaimen, your new owner :)",
-  },
-
-  photos: {
-    intro: { src: "images/us-cheek.webp", alt: "Gabrielle and Mohaimen cheek to cheek under the trees, smiling" },
-    celebration: { src: "images/us-cake.webp", alt: "Gabrielle holding a slice of cake next to Mohaimen doing a peace sign" },
-  },
-
-  sound: {
-    mute: "Mute music",
-    unmute: "Play music",
-  },
-
-  // The clock in the corner: one day on the farm, a little later on every page
-  hud: {
-    day: "Sat.",
-    times: ["6:10am", "9:00am", "12:30pm", "3:40pm", "6:50pm", "10:20pm", "11:50pm"],
-  },
-
-  // Mei the cat: everything she says
-  mei: {
-    label: "Mei the cat. Tap to pet her.",
-    hint: "psst… you can pet me",
-    hello: "hi! I'm Mei",
-    purr: "prrrrrr…",
-    blink: "*slow blink* (that means I love you)",
-    lines: ["mrrp?", "meow!", "Mei approves of you", "again. pet me again.", "you smell like shawarma", "I'm on your side"],
-    // things she says when a page opens (by page number, starting at 0)
-    pages: {
-      1: "ooh, I remember this",
-      3: "I would've eaten that shawarma",
-      4: "all true, I checked",
-      5: "psst… say yes",
-      6: "achievement unlocked!",
-    },
-    dodge: ["hehe, nope", "that button's shy", "try the big one"],
-    startled: "eep!",
-  },
-
-  // Tufo the cat: white, pink-eyed, mean. Everything he says.
-  tufo: {
-    label: "Tufo the cat. He does not like being touched.",
-    intro: "I'm Tufo. I don't do cute.",
-    hello: "don't. touch. me.",
-    hiss: ["hsssss", "back OFF", "I bite. hard."],
-    swat: ["*swat*", "no touching", "that was a warning"],
-    ignore: "I'm ignoring you now",
-    rude: ["your hands are cold", "mid petting, honestly", "I was here first", "don't look at me", "go pet the other one"],
-    allow: "…fine. ONE pet.",
-    allowAfter: "okay that's enough",
-    jealous: ["why does SHE get pets", "ew. affection.", "Mei is a suck-up"],
-    hissAtMei: "hsss. MY human.",
-    knock: "oops. not sorry.",
-    knockLove: "oops. it fell.",
-    // things he says when a page opens (by page number, starting at 0)
-    pages: {
-      1: "he was SO nervous. pathetic.",
-      3: "and nobody saved me any",
-      4: "eh. I'm funnier",
-      5: "press No. I dare you.",
-      6: "ugh. fine. welcome, I guess",
-    },
-    dodge: ["HA. coward button", "even No is scared of you", "just press it. oh wait."],
-    // when he chases Mei around (like he does at home)
-    chase: {
-      start: ["zoomies.", "RUN, Mei.", "tag. you're it."],
-      end: ["that's cardio.", "she started it", "I let her win"],
-      meiStart: "not again!!",
-      meiEnd: "he does this EVERY day",
-    },
-  },
-
-  progress: "Page {n} of {total}",
-
-  // Background music. Swap the file in /audio and change src to use another song.
-  music: {
-    src: "audio/gymnopedie.m4a",
-    volume: 1,     // 0–1 (the file itself is already mixed soft; iPhones ignore this and play at 1)
-    startAt: 0,    // seconds into the song to begin from
-    credit: "Music: Gymnopédie No. 1 by Erik Satie, performed by Michael Laucke (public domain)",
-  },
-};
-
-/* ========================================================================== */
 
 (() => {
   "use strict";
@@ -223,25 +87,29 @@ const CONTENT = {
 
     function stop(el) {
       const run = runs.get(el);
-      if (!run) return;
+      if (!run) return null;
       clearTimeout(run.timer);
       cancelAnimationFrame(run.raf);
       runs.delete(el);
+      return run;
     }
 
     function finish(el) {
-      stop(el);
+      const run = stop(el);
       el.classList.add("is-typed");
       const box = el.closest("[data-dialog]");
       if (box) box.classList.add("has-typed");
+      if (run && run.onDone) run.onDone();
     }
 
-    // returns when (ms from now) the last letter lands
-    function play(el, delay = 0) {
+    const busy = (el) => runs.has(el);
+
+    // returns when (ms from now) the last letter lands; onDone runs when it does (or is tapped through)
+    function play(el, delay = 0, onDone) {
       stop(el);
       const chars = $$(".typed .ch", el);
-      if (reducedMotion() || !chars.length) { finish(el); return 0; }
-      const run = { timer: 0, raf: 0 };
+      if (reducedMotion() || !chars.length) { finish(el); if (onDone) onDone(); return 0; }
+      const run = { timer: 0, raf: 0, onDone };
       runs.set(el, run);
       let shown = 0;
       run.timer = setTimeout(() => {
@@ -261,13 +129,13 @@ const CONTENT = {
       return delay + chars.length * SPEED;
     }
 
-    // a tap on a dialogue box finishes its sentences at once
+    // a tap on a dialogue box finishes its sentences at once (the talk box handles its own taps)
     document.addEventListener("click", (e) => {
       const box = e.target.closest("[data-dialog]");
-      if (box && !e.target.closest("button")) $$("[data-type], .love__text", box).forEach(finish);
+      if (box && !box.hasAttribute("data-talk") && !e.target.closest("button")) $$("[data-type]", box).forEach(finish);
     });
 
-    return { prepare, play, finish };
+    return { prepare, play, finish, busy };
   })();
 
   function renderContent() {
@@ -282,6 +150,7 @@ const CONTENT = {
       el.insertAdjacentHTML("afterbegin", `<span class="visually-hidden">${escapeHTML(text)}</span>`);
     });
     $$("[data-type]").forEach(Typer.prepare);
+    $("[data-credits-list]").innerHTML = CONTENT.title.creditsLines.map((line) => `<li>${format(line)}</li>`).join("");
     $$("[data-photo]").forEach((img) => {
       const photo = CONTENT.photos[img.dataset.photo];
       if (!photo) return;
@@ -370,47 +239,30 @@ const CONTENT = {
   /* ---------- The clock in the corner ---------- */
 
   const Clock = (() => {
+    const plate = $("[data-clock]");
     const time = $("[data-clock-time]");
     const ctx = $("[data-clock-icon]").getContext("2d");
     const sun = Pixel.sun();
     const moon = Pixel.moon();
-
-    function set(index) {
-      time.textContent = CONTENT.hud.times[index] || "";
-      (index >= 5 ? moon : sun).paint(ctx);
-    }
-    return { set };
-  })();
-
-  /* ---------- The crop (progress) ---------- */
-
-  const Plant = (() => {
-    const holder = $("[data-plant]");
-    const canvas = $("[data-plant-canvas]");
-    const ctx = canvas.getContext("2d");
-    const stages = Array.from({ length: 7 }, (_, i) => Pixel.crop(i));
     let current = -1;
 
-    function set(stage, total) {
-      holder.setAttribute(
-        "aria-label",
-        CONTENT.progress.replace("{n}", stage + 1).replace("{total}", total)
-      );
-      const s = Math.min(stages.length - 1, Math.round((stage / Math.max(1, total - 1)) * (stages.length - 1)));
-      if (s === current) return;
+    function set(index) {
+      if (index === current) return;
       const first = current < 0;
-      current = s;
-      stages[s].paint(ctx);
+      current = index;
+      time.textContent = CONTENT.hud.times[index] || "";
+      ctx.clearRect(0, 0, 9, 9);
+      (index >= 5 ? moon : sun).paint(ctx);
+      // the plate hops when the hour changes
       if (!first && !reducedMotion()) {
         const P = PX();
-        canvas.animate([
+        plate.animate([
           { transform: "translateY(0)" },
-          { transform: `translateY(${-P * 3}px)` },
+          { transform: `translateY(${-P * 2}px)` },
           { transform: "translateY(0)" },
         ], { duration: 360, easing: "steps(3, end)" });
       }
     }
-
     return { set };
   })();
 
@@ -439,7 +291,7 @@ const CONTENT = {
 
     animateIn(page, [{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "steps(2, end)" });
 
-    $$(".frame", page).forEach((el, i) => {
+    $$(".logo, .frame", page).forEach((el, i) => {
       animateIn(el, [
         { opacity: 0, transform: `translateY(${-P * 14}px)` },
         { opacity: 1, transform: `translateY(${P * 2}px)`, offset: 0.7 },
@@ -455,7 +307,7 @@ const CONTENT = {
       ], { duration: 560, delay: 260, easing: "steps(6, end)" });
     });
 
-    $$(".achievement, .meter, .dialog", page).forEach((el, i) => {
+    $$(".achievement, .meter:not(.meter--talk), .dialog:not(.credits__box)", page).forEach((el, i) => {
       animateIn(el, [
         { opacity: 0, transform: "scale(.9)" },
         { opacity: 1, transform: "scale(1.02)", offset: 0.6 },
@@ -475,7 +327,7 @@ const CONTENT = {
 
     typed.forEach((el) => Typer.play(el, afterWords));
 
-    $$(".dialog__actions, .answers, .btn--begin, .signoff", page).forEach((el, i) => {
+    $$(".dialog__actions, .answers, .menu, .signoff", page).forEach((el, i) => {
       animateIn(el, [
         { opacity: 0, transform: `translateY(${P * 3}px)` },
         { opacity: 1, transform: "none" },
@@ -496,32 +348,30 @@ const CONTENT = {
   }
 
   const Pages = (() => {
-    const pages = $$("[data-page]").sort((a, b) => a.dataset.page - b.dataset.page);
-    let index = 0;
+    const pages = {};
+    $$("[data-page]").forEach((page) => { pages[page.dataset.page] = page; });
+    let current = "title";
     let busy = false;
 
-    function show(next, onShown) {
-      if (busy || next === index || !pages[next]) return;
+    function show(name, onShown) {
+      const to = pages[name];
+      if (busy || name === current || !to) return;
       busy = true;
 
-      const from = pages[index];
-      const to = pages[next];
+      const from = pages[current];
       from.inert = true;
       const leaving = depart(from);
-      Scene.set(next);
-      Clock.set(next);
 
       setTimeout(() => {
         to.hidden = false;
         to.inert = false;
-        index = next;
-        Plant.set(index, pages.length);
+        current = name;
         arrive(to);
-        Mei.onPage(index, to);
-        Tufo.onPage(index, to);
+        Mei.onPage(to);
+        Tufo.onPage(to);
 
-        const heading = $("h1, h2", to);
-        if (heading) heading.focus({ preventScroll: true });
+        const focus = $("[data-talk], h1, h2", to);
+        if (focus) focus.focus({ preventScroll: true });
         window.scrollTo({ top: 0, behavior: "auto" });
 
         if (onShown) onShown(to);
@@ -534,56 +384,48 @@ const CONTENT = {
       });
     }
 
-    function next(onShown) {
-      show(index + 1, onShown);
-    }
-
     function init() {
-      pages.forEach((page, i) => {
-        if (i !== 0) page.inert = true;
+      Object.values(pages).forEach((page) => {
+        if (page !== pages.title) page.inert = true;
       });
-      Plant.set(0, pages.length);
       Clock.set(0);
 
-      // wait for the fonts and the first photo (max 700ms) so the entrance
+      // wait for the fonts and the photo (max 700ms) so the entrance
       // starts on a clean frame instead of fighting the first paint
-      const intro = pages[0];
-      const img = $("img", intro);
-      intro.style.opacity = "0";
+      const title = pages.title;
+      const img = $("img", title);
+      title.style.opacity = "0";
       const assets = Promise.all([
         document.fonts ? document.fonts.ready : null,
         img && img.decode ? img.decode().catch(() => {}) : null,
       ]);
       const cap = new Promise((r) => setTimeout(r, 700));
       Promise.race([assets, cap]).then(() => requestAnimationFrame(() => {
-        intro.style.opacity = "";
-        arrive(intro);
+        title.style.opacity = "";
+        arrive(title);
       }));
     }
 
-    return { init, next, show, get index() { return index; }, get busy() { return busy; } };
+    return { init, show, get current() { return current; } };
   })();
 
-  /* ---------- Things I love about you: the heart meter fills ---------- */
+  /* ---------- Friendship hearts: they fill as the day goes on ---------- */
 
-  const Loves = (() => {
-    const list = $("[data-loves]");
-    const button = $('[data-action="reveal"]');
-    const label = $("[data-reveal-label]");
-    const hearts = $$("[data-meter] i");
-    let shown = 0;
+  const Meter = (() => {
+    const meter = $("[data-meter]");
+    const hearts = $$("i", meter);
     let filled = 0;
 
-    const done = () => shown >= CONTENT.loves.items.length;
-
-    function updateLabel() {
-      const { revealButton, moreButton, doneButton } = CONTENT.loves;
-      label.textContent = done() ? doneButton : shown === 0 ? revealButton : moreButton;
+    function label() {
+      meter.setAttribute("aria-label", CONTENT.hearts.replace("{n}", filled));
     }
 
     function fillTo(n) {
+      n = Math.min(hearts.length, n);
       const from = filled;
+      if (n <= from) return;
       filled = n;
+      label();
       for (let i = from; i < n; i++) {
         const heart = hearts[i];
         setTimeout(() => {
@@ -594,26 +436,8 @@ const CONTENT = {
       }
     }
 
-    function reveal() {
-      if (done()) {
-        Pages.next();
-        return;
-      }
-      const li = document.createElement("li");
-      li.className = "is-new";
-      li.innerHTML = '<span class="love__text">' + format(CONTENT.loves.items[shown]) + "</span>";
-      list.appendChild(li);
-      const text = $(".love__text", li);
-      Typer.prepare(text);
-      Typer.play(text, 60);
-      fillTo(Math.round(((shown + 1) / CONTENT.loves.items.length) * hearts.length));
-      Tufo.onLove(li, shown);
-      shown += 1;
-      updateLabel();
-    }
-
-    button.addEventListener("click", reveal);
-    updateLabel();
+    label();
+    return { fillTo, add: (n = 1) => fillTo(filled + n), get filled() { return filled; } };
   })();
 
   /* ---------- The No button that won't be caught ---------- */
@@ -627,6 +451,7 @@ const CONTENT = {
     const clock = $("[data-clock]");
     const question = $(".question");
     const questionBox = $(".dialog--question");
+    const portrait = $(".portrait--question");
     const labels = CONTENT.question.no;
 
     const MARGIN = 12;
@@ -693,6 +518,8 @@ const CONTENT = {
         inflate(clock.getBoundingClientRect(), 10),
         inflate(Mei.rect, 8),
         inflate(Tufo.rect, 8),
+        inflate(portrait.getBoundingClientRect(), 8),
+        ...Actors.rects().map((r) => inflate(r, 8)),
       ];
       const prefer = [inflate(question.getBoundingClientRect(), 6)]; // try not to cover the question
       // never park on the question box's wooden border: fully inside it or clear of it
@@ -764,6 +591,7 @@ const CONTENT = {
       place(pickSpot());
       Mei.onDodge();
       Tufo.onDodge();
+      Actors.onDodge(dodges);
     }
 
     function rememberPointer(e) {
@@ -998,6 +826,14 @@ const CONTENT = {
       [65, 69, 72, 77].forEach((note) => pluck(note, tChord, 0.16, bus));
     }
 
+    // A quick rising pluck when a memory item pops up
+    function pickup() {
+      if (!ctx || muted) return;
+      const bus = sendBus(0.45);
+      const t0 = ctx.currentTime + 0.02;
+      [72, 77, 81, 84].forEach((note, i) => pluck(note, t0 + i * 0.07, 0.2, bus));
+    }
+
     // The little square-wave blip under typing text, in the song's key
     const BLIPS = [77, 79, 81, 84, 86];
     let lastBlip = 0;
@@ -1147,7 +983,7 @@ const CONTENT = {
       src.stop(t + 0.8);
     }
 
-    return { warm, start, setMuted, gliss, chime, blip, meow, purr, hiss, get muted() { return muted; } };
+    return { warm, start, setMuted, gliss, chime, pickup, blip, meow, purr, hiss, get muted() { return muted; } };
   })();
 
   /* ---------- The cats: pixel sprites driven by their mood classes ---------- */
@@ -1244,11 +1080,12 @@ const CONTENT = {
 
     const width = () => wrap.offsetWidth || 78;
 
-    // A little way off to one side of the crop, never at the far edge of a big screen
+    // A little way off to one side of the middle, never at the far edge of a big screen;
+    // once Gabrielle and Mohaimen stand there, far enough out that a bubble won't cover them
     function spotFor(side) {
       const vw = document.documentElement.clientWidth;
       const w = width();
-      const reach = Math.min(vw / 2 - w / 2 - 12, 250);
+      const reach = Math.min(vw / 2 - w / 2 - 12, document.body.dataset.scene === "title" ? 250 : 340);
       return vw / 2 - w / 2 + (side === "left" ? -reach : reach);
     }
 
@@ -1379,7 +1216,6 @@ const CONTENT = {
     };
   }
 
-  const sideFor = (index) => (index % 2 === 0 ? "left" : "right");
   const otherSide = (side) => (side === "left" ? "right" : "left");
 
   /* ---------- Mei: sweet, follows you everywhere ---------- */
@@ -1419,18 +1255,18 @@ const CONTENT = {
       if (e.pointerType === "mouse") cat.mood(["is-twitching"], 900);
     });
 
-    function onPage(index, page) {
+    function onPage(page) {
       clearTimeout(hintTimer);
       const token = cat.hush();
-      side = sideFor(index);
-      const line = text.pages[index];
+      const name = page.dataset.page;
+      const line = text.pages[name];
       cat.place(cat.spotFor(side), true).then(() => {
         if (!cat.current(token)) return;
-        if (page.matches(".page--question")) {
+        if (name === "question") {
           cat.lookAtEl($('[data-action="yes"]', page));
           cat.mood(["is-excited"], 2400);
         }
-        if (page.matches(".page--yay")) {
+        if (name === "yay") {
           cat.mood(["is-happy", "is-jumping", "is-excited"], 700);
           cat.hearts(8);
           setTimeout(() => { cat.mood(["is-happy", "is-jumping"], 700); cat.hearts(5); }, 750);
@@ -1473,7 +1309,7 @@ const CONTENT = {
 
     return {
       init, onPage, onDodge, startle, run,
-      say: (line, ms) => cat.say(line, ms),
+      say: (line, ms) => { clearTimeout(hintTimer); cat.say(line, ms); }, // she's talked: no need for the hint
       spotFor: (s) => cat.spotFor(s),
       get side() { return side; },
       get rect() { return cat.rect; },
@@ -1639,41 +1475,43 @@ const CONTENT = {
       }, 900);
     }
 
-    function onPage(index, page) {
+    function onPage(page) {
       clearTimeout(introTimer);
       clearTimeout(chaseTimer);
       pageToken += 1;
       chasing = false;
       const token = cat.hush();
-      side = otherSide(sideFor(index));
-      const line = text.pages[index];
+      const name = page.dataset.page;
+      const line = text.pages[name];
       // follows… reluctantly: later and slower than Mei
       setTimeout(() => {
         if (!cat.current(token)) return;
         cat.place(cat.spotFor(side), true, 8).then(() => {
           if (!cat.current(token)) return;
-          if (page.matches(".page--question")) cat.lookAtEl($("[data-no]"));
-          if (index === 2) {
-            knock($(".dialog", page), text.knock);
-            return;
-          }
-          if (page.matches(".page--yay")) {
+          if (name === "question") cat.lookAtEl($("[data-no]"));
+          if (name === "yay") {
             cat.mood(["is-happy"], 2600);
             setTimeout(() => cat.hearts(1), 1400);
           }
           if (line) setTimeout(() => { if (cat.current(token)) cat.say(line, 3000); }, 900);
-          // on the memory and love pages he sometimes goes after Mei (always the first time)
-          if (index >= 1 && index <= 4 && chases < 4 && (chases === 0 || Math.random() < 0.4)) {
-            const mine = pageToken;
-            chaseTimer = setTimeout(() => { if (mine === pageToken) chase(); }, 5200 + Math.random() * 2500);
-          }
         });
       }, reducedMotion() ? 0 : 600);
     }
 
-    // A love-list item was revealed: he swats the second one crooked
-    function onLove(li, i) {
-      if (i === 1) setTimeout(() => knock(li, text.knockLove), 500);
+    // A new hour of the talk: on the memory and love beats he sometimes goes after Mei (always the first time)
+    function onBeat(index) {
+      clearTimeout(chaseTimer);
+      if (!chasing) pageToken += 1; // a chase already under way gets to finish, even as the hour changes
+      if (index >= 1 && index <= 4 && chases < 4 && (chases === 0 || Math.random() < 0.4)) {
+        const mine = pageToken;
+        chaseTimer = setTimeout(() => { if (mine === pageToken) chase(); }, 5200 + Math.random() * 2500);
+      }
+    }
+
+    // A line from the story; knock: true means he swats the dialogue box crooked
+    function speak(line, knockIt) {
+      if (knockIt) knock($("[data-talk]"), line);
+      else cat.say(line, 2600);
     }
 
     let dodges = 0;
@@ -1695,7 +1533,10 @@ const CONTENT = {
       window.addEventListener("resize", () => cat.place(cat.spotFor(side), false));
     }
 
-    return { init, onPage, onLove, onDodge, jealous, get rect() { return cat.rect; } };
+    // "Load game" on the title: there are no saves
+    const scoff = (line) => { clearTimeout(introTimer); cat.face(false); hiss(line); };
+
+    return { init, onPage, onBeat, onDodge, jealous, speak, scoff, say: (line, ms) => cat.say(line, ms), get rect() { return cat.rect; } };
   })();
 
   /* ---------- Sound toggle ---------- */
@@ -2046,6 +1887,394 @@ const CONTENT = {
     return { bloom };
   })();
 
+  /* ---------- Gabrielle and Mohaimen, standing on the grass ---------- */
+
+  // what each face does to their whole-body sprite
+  const FACES = {
+    neutral: {},
+    nervous: { mouth: "flat", sweat: true, arm: "head", look: 0 },
+    happy: { eyes: "happy", mouth: "open" },
+    blush: { eyes: "happy", blush: true },
+    soft: { blush: true },
+    shocked: { eyes: "wide", mouth: "o", look: 0 },
+    cheer: { eyes: "happy", mouth: "open", arm: "up", blush: true },
+  };
+
+  const Actors = (() => {
+    function make(kind) {
+      const wrap = $(`[data-actor="${kind}"]`);
+      const ctx = $("[data-actor-canvas]", wrap).getContext("2d");
+      const emoteEl = $("[data-emote]", wrap);
+      const cache = new Map();
+      let base = "neutral";   // the face they settle back into
+      let face = base;
+      let talking = false;
+      let blink = 0;
+      let tick = 0;
+      let last = "";
+      let faceTimer = 0;
+      let emoteTimer = 0;
+
+      function draw() {
+        const p = Object.assign({ eyes: "open", mouth: "smile", look: 1, arm: "down" }, FACES[face]);
+        if (blink > 0 && p.eyes === "open") p.eyes = "blink";
+        if (talking && tick % 2 === 0) p.mouth = "open";
+        const key = [p.eyes, p.mouth, p.look, p.arm, p.blush, p.sweat].join();
+        if (key === last) return;
+        last = key;
+        let g = cache.get(key);
+        if (!g) {
+          g = Pixel.person(kind, p);
+          cache.set(key, g);
+        }
+        g.paint(ctx);
+      }
+
+      // a slow heartbeat: blinks, and a mouth that moves while his words type out
+      function loop() {
+        tick += 1;
+        if (blink > 0) blink -= 1;
+        else if (Math.random() < 0.025) blink = 2;
+        draw();
+        setTimeout(loop, document.hidden ? 600 : 110);
+      }
+      setTimeout(loop, 110);
+
+      // ms: show this face for a moment, then go back to the one before
+      function setFace(next, ms) {
+        clearTimeout(faceTimer);
+        if (!FACES[next]) next = "neutral";
+        face = next;
+        wrap.dataset.face = next;
+        if (ms) faceTimer = setTimeout(() => { face = base; wrap.dataset.face = base; draw(); }, ms);
+        else base = next;
+        draw();
+      }
+
+      function emote(kind, ms = 1600) {
+        clearTimeout(emoteTimer);
+        emoteEl.dataset.kind = kind;
+        emoteEl.classList.remove("is-showing");
+        void emoteEl.offsetWidth; // restart the pop
+        emoteEl.classList.add("is-showing");
+        Music.blip(1.5);
+        emoteTimer = setTimeout(() => emoteEl.classList.remove("is-showing"), ms);
+      }
+
+      function jump() {
+        wrap.classList.remove("is-jumping");
+        void wrap.offsetWidth;
+        wrap.classList.add("is-jumping");
+        setTimeout(() => wrap.classList.remove("is-jumping"), 620);
+      }
+
+      draw();
+      return {
+        setFace, emote, jump,
+        talk(on) { talking = on; draw(); },
+        get rect() { return $("canvas", wrap).getBoundingClientRect(); },
+      };
+    }
+
+    const gab = make("gab");
+    const mo = make("mo");
+
+    // No ran away again: he panics a little more each time
+    function onDodge(n) {
+      const face = n % 3 === 1 ? "shocked" : "nervous";
+      Portrait.set(face, 900);
+      mo.setFace(face, 900);
+      if (n === 1 || n % 4 === 0) mo.emote("sweat");
+    }
+
+    // She said yes
+    function celebrate() {
+      Portrait.set("happy");
+      mo.setFace("cheer");
+      gab.setFace("cheer");
+      gab.emote("heart", 2400);
+      [0, 700, 1400].forEach((t, i) => setTimeout(() => {
+        mo.jump();
+        setTimeout(() => gab.jump(), 160);
+        if (i === 1) mo.emote("heart", 2400);
+      }, reducedMotion() ? 0 : t));
+    }
+
+    return { gab, mo, onDodge, celebrate, rects: () => [gab.rect, mo.rect] };
+  })();
+
+  /* ---------- Mohaimen's portrait (talk box and question box) ---------- */
+
+  const Portrait = (() => {
+    const ctxs = $$("[data-portrait]").map((c) => c.getContext("2d"));
+    const cache = new Map();
+    let current = "neutral";
+    let timer = 0;
+
+    function paint(expr) {
+      let g = cache.get(expr);
+      if (!g) {
+        g = Pixel.portrait(expr);
+        cache.set(expr, g);
+      }
+      ctxs.forEach((ctx) => g.paint(ctx));
+    }
+
+    // ms: flash this face, then go back
+    function set(expr, ms) {
+      clearTimeout(timer);
+      paint(expr);
+      if (ms) timer = setTimeout(() => paint(current), ms);
+      else current = expr;
+    }
+
+    paint(current);
+    return { set };
+  })();
+
+  /* ---------- The dialogue box: his words, her choices ---------- */
+
+  const Dialogue = (() => {
+    const box = $("[data-talk]");
+    const titleEl = $("[data-talk-title]");
+    const textEl = $("[data-talk-text]");
+    const choicesEl = $("[data-choices]");
+    const nextBtn = $("[data-talk-next]");
+    const found = $("[data-found]");
+    const foundItem = $("[data-found-item]");
+    let waiting = null;   // resolves the current line when she taps on
+    let choosing = false;
+
+    // Type a line out; resolves once every letter is showing
+    function speak(line) {
+      titleEl.hidden = !line.title;
+      titleEl.innerHTML = line.title ? format(line.title) : "";
+      textEl.classList.remove("is-typed");
+      box.classList.remove("has-typed");
+      nextBtn.hidden = true;
+      textEl.innerHTML = format(line.text);
+      Typer.prepare(textEl);
+      $(".visually-hidden", textEl).insertAdjacentHTML("afterbegin", `${escapeHTML(CONTENT.mohaimen.name)}: `);
+      const face = line.face || "neutral";
+      Portrait.set(face);
+      Actors.mo.setFace(face);
+      Actors.mo.talk(true);
+      return new Promise((resolve) => {
+        Typer.play(textEl, 120, () => {
+          Actors.mo.talk(false);
+          resolve();
+        });
+      });
+    }
+
+    // Type a line, then wait for her tap
+    async function say(line) {
+      await speak(line);
+      nextBtn.hidden = false;
+      await new Promise((resolve) => { waiting = resolve; });
+      Music.blip();
+    }
+
+    // Offer her replies; resolves with the one she picks
+    function ask(options) {
+      choosing = true;
+      nextBtn.hidden = true;
+      const buttons = options.map((label) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn choice";
+        b.innerHTML = `<span>${format(label)}</span>`;
+        b.addEventListener("pointerenter", () => b.focus({ preventScroll: true })); // the cursor follows the pointer
+        return b;
+      });
+      choicesEl.replaceChildren(...buttons);
+      choicesEl.hidden = false;
+      box.classList.add("is-choosing");
+      const P = PX();
+      buttons.forEach((b, i) => animateIn(b, reducedMotion()
+        ? [{ opacity: 0 }, { opacity: 1 }]
+        : [{ opacity: 0, transform: `translateY(${P * 2}px)` }, { opacity: 1, transform: "none" }],
+      { duration: 200, delay: i * 80, easing: "steps(2, end)" }));
+      buttons[0].focus({ preventScroll: true });
+      choicesEl.scrollIntoView({ block: "nearest" }); // on a short phone they can start below the fold
+
+      return new Promise((resolve) => {
+        buttons.forEach((b, i) => b.addEventListener("click", () => {
+          if (!choosing) return;
+          choosing = false;
+          choicesEl.hidden = true;
+          choicesEl.replaceChildren();
+          box.classList.remove("is-choosing");
+          box.focus({ preventScroll: true });
+          Music.blip(2);
+          resolve(i);
+        }));
+      });
+    }
+
+    // arrow keys walk the choices, like a game menu
+    choicesEl.addEventListener("keydown", (e) => {
+      const buttons = $$("button", choicesEl);
+      const i = buttons.indexOf(document.activeElement);
+      if (i < 0) return;
+      const step = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      buttons[(i + step + buttons.length) % buttons.length].focus();
+    });
+
+    // One tap finishes the typing; the next one moves on
+    function advance() {
+      if (choosing) return;
+      if (Typer.busy(textEl)) { Typer.finish(textEl); return; }
+      if (waiting) {
+        const go = waiting;
+        waiting = null;
+        nextBtn.hidden = true;
+        go();
+      }
+    }
+
+    // anywhere on the farm counts as a tap, except the cats, the HUD and other buttons
+    document.addEventListener("click", (e) => {
+      if (Pages.current !== "talk") return;
+      if (e.target.closest("button:not([data-talk-next]), a, .hud, .cat-wrap, dialog")) return;
+      advance();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (Pages.current !== "talk" || e.repeat || (e.key !== "Enter" && e.key !== " ")) return;
+      const el = document.activeElement;
+      if (el && el !== box && el.closest("button, a, input, dialog")) return; // buttons press themselves
+      e.preventDefault();
+      advance();
+    });
+
+    // A memory's item pops up on top of the box
+    function showItem(item) {
+      foundItem.className = "item item--" + item;
+      found.hidden = false;
+      Music.pickup();
+      const P = PX();
+      animateIn(found, reducedMotion()
+        ? [{ opacity: 0 }, { opacity: 1 }]
+        : [
+          { opacity: 0, transform: `translateY(${P * 12}px) scale(.5)` },
+          { opacity: 1, transform: `translateY(${-P * 5}px) scale(1.1)`, offset: 0.6 },
+          { opacity: 1, transform: "none" },
+        ], { duration: 560, easing: "steps(6, end)" });
+    }
+
+    // Between hours the box folds away while the sky changes
+    function close() {
+      const a = animate(box, reducedMotion()
+        ? [{ opacity: 1 }, { opacity: 0 }]
+        : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }],
+      { duration: reducedMotion() ? 140 : 240, easing: "steps(3, end)" });
+      if (!found.hidden) animate(found, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: "steps(2, end)" });
+      return a ? a.finished.catch(() => {}) : Promise.resolve();
+    }
+
+    function open() {
+      box.getAnimations().forEach((a) => a.cancel()); // also straightens anything Tufo knocked over
+      found.getAnimations().forEach((a) => a.cancel());
+      found.hidden = true;
+      animateIn(box, reducedMotion()
+        ? [{ opacity: 0 }, { opacity: 1 }]
+        : [
+          { opacity: 0, transform: "scale(.9)" },
+          { opacity: 1, transform: "scale(1.02)", offset: 0.6 },
+          { opacity: 1, transform: "none" },
+        ], { duration: reducedMotion() ? 140 : 300, easing: "steps(3, end)" });
+    }
+
+    return { speak, say, ask, showItem, close, open };
+  })();
+
+  /* ---------- The story: one Saturday, dawn to night ---------- */
+
+  const Story = (() => {
+    const beats = CONTENT.story;
+    const NIGHT = 5; // the question comes at night; the festival is saved for her answer
+    const wait = (ms) => new Promise((r) => setTimeout(r, reducedMotion() ? Math.min(ms, 150) : ms));
+    let started = false;
+
+    // a line followed straight away by choices stays up while she chooses
+    const holds = (next) => Boolean(next && next.choose);
+
+    async function play(l, next) {
+      if (l.mei) { Mei.say(l.mei, 2800); return; }
+      if (l.tufo) { Tufo.speak(l.tufo, l.knock); return; }
+
+      if (l.memory != null) {
+        const m = CONTENT.memories[l.memory];
+        if (m.item) Dialogue.showItem(m.item);
+        const line = { title: m.title, text: m.body, face: l.face };
+        await (holds(next) ? Dialogue.speak(line) : Dialogue.say(line));
+        return;
+      }
+
+      if (l.mo) {
+        const line = { text: l.mo, face: l.face };
+        await (holds(next) ? Dialogue.speak(line) : Dialogue.say(line));
+        return;
+      }
+
+      if (l.choose) {
+        const i = await Dialogue.ask(l.choose.map((c) => c.say));
+        const pick = l.choose[i];
+        Meter.add(1);
+        Actors.gab.emote(pick.emote || "heart");
+        Actors.gab.setFace("happy", 1600);
+        const replies = pick.reply || [];
+        for (let k = 0; k < replies.length; k++) await play(replies[k], replies[k + 1] || next);
+        return;
+      }
+
+      if (l.loves) {
+        const faces = ["blush", "soft", "happy"];
+        const items = CONTENT.loves.items;
+        for (let k = 0; k < items.length; k++) {
+          Meter.add(1);
+          Actors.gab.setFace("blush");
+          if (k > 0) Actors.gab.emote("heart");
+          await Dialogue.say({ text: items[k], face: faces[k % faces.length] });
+        }
+        Actors.gab.setFace("neutral");
+      }
+    }
+
+    async function beat(i) {
+      const hour = Math.min(i, NIGHT);
+      Tufo.onBeat(i);
+      if (i > 0) {
+        await Dialogue.close();
+        Scene.set(hour);
+        Clock.set(hour);
+        Actors.mo.setFace("neutral");
+        await wait(1200);
+        Dialogue.open();
+        await wait(320);
+      }
+      const lines = beats[i].lines;
+      for (let k = 0; k < lines.length; k++) await play(lines[k], lines[k + 1]);
+    }
+
+    async function start() {
+      if (started) return;
+      started = true;
+      for (let i = 0; i < beats.length; i++) await beat(i);
+      // ten hearts, and he finally asks
+      Meter.fillTo(10);
+      Actors.mo.setFace("soft");
+      Actors.gab.emote("exclaim");
+      await wait(1100);
+      Portrait.set("soft");
+      Pages.show("question");
+    }
+
+    return { start };
+  })();
+
   /* ---------- Wiring ---------- */
 
   Scene.init();
@@ -2067,19 +2296,23 @@ const CONTENT = {
   if (document.readyState === "complete") setTimeout(loadLatePhotos, 500);
   else window.addEventListener("load", () => setTimeout(loadLatePhotos, 500), { once: true });
 
-  // the engine is built the moment a finger or key goes down on "Tap to begin"
-  const beginButton = $('[data-action="begin"]');
-  beginButton.addEventListener("pointerdown", () => Music.warm(), { once: true });
-  beginButton.addEventListener("keydown", (e) => {
+  // the engine is built the moment a finger or key goes down on "Play"
+  const playButton = $('[data-action="play"]');
+  playButton.addEventListener("pointerdown", () => Music.warm(), { once: true });
+  playButton.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") Music.warm();
   });
+
+  // Credits: a wooden box over the farm; tapping outside it closes it too
+  const credits = $("[data-credits]");
+  credits.addEventListener("click", (e) => { if (e.target === credits) credits.close(); });
 
   document.addEventListener("click", (e) => {
     const target = e.target.closest("[data-action]");
     if (!target) return;
     const action = target.dataset.action;
 
-    if (action === "begin") {
+    if (action === "play") {
       if (target.dataset.used) return;
       target.dataset.used = "true";
       Music.start(); // the tap is the permission browsers need
@@ -2089,18 +2322,30 @@ const CONTENT = {
         ? { x: e.clientX, y: e.clientY }
         : { x: r.left + r.width / 2, y: r.top + r.height / 2 };
       const covered = Lilies.bloom(origin);
-      // swap pages underneath while the flowers cover everything
-      setTimeout(() => Pages.next(), covered + 300);
-    } else if (action === "next") {
-      Pages.next();
+      // swap to the farm underneath while the flowers cover everything
+      setTimeout(() => {
+        document.body.dataset.scene = "talk";
+        Pages.show("talk", () => setTimeout(Story.start, reducedMotion() ? 200 : 1300));
+      }, covered + 300);
+    } else if (action === "load") {
+      Tufo.scoff(CONTENT.title.loadJoke.tufo);
+      setTimeout(() => Mei.say(CONTENT.title.loadJoke.mei, 2400), 1100);
+    } else if (action === "credits") {
+      if (credits.showModal) credits.showModal();
+      else credits.setAttribute("open", "");
     } else if (action === "yes") {
       Dodge.retire();
       Music.start();
       Music.chime();
-      Pages.next(() => {
+      Scene.set(6);
+      Clock.set(6);
+      Actors.celebrate();
+      Pages.show("yay", () => {
         Fireworks.run();
         setTimeout(Petals.run, reducedMotion() ? 0 : 250);
       });
+    } else if (action === "replay") {
+      window.location.reload();
     }
   });
 })();

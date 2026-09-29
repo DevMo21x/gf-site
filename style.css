@@ -16,6 +16,7 @@
   --hpx: 3px;               /* heart meter pixels */
   --gutter: 14px;
   --ground-h: 146px;        /* the grass strip: tall enough that cat bubbles never reach the pages */
+  --stand: 29;              /* how far up the grass Gabrielle and Mohaimen stand, in art pixels */
 
   --ink: #3b1d0b;
   --ink-soft: #5a3216;
@@ -94,8 +95,10 @@ em {
 /* everything drawn in pixels stays crisp */
 .dialog, .frame, .plaque, .slot, .item, .sparkle, .meter, .meter i, .btn, .btn__arrow, .btn__hand,
 .achievement, .achievement__star, .clock, .clock__icon, .sound-toggle, .sound-toggle__icon,
-.cat__px, .cat__bubble, .cat__bubble::after, .cat__heart, .plant canvas, .world canvas, .cloud,
-.loves li::before, .signoff__heart, .dialog__more, .petals, .lilies {
+.cat__px, .cat__bubble, .cat__bubble::after, .cat__heart, .world canvas, .cloud,
+.signoff__heart, .dialog__more, .petals, .lilies,
+.logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .nameplate, .choice::before,
+.credits__list li::before, .actor__px, .emote {
   image-rendering: pixelated;
 }
 
@@ -179,6 +182,7 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   transition: opacity 300ms steps(3, end);
 }
 .px-ready .hud { opacity: 1; }
+body[data-scene="title"] .clock { visibility: hidden; } /* the day starts when she presses Play */
 
 .clock {
   display: grid;
@@ -343,11 +347,14 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   50% { transform: translateX(var(--px)); }
 }
 
-.btn--begin {
-  width: 100%;
-  min-height: 60px;
-  font-size: 1.5rem;
+/* the quieter plank: parchment, ink label (Load game, Credits, Play again) */
+.btn--quiet {
+  border-image-source: var(--img-btn-parch);
+  color: var(--ink);
+  text-shadow: none;
+  font-size: 1.1875rem;
 }
+.btn--quiet:hover { border-image-source: var(--img-btn-parchHi); }
 
 /* ---------- Picture frames ---------- */
 
@@ -383,31 +390,292 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   color: var(--ink);
 }
 
-/* ---------- Intro ---------- */
+/* ---------- The start menu ---------- */
 
-.page--intro {
+.page--title {
   display: grid;
   justify-items: center;
-  gap: 38px;
+  gap: 22px;
 }
-.frame--intro {
-  width: clamp(120px, calc((100svh - 570px) * .75 + 30px), min(58vw, 230px));
+
+/* a wooden sign hanging on two ropes from the top of the screen */
+.logo {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: calc(var(--px) * 6);
 }
-.intro__side {
+.logo__sign {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: calc(var(--px) * 2) calc(var(--px) * 5) calc(var(--px) * 4);
+  border: calc(var(--px) * 6) solid transparent;
+  border-image: var(--img-sign) 6 fill / calc(var(--px) * 6) round;
+  font-size: clamp(2.125rem, 1.1rem + 4.4vw, 4rem);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  color: var(--cream);
+  text-shadow: 0 var(--px) 0 var(--wood-dk), 0 calc(var(--px) * 2) 0 var(--ink);
+  filter: drop-shadow(0 calc(var(--px) * 2) 0 rgb(40 18 6 / .38));
+}
+.logo__rope {
+  position: absolute;
+  bottom: calc(100% - var(--px) * 4);
+  width: calc(var(--px) * 3);
+  height: 100vh;
+  background: var(--img-rope) 0 100% / calc(var(--px) * 3) calc(var(--px) * 4) repeat-y;
+}
+.logo__rope--l { left: 18%; }
+.logo__rope--r { right: 18%; }
+
+.logo__bloom {
+  position: absolute;
+  z-index: 2;
+  width: calc(var(--px) * 15);
+  height: calc(var(--px) * 15);
+  background: 0 0 / 100% 100% no-repeat;
+}
+.logo__bloom--a { left: calc(var(--px) * -6); top: calc(var(--px) * -6); background-image: var(--img-flower-pink); }
+.logo__bloom--b { left: calc(var(--px) * 6); top: calc(var(--px) * -8); width: calc(var(--px) * 13); height: calc(var(--px) * 13); background-image: var(--img-leaf); z-index: 1; }
+.logo__bloom--c { right: calc(var(--px) * -6); bottom: calc(var(--px) * -2); background-image: var(--img-flower-lily); }
+
+.logo__ribbon { z-index: 2; bottom: calc(var(--px) * -9); }
+
+.title__row {
   display: grid;
-  justify-items: center;
-  gap: 18px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
   width: 100%;
 }
-.intro__side .dialog { width: 100%; }
+.frame--title {
+  width: clamp(96px, 34vw, 150px);
+  margin-bottom: calc(var(--px) * 6);
+}
+.dialog--greeting .dialog__body { font-size: 1.0625rem; line-height: 1.3; }
 
-/* ---------- Memories: an item found ---------- */
+.menu {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+.btn--play {
+  width: 100%;
+  min-height: 60px;
+  font-size: 1.5rem;
+}
+.menu__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
-.page--memory {
+/* credits: a wooden box over the farm */
+.credits {
+  width: min(30rem, calc(100vw - 28px));
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  overflow: visible;
+}
+.credits::backdrop { background: rgb(26 12 4 / .55); }
+.credits[open] .credits__box { animation: box-pop 300ms steps(3, end); }
+@keyframes box-pop {
+  0% { opacity: 0; transform: scale(.9); }
+  60% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: none; }
+}
+.credits__box {
+  display: grid;
+  gap: 12px;
+}
+.credits__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 1.05rem + 2vw, 2.125rem);
+  line-height: 1.12;
+}
+.credits__list {
+  display: grid;
+  gap: .6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.credits__list li {
+  display: grid;
+  grid-template-columns: calc(var(--px) * 7) 1fr;
+  gap: 10px;
+  align-items: start;
+  text-wrap: pretty;
+}
+.credits__list li::before {
+  content: "";
+  width: calc(var(--px) * 7);
+  height: calc(var(--px) * 6);
+  margin-top: .3em;
+  background: var(--img-heartSmall) 0 0 / 100% 100% no-repeat;
+}
+.credits__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+/* ---------- Talking with Mohaimen ---------- */
+
+/* they stand on the grass under the box, so every page after the title leaves room for them */
+body:not([data-scene="title"]) .stage {
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--px) * (var(--stand) + 46));
+}
+
+/* pinned to the top, so the box never jumps as his lines change length */
+.page--talk {
   display: grid;
   justify-items: center;
+  align-self: start;
 }
-.page--memory .dialog { width: 100%; padding-top: calc(var(--px) * 5); }
+.page--talk .found { justify-self: start; margin-left: calc(var(--px) * 8); }
+.page--talk .found[hidden] { display: block; visibility: hidden; } /* its room is kept, so nothing moves when it pops */
+
+.dialog--talk {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  padding: calc(var(--px) * 3) calc(var(--px) * 3) calc(var(--px) * 5);
+  cursor: pointer;
+}
+
+.speaker {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.speaker__meta {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.portrait {
+  display: block;
+  width: calc(var(--px) * 42);
+  border: calc(var(--px) * 3) solid transparent;
+  border-image: var(--img-portrait) 3 fill / calc(var(--px) * 3) stretch;
+  filter: drop-shadow(0 var(--px) 0 var(--ink));
+}
+.portrait canvas {
+  display: block;
+  width: calc(var(--px) * 36);
+  height: calc(var(--px) * 36);
+}
+
+.nameplate {
+  margin: 0;
+  padding: 0 6px;
+  border: calc(var(--px) * 4) solid transparent;
+  border-image: var(--img-plate) 4 fill / calc(var(--px) * 4) stretch;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* the hearts sit on the parchment, two rows of five */
+.dialog--talk .meter--talk {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  row-gap: var(--hpx);
+  padding: 0;
+  border: 0;
+  border-image: none;
+  filter: none;
+}
+
+.talk__main {
+  display: grid;
+  gap: 12px;
+}
+.talk__lines {
+  display: grid;
+  gap: 6px;
+}
+.talk__title {
+  margin: 0;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.625rem);
+  font-weight: 700;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.talk__title[hidden] { display: none; }
+.talk__text {
+  min-height: calc(1.35em * 3); /* the box holds its size from line to line */
+  padding-right: 18px;          /* room for the next arrow */
+}
+
+.choices {
+  display: grid;
+  gap: 8px;
+  cursor: auto;
+  scroll-margin-bottom: calc(var(--px) * (var(--stand) + 46) + 12px); /* clear of the cats and the two of them */
+}
+.choices[hidden] { display: none; }
+
+/* her replies: parchment planks, and a pointing hand on the one she's on */
+.btn.choice {
+  justify-content: flex-start;
+  width: 100%;
+  padding: 6px 12px 6px calc(var(--px) * 15);
+  border-image-source: var(--img-btn-parch);
+  color: var(--ink);
+  text-shadow: none;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+}
+.btn.choice:hover { border-image-source: var(--img-btn-parchHi); }
+.choice::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--px) * 1);
+  top: 50%;
+  width: calc(var(--px) * 11);
+  height: calc(var(--px) * 8);
+  margin-top: calc(var(--px) * -4);
+  background: var(--img-hand) 0 0 / 100% 100% no-repeat;
+  opacity: 0;
+}
+/* a game cursor: it rests on the first reply and follows her finger, mouse or keys */
+.choice:focus::before {
+  opacity: 1;
+  animation: point 700ms steps(1, end) infinite;
+}
+
+.talk__next {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: end;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.talk__next[hidden] { display: none; }
+.talk__next .dialog__more {
+  position: static;
+  opacity: 1;
+  animation: bob 800ms steps(1, end) infinite;
+}
+
+/* ---------- A memory's item, popping up on the talk box ---------- */
 
 .found {
   position: relative;
@@ -448,14 +716,7 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   66% { opacity: 0; }
 }
 
-/* ---------- Things I love about you ---------- */
-
-.page--loves {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-}
-.page--loves .dialog { width: 100%; }
+/* ---------- Friendship hearts ---------- */
 
 .meter {
   display: flex;
@@ -479,34 +740,11 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   100% { transform: scale(1); }
 }
 
-.loves {
-  list-style: none;
-  margin: .25rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: .75rem;
-}
-.loves:empty { display: none; }
-.loves li {
-  display: grid;
-  grid-template-columns: calc(var(--px) * 7) 1fr;
-  gap: 10px;
-  align-items: start;
-  text-wrap: pretty;
-}
-.loves li::before {
-  content: "";
-  width: calc(var(--px) * 7);
-  height: calc(var(--px) * 6);
-  margin-top: .3em;
-  background: var(--img-heartSmall) 0 0 / 100% 100% no-repeat;
-}
-.loves li.is-new::before { animation: heart-pop 420ms steps(4, end); }
-
 /* ---------- The question ---------- */
 
 .page--question { max-width: 38rem; }
 .dialog--question { text-align: center; padding-bottom: calc(var(--px) * 5); }
+.portrait--question { margin: calc(var(--px) * 1) auto 10px; }
 
 .question {
   display: grid;
@@ -622,8 +860,9 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   gap: 14px;
   width: 100%;
 }
+/* small on a phone, so the two of them stay in view below, cheering */
 .frame--yay {
-  width: clamp(96px, calc((100svh - 640px) * .75 + 30px), 200px);
+  width: clamp(90px, calc((100svh - 720px) * .5 + 90px), 132px);
 }
 .yay__words {
   display: grid;
@@ -640,6 +879,8 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   text-wrap: balance;
 }
 .signoff::before { content: "— "; }
+
+.btn--replay { min-width: 150px; }
 .signoff__heart {
   display: inline-block;
   width: calc(var(--px) * 7);
@@ -649,21 +890,68 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   background: var(--img-heartSmall) 0 0 / 100% 100% no-repeat;
 }
 
-/* ---------- The crop (progress) ---------- */
+/* ---------- Gabrielle and Mohaimen, on the grass ---------- */
 
-.plant {
+/* behind the boxes: on a very short phone the talk box may cover their heads, never the reverse */
+.actors {
   position: fixed;
-  z-index: 10;
-  left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + 1px);
-  translate: -50% 0;
+  z-index: 1;
+  left: 0;
+  bottom: 0;
   pointer-events: none;
 }
-.plant canvas {
-  display: block;
-  width: calc(var(--px) * 18);
-  height: calc(var(--px) * 26);
-  transform-origin: 50% 100%;
+body[data-scene="title"] .actors { visibility: hidden; }
+
+/* they stand back by the fence, so the cats' speech bubbles open below their faces */
+.actor {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + var(--px) * var(--stand));
+  width: calc(var(--px) * 22);
+}
+.actor--gab { margin-left: calc(var(--px) * -26); }
+.actor--mo { margin-left: calc(var(--px) * 4); }
+
+.actor__hop,
+.actor__flip,
+.actor__px { display: block; width: 100%; }
+.actor__px { height: calc(var(--px) * 42); }
+.actor__hop { transform-origin: 50% 100%; }
+.actor--mo .actor__flip { transform: scaleX(-1); } /* he faces her */
+
+.actor.is-jumping .actor__hop { animation: actor-jump 600ms steps(7, end); }
+@keyframes actor-jump {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(calc(var(--px) * -10)); }
+  100% { transform: translateY(0); }
+}
+.actor[data-face="nervous"] .actor__hop { animation: fidget 760ms steps(1, end) infinite; }
+@keyframes fidget {
+  50% { transform: translateX(var(--px)); }
+}
+
+.emote {
+  position: absolute;
+  left: calc(var(--px) * 4);
+  bottom: calc(100% - var(--px) * 2);
+  width: calc(var(--px) * 13);
+  height: calc(var(--px) * 12);
+  background: 0 0 / 100% 100% no-repeat;
+  opacity: 0;
+}
+.emote[data-kind="heart"] { background-image: var(--img-emote-heart); }
+.emote[data-kind="exclaim"] { background-image: var(--img-emote-exclaim); }
+.emote[data-kind="dots"] { background-image: var(--img-emote-dots); }
+.emote[data-kind="sweat"] { background-image: var(--img-emote-sweat); }
+.emote[data-kind="note"] { background-image: var(--img-emote-note); }
+.emote.is-showing {
+  opacity: 1;
+  animation: emote-pop 360ms steps(3, end);
+}
+@keyframes emote-pop {
+  0% { opacity: 0; transform: translateY(calc(var(--px) * 4)); }
+  60% { opacity: 1; transform: translateY(calc(var(--px) * -1)); }
+  100% { opacity: 1; transform: none; }
 }
 
 /* ---------- The cats (Mei & Tufo) ---------- */
@@ -801,9 +1089,17 @@ body[data-time="festival"] .world__flies { opacity: 1; }
   :root { --hpx: 2px; --gutter: 10px; }
 }
 
-@media (max-height: 640px) and (max-width: 759px) {
+@media (max-width: 759px) {
+  /* she's read the memory's title by now: fold it away so her replies fit above the two of them */
+  .dialog--talk.is-choosing .talk__title { display: none; }
+  /* the hearts already filled in the talk box; on a phone the room goes to the two of them cheering */
+  .yay__words .meter--full { display: none; }
+}
+
+@media (max-height: 700px) and (max-width: 759px) {
   .stage { padding-top: calc(env(safe-area-inset-top) + 70px); }
-  .page--intro { gap: 32px; }
+  .page--title { gap: 16px; }
+  .frame--title { width: clamp(90px, 28vw, 120px); }
 }
 
 /* ---------- Larger screens ---------- */
@@ -814,6 +1110,7 @@ body[data-time="festival"] .world__flies { opacity: 1; }
     --cat-px: 4px;
     --hpx: 4px;
     --ground-h: 172px;
+    --stand: 20;            /* the cats sit far enough away on a wide screen */
   }
 
   body { font-size: 1.4375rem; }
@@ -822,20 +1119,48 @@ body[data-time="festival"] .world__flies { opacity: 1; }
 
   .dialog__title { font-size: clamp(1.75rem, 1rem + 2vw, 2.5rem); }
   .btn { font-size: 1.5rem; min-height: 60px; }
-  .btn--begin { font-size: 1.75rem; min-height: 68px; }
+  .btn--quiet { font-size: 1.3125rem; }
+  .btn--play { font-size: 1.75rem; min-height: 68px; }
   .cat__bubble { font-size: 1.1875rem; max-width: 280px; }
 
-  .page--intro {
-    max-width: 64rem;
+  /* photo on the left, sign, greeting and menu on the right */
+  .page--title {
+    max-width: 62rem;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      "photo logo"
+      "photo greet"
+      "photo menu";
+    align-content: center;
     align-items: center;
-    gap: clamp(2.5rem, 5vw, 4.5rem);
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    row-gap: 22px;
   }
-  .frame--intro { width: 100%; max-width: 340px; justify-self: end; }
-  .intro__side { justify-items: start; }
+  .title__row { display: contents; }
+  .frame--title { grid-area: photo; width: 100%; max-width: 340px; justify-self: end; }
+  .logo { grid-area: logo; justify-self: start; }
+  .dialog--greeting { grid-area: greet; width: 100%; }
+  .dialog--greeting .dialog__body { font-size: inherit; line-height: 1.35; }
+  .menu { grid-area: menu; }
 
-  .page--memory,
-  .page--loves { max-width: 44rem; }
+  /* talk: words on the left, his portrait, name and hearts on the right */
+  .page--talk { max-width: 46rem; }
+  .dialog--talk {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: 22px;
+  }
+  .speaker {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: auto;
+    justify-items: center;
+  }
+  .speaker__meta { justify-items: center; }
+  .talk__main { grid-column: 1; grid-row: 1; align-content: start; }
+  .talk__text { min-height: 0; } /* the portrait column already holds the box's height */
+  .btn.choice { font-size: 1.3125rem; }
+
   .page--question { max-width: 44rem; }
 
   .page--yay { max-width: 60rem; }
@@ -855,13 +1180,17 @@ body[data-time="festival"] .world__flies { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   .cloud, .fly, .sparkle, .btn__hand, .achievement__star, .has-typed > .dialog__more,
+  .talk__next .dialog__more, .choice:focus::before,
   .cat-wrap.is-walking .cat__hop,
   .cat-wrap.is-jumping .cat__hop,
   .cat-wrap.is-purring .cat__hop,
   .cat-wrap.is-hissing .cat__hop,
   .cat-wrap.is-startled .cat__hop,
+  .actor.is-jumping .actor__hop,
+  .actor[data-face="nervous"] .actor__hop,
+  .emote.is-showing,
+  .credits[open] .credits__box,
   .meter i.is-new,
-  .loves li.is-new::before,
   .btn:hover .btn__arrow { animation: none; }
   .world__sky, .world__clouds, .world__flies { transition-duration: 300ms; }
   .btn--yes, .btn--no.is-loose, .cat__bubble { transition-duration: 1ms; }

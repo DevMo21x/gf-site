@@ -242,6 +242,36 @@
     }),
     // speech bubble (slice 3)
     bubble: () => frame(8, (ring) => (ring === 0 ? K : "#fffdf6")),
+    // the title sign: dark planks with a nail in every corner (slice 6)
+    sign: () => {
+      const g = frame(20, (ring, tl, along, side) => {
+        switch (ring) {
+          case 0: return K;
+          case 1: return tl ? WOOD.hi : WOOD.dk;
+          case 2: return tl ? WOOD.hi2 : WOOD.mid;
+          default: return null;
+        }
+      });
+      // planks run sideways; a seam every 8 rows, grain here and there
+      for (let y = 3; y < 17; y++) {
+        for (let x = 3; x < 17; x++) {
+          const seam = y % 8 === 5;
+          const grain = !seam && (x * 3 + y * 5) % 11 === 0;
+          g.set(x, y, seam ? WOOD.dk : grain ? "#8a4418" : "#9a4e1c");
+        }
+      }
+      [[4, 4], [15, 4], [4, 15], [15, 15]].forEach(([x, y]) => g.set(x, y, "#f2c46a").set(x + 1, y + 1, WOOD.dk));
+      return g;
+    },
+    // Mohaimen's portrait: a light slot with a sky-warm backdrop (slice 3)
+    portrait: () => frame(10, (ring, tl) => {
+      switch (ring) {
+        case 0: return WOOD.dk;
+        case 1: return tl ? "#c7843c" : "#fff1c9";
+        case 2: return tl ? "#e7b667" : "#f4d496";
+        default: return "#f4d496";
+      }
+    }),
   };
 
   // raised buttons (slice 3)
@@ -375,6 +405,13 @@
       "..KWK..",
       "...K...",
     ], { K, W: "#fffdf6" }),
+    // one twist of rope; it tiles down from the top of the screen
+    rope: () => fromRows([
+      "KTK",
+      "KTK",
+      "KtK",
+      "KtK",
+    ], { K, T: "#d9b574", t: "#a9803e" }),
   };
 
   /* ---------- Items found in the memories ---------- */
@@ -439,42 +476,297 @@
     ], { K, G: "#6fb04a", R: "#d9433b", M: "#9a5a2e", T: "#e9c98a", t: "#c9a060", W: "#dfe3ea", w: "#9aa0ab" }),
   };
 
-  /* ---------- The crop that grows one stage per page ---------- */
+  /* ---------- Gabrielle and Mohaimen, standing on the farm ---------- */
 
-  function crop(stage) {
-    const g = new Grid(18, 26);
-    const soil = "#8a5a2b";
-    const soilDk = "#6b4220";
-    g.ellipse(9, 23, 7.6, 2.2, soil);
-    const top = [21, 19, 16, 13, 11, 9, 9][stage];
-    if (stage >= 1) g.line(9, 21, 9, top, LEAF);
-    const leaf = (y, dir, s = 1) => g.ellipse(9 + dir * (2 * s), y, 1.9 * s, 0.9 * s, LEAF, dir * -0.5);
-    if (stage === 1) { g.set(8, 19, LEAF); g.set(10, 19, LEAF); }
-    if (stage >= 2) { leaf(19, -1); leaf(19, 1); }
-    if (stage >= 3) { leaf(16, -1, 1.2); leaf(15, 1, 1.2); }
-    if (stage >= 4) { leaf(12.5, -1, 1.1); leaf(12, 1, 1.1); }
-    if (stage === 5) {
-      g.ellipse(9, 7.5, 1.4, 2, "#f06a8a");
-      g.px([[8, 9], [10, 9]], LEAF);
-    }
-    if (stage >= 6) {
-      for (let k = 0; k < 6; k++) {
-        const a = (k / 6) * Math.PI * 2;
-        g.ellipse(9 + Math.cos(a) * 3, 6 + Math.sin(a) * 3, 1.9, 1.9, "#f4879c");
+  // pose: { eyes: open|blink|happy|wide, look: -1..1, mouth: smile|flat|open|o,
+  //         blush, sweat, arm: down|head|up }
+  // Both are drawn facing the viewer; the page mirrors Mohaimen so they face each other.
+  const GAB = {
+    skin: "#f5cfae", skinSh: "#e2ad8c", hair: "#b8814a", hairSh: "#8e5c30", hairHi: "#d9a45f",
+    hat: "#5b5860", hatSh: "#45424a", hatHi: "#78747d", coat: "#7a4a2a", coatSh: "#5f3720", coatHi: "#9a6238",
+    top: "#2a2226", lace: "#6a5560", jeans: "#4a6390", jeansSh: "#36496e", shoe: "#3a2a24",
+  };
+  const MO = {
+    skin: "#c98f68", skinSh: "#ae734f", hair: "#2b1a13", hairHi: "#4d3226", beard: "#3d2519",
+    coat: "#f3ecdc", coatSh: "#d3c6aa", coatDot: "#e4dac4", shirt: "#262022",
+    jeans: "#353c4a", jeansSh: "#272c37", shoe: "#ece6da", sole: "#bdb4a6",
+  };
+  const EYE = "#2b1d16";
+  const MOUTH = "#a8433b";
+  const LIP = "#7a2e28";   // a closed mouth: darker than an open one
+  const BLUSH = "#f09a9a";
+  const SWEAT = "#9ad8f5";
+
+  function person(kind, p) {
+    const mo = kind === "mo";
+    const C = mo ? MO : GAB;
+    const g = new Grid(22, 42);
+    const arm = p.arm || "down";
+
+    // arms first, so the body sits over their shoulders
+    const sleeve = C.coat;
+    if (arm === "up") {
+      g.line(5, 25, 2, 17, sleeve, 2).line(16, 25, 19, 17, sleeve, 2);
+      g.ellipse(2.5, 15.5, 1.3, 1.3, C.skin).ellipse(19.5, 15.5, 1.3, 1.3, C.skin);
+    } else {
+      g.rect(mo ? 2 : 3, 23, mo ? 3 : 2, 8, sleeve);
+      g.rect(mo ? 2 : 3, 31, 2, 2, C.skin);
+      if (arm === "head") {
+        g.line(17, 25, 19, 17, sleeve, 3);
+        g.ellipse(18.5, 14.5, 1.6, 1.6, C.skin);
+      } else {
+        g.rect(17, 23, mo ? 3 : 2, 8, sleeve);
+        g.rect(mo ? 18 : 17, 31, 2, 2, C.skin);
       }
-      g.ellipse(9, 6, 1.6, 1.6, GOLD);
     }
+
+    // legs and shoes
+    g.rect(6, 32, 4, 7, C.jeans).rect(12, 32, 4, 7, C.jeans);
+    if (mo) g.rect(5, 38, 5, 2, C.shoe).rect(12, 38, 5, 2, C.shoe);
+    else g.rect(6, 38, 4, 2, C.shoe).rect(12, 38, 4, 2, C.shoe);
+
+    // body
+    if (mo) {
+      g.ellipse(10.5, 24, 7.6, 2.6, C.coat);
+      g.rect(4, 24, 14, 9, C.coat);
+    } else {
+      g.ellipse(10.5, 23.4, 6.2, 2, C.coat);
+      g.rect(5, 23, 12, 10, C.coat);
+    }
+    g.rect(9, 21, 4, 3, C.skin); // neck
+
+    // head
+    if (mo) {
+      g.ellipse(10.5, 9.5, 7.8, 6.2, C.hair);
+      [[3.8, 11, 2.6], [4.2, 7, 2.8], [6.8, 3.9, 2.8], [10.5, 2.8, 2.9], [14.2, 3.9, 2.8], [16.8, 7, 2.8], [17.2, 11, 2.6]]
+        .forEach(([x, y, r]) => g.ellipse(x, y, r, r, C.hair));
+      g.ellipse(10.5, 15.4, 5.5, 5.5, C.skin);
+      [[6.2, 10.6], [10.5, 10.1], [14.8, 10.6]].forEach(([x, y]) => g.ellipse(x, y, 1.9, 1.5, C.hair));
+    } else {
+      // long hair behind, falling over both shoulders
+      g.ellipse(10.5, 16, 7.4, 6.4, C.hair);
+      g.rect(4, 17, 3, 10, C.hair).rect(15, 17, 3, 10, C.hair);
+      g.ellipse(10.5, 15.8, 5.4, 5, C.skin);
+      g.rect(5, 13, 12, 1, C.hair).px([[5, 14], [6, 14], [15, 14], [16, 14], [5, 15], [16, 15]], C.hair);
+      // the grey bucket hat
+      g.ellipse(10.5, 8.4, 6, 3.6, C.hat);
+      g.ellipse(10.5, 11.3, 9, 1.7, C.hat);
+    }
+
     g.outline(K);
-    g.px([[4, 23], [7, 22], [11, 24], [14, 23], [9, 24]], soilDk);
-    if (stage === 0) g.px([[7, 22], [11, 22]], "#f3dfa8");
-    if (stage >= 2) g.px([[7, 18], [11, 18]], LEAF_HI);
-    if (stage >= 3) g.px([[6, 15], [12, 14]], LEAF_HI);
-    if (stage >= 6) {
-      g.px([[7, 2], [13, 4], [5, 8]], "#ffc2cf");
-      g.px([[8, 5], [9, 5]], GOLD_HI);
+
+    // ---- details over the outline ----
+    const L = Math.max(-1, Math.min(1, p.look == null ? 1 : p.look));
+    const eyeY = mo ? 14 : 16;
+    const ex = [7 + L, 13 + L];
+    if (p.eyes === "blink") {
+      ex.forEach((x) => g.rect(x, eyeY + 1, 2, 1, EYE));
+    } else if (p.eyes === "happy") {
+      ex.forEach((x) => g.rect(x, eyeY, 2, 1, EYE).set(x - 1, eyeY + 1, EYE).set(x + 2, eyeY + 1, EYE));
+    } else if (p.eyes === "wide") {
+      ex.forEach((x) => g.rect(x, eyeY - 1, 2, 3, EYE).set(x, eyeY - 1, "#ffffff"));
+    } else {
+      ex.forEach((x) => g.rect(x, eyeY, 2, 2, EYE).set(x, eyeY, "#ffffff"));
     }
+
+    if (mo) {
+      // a short beard along the jaw, moustache, then the mouth inside it
+      g.rect(7, 19, 8, 2, C.beard).rect(9, 21, 4, 1, C.beard).rect(9, 18, 4, 1, C.beard);
+      g.set(6, 18, C.beard).set(15, 18, C.beard);
+    }
+    const mY = 19;
+    const lip = mo ? LIP : MOUTH;
+    if (p.mouth === "open") g.rect(10, mY, 2, 2, MOUTH);
+    else if (p.mouth === "o") g.rect(10, mY, 2, 2, EYE);
+    else if (p.mouth === "flat") g.px([[9, mY], [10, mY + 1], [11, mY], [12, mY + 1]], lip);
+    else if (mo) g.rect(9, mY, 4, 1, lip).set(9, mY, C.skin).set(12, mY, C.skin).rect(10, mY, 2, 1, lip);
+    else g.rect(10, mY, 2, 1, MOUTH).set(9, mY - 1, MOUTH).set(12, mY - 1, MOUTH);
+
+    if (p.blush) g.px([[6, eyeY + 2], [7, eyeY + 2], [14, eyeY + 2], [15, eyeY + 2]], BLUSH);
+
+    if (mo) {
+      g.rect(6, 12, 3, 1, C.hair).rect(13, 12, 3, 1, C.hair);           // thick brows
+      g.set(10, 16, C.skinSh).set(10, 17, C.skinSh);                    // nose
+      g.px([[5, 8], [8, 5], [12, 4], [15, 6], [4, 12], [17, 12]], C.hairHi); // curls catching light
+      // sherpa texture and the open jacket over a black shirt
+      g.rect(8, 22, 6, 10, C.shirt);
+      g.px([[5, 25], [6, 28], [5, 30], [16, 25], [15, 28], [16, 30], [3, 26], [18, 27]], C.coatDot);
+      g.rect(4, 32, 14, 1, C.coatSh).rect(7, 23, 1, 9, C.coatSh).rect(14, 23, 1, 9, C.coatSh);
+      g.rect(6, 36, 4, 1, C.jeansSh).rect(12, 36, 4, 1, C.jeansSh);
+      g.rect(5, 39, 5, 1, C.sole).rect(12, 39, 5, 1, C.sole);
+    } else {
+      g.px([[4, 11], [5, 10], [8, 9], [12, 8]], C.hatHi);              // hat catches the sun
+      g.rect(3, 12, 16, 1, C.hatSh);                                    // under the brim
+      g.px([[5, 17], [16, 17], [4, 20], [17, 21]], C.hairSh);
+      g.px([[5, 22], [16, 23], [6, 25]], C.hairHi);
+      g.set(10, 18, C.skinSh);                                          // nose
+      // leather jacket open over a black lace top, a little gold necklace
+      g.rect(9, 23, 4, 9, C.top);
+      g.px([[9, 23], [11, 23], [10, 24], [12, 24]], C.lace);
+      g.set(10, 25, GOLD).set(11, 25, GOLD);
+      g.rect(8, 23, 1, 9, C.coatHi).rect(13, 23, 1, 9, C.coatSh);
+      g.rect(5, 32, 12, 1, C.coatSh);
+      g.px([[6, 24], [7, 27]], C.coatHi);
+      g.rect(8, 33, 1, 5, C.jeansSh).rect(14, 33, 1, 5, C.jeansSh);
+    }
+
+    if (p.sweat) g.px([[3, 9], [3, 10], [2, 11], [3, 11]], SWEAT).set(2, 10, K).set(4, 10, K).set(4, 11, K);
     return g;
   }
+
+  /* ---------- Mohaimen's portrait, for the dialogue box ---------- */
+
+  // expr: neutral | nervous | happy | blush | soft | shocked
+  function portrait(expr) {
+    const C = MO;
+    const g = new Grid(36, 36);
+
+    // shoulders: the white sherpa collar over a black shirt
+    g.ellipse(18, 36, 17, 7.5, C.coat);
+    g.rect(15, 27, 6, 4, C.skinSh); // neck
+    // the curls
+    g.ellipse(18, 12, 12.4, 9.6, C.hair);
+    [[6.6, 16], [5.8, 10.8], [8.2, 6], [12.6, 3], [18, 2.2], [23.4, 3], [27.8, 6], [30.2, 10.8], [29.4, 16], [7.4, 20], [28.6, 20]]
+      .forEach(([x, y]) => g.ellipse(x, y, 3.5, 3.5, C.hair));
+    // ears and face
+    g.ellipse(8.4, 20.5, 1.8, 2.6, C.skin).ellipse(27.6, 20.5, 1.8, 2.6, C.skin);
+    g.ellipse(18, 20, 8.6, 9, C.skin);
+    // curls falling over the forehead
+    [[11.5, 11.8], [15.5, 11], [20, 11], [24.4, 11.8]].forEach(([x, y]) => g.ellipse(x, y, 2.4, 2, C.hair));
+    g.outline(K);
+
+    // shade on the far side of the face
+    g.tint((x, y, v) => v === C.skin && (x >= 25 || y >= 27), C.skinSh);
+    g.px([[8, 7], [12, 4], [17, 3], [22, 3], [27, 6], [30, 11], [6, 13], [11, 10], [19, 9]], C.hairHi);
+
+    const shirt = [[15, 31], [16, 31], [17, 31], [18, 31], [19, 31], [20, 31], [21, 31]];
+    g.px(shirt, C.shirt);
+    g.rect(16, 32, 5, 4, C.shirt);
+    g.px([[6, 33], [9, 31], [11, 34], [26, 31], [28, 34], [24, 33], [4, 35], [31, 35]], C.coatDot);
+    g.px([[13, 31], [14, 32], [22, 32], [23, 31]], C.coatSh);
+
+    const W = "#ffffff";
+
+    // eyes: 3×3 with a glint, or shut, or wide
+    const eye = (x, kind, look = 0) => {
+      if (kind === "happy") { g.rect(x, 19, 3, 1, EYE).set(x - 1, 20, EYE).set(x + 3, 20, EYE); return; }
+      if (kind === "soft") { g.rect(x - 1, 19, 5, 1, EYE); g.rect(x, 20, 3, 1, EYE); return; }
+      if (kind === "wide") { g.rect(x - 1, 17, 5, 5, W); g.rect(x + 1 + look, 18, 2, 2, EYE); g.rect(x - 1, 17, 5, 1, EYE); return; }
+      g.rect(x, 18, 3, 3, EYE);
+      g.set(x + look, 18, W);
+    };
+
+    switch (expr) {
+      case "nervous":
+        g.rect(11, 14, 5, 1, C.hair).rect(21, 14, 5, 1, C.hair).set(15, 13, C.hair).set(21, 13, C.hair);
+        eye(12, "open", 2); eye(22, "open", 2);
+        g.px([[15, 26], [16, 25], [17, 26], [18, 25], [19, 26], [20, 25], [21, 26]], LIP);
+        g.px([[28, 13], [28, 14], [27, 15], [28, 15], [29, 15], [28, 16]], SWEAT).set(29, 14, K).set(27, 14, K);
+        break;
+      case "happy":
+        g.rect(11, 15, 5, 1, C.hair).rect(21, 15, 5, 1, C.hair);
+        eye(12, "happy"); eye(22, "happy");
+        g.rect(15, 25, 7, 2, MOUTH).rect(15, 25, 7, 1, W).set(15, 26, EYE).set(21, 26, EYE).rect(16, 27, 5, 1, MOUTH);
+        g.px([[10, 22], [11, 22], [25, 22], [26, 22]], BLUSH);
+        break;
+      case "blush":
+        g.rect(11, 15, 5, 1, C.hair).rect(21, 15, 5, 1, C.hair);
+        eye(12, "soft"); eye(22, "soft");
+        g.px([[15, 25], [16, 26], [17, 26], [18, 26], [19, 26], [20, 26], [21, 25]], LIP);
+        g.rect(9, 22, 4, 1, BLUSH).rect(24, 22, 4, 1, BLUSH).rect(10, 23, 2, 1, BLUSH).rect(25, 23, 2, 1, BLUSH);
+        break;
+      case "soft":
+        g.rect(11, 15, 5, 1, C.hair).rect(21, 15, 5, 1, C.hair);
+        eye(12, "open", 1); eye(22, "open", 1);
+        g.px([[16, 25], [17, 26], [18, 26], [19, 26], [20, 25]], LIP);
+        g.px([[10, 22], [11, 22], [25, 22], [26, 22]], BLUSH);
+        break;
+      case "shocked":
+        g.rect(11, 13, 5, 1, C.hair).rect(21, 13, 5, 1, C.hair);
+        eye(12, "wide", 0); eye(22, "wide", 0);
+        g.rect(17, 25, 3, 3, EYE).set(18, 26, MOUTH);
+        g.px([[28, 13], [28, 14], [27, 15], [28, 15], [29, 15], [28, 16]], SWEAT).set(29, 14, K).set(27, 14, K);
+        break;
+      default:
+        g.rect(11, 15, 5, 1, C.hair).rect(21, 15, 5, 1, C.hair);
+        eye(12, "open", 1); eye(22, "open", 1);
+        g.px([[15, 25], [16, 26], [17, 26], [18, 26], [19, 26], [20, 26], [21, 25]], LIP);
+    }
+
+    // moustache and a short beard that follows the jaw
+    const stubble = "#8f5e42";
+    for (let y = 22; y < 30; y++) {
+      for (let x = 9; x < 28; x++) {
+        const v = g.get(x, y);
+        if (v !== C.skin && v !== C.skinSh) continue;
+        const jaw = y >= 27 || (y >= 24 && (x <= 12 || x >= 24));
+        if (jaw) g.set(x, y, y >= 28 || x <= 10 || x >= 26 ? C.beard : stubble);
+      }
+    }
+    if (expr !== "happy" && expr !== "shocked") g.rect(15, 24, 7, 1, C.beard).set(14, 25, C.beard).set(22, 25, C.beard);
+    else g.px([[14, 24], [15, 24], [21, 24], [22, 24]], C.beard);
+    // nose
+    g.px([[18, 21], [18, 22], [17, 23], [19, 23]], C.skinSh);
+    return g;
+  }
+
+  /* ---------- Emotes that pop over their heads ---------- */
+
+  const EMOTE_TOP = ".KKKKKKKKKKK.";
+  const EMOTE_TAIL = [".KKKWKKKKKKK.", "...KWK.......", "...KK........"];
+  const emote = (rows, legend) => fromRows([EMOTE_TOP, ...rows, ...EMOTE_TAIL], Object.assign({ K, W: "#fffdf6" }, legend));
+  const EMOTES = {
+    heart: () => emote([
+      "KWWWWWWWWWWWK",
+      "KWWWRRWRRWWWK",
+      "KWWRRHRRRRWWK",
+      "KWWRRRRRRRWWK",
+      "KWWWRRRRRWWWK",
+      "KWWWWRRRWWWWK",
+      "KWWWWWRWWWWWK",
+      "KWWWWWWWWWWWK",
+    ], { R: RED, H: RED_HI }),
+    exclaim: () => emote([
+      "KWWWWWKWWWWWK",
+      "KWWWWKRKWWWWK",
+      "KWWWWKRKWWWWK",
+      "KWWWWKRKWWWWK",
+      "KWWWWWKWWWWWK",
+      "KWWWWKRKWWWWK",
+      "KWWWWWKWWWWWK",
+      "KWWWWWWWWWWWK",
+    ], { R: RED }),
+    dots: () => emote([
+      "KWWWWWWWWWWWK",
+      "KWWWWWWWWWWWK",
+      "KWWWWWWWWWWWK",
+      "KWWKKWKKWKKWK",
+      "KWWKKWKKWKKWK",
+      "KWWWWWWWWWWWK",
+      "KWWWWWWWWWWWK",
+      "KWWWWWWWWWWWK",
+    ], {}),
+    sweat: () => emote([
+      "KWWWWWWWWWWWK",
+      "KWWWWWBWWWWWK",
+      "KWWWWBBWWWWWK",
+      "KWWWBBHBWWWWK",
+      "KWWWBBBBWWWWK",
+      "KWWWBBBBWWWWK",
+      "KWWWWBBWWWWWK",
+      "KWWWWWWWWWWWK",
+    ], { B: "#4a9fd6", H: "#cdeefc" }),
+    note: () => emote([
+      "KWWWWWWWWWWWK",
+      "KWWWWWKKKKWWK",
+      "KWWWWWKWWKWWK",
+      "KWWWWWKWWKWWK",
+      "KWWWWWKWWKWWK",
+      "KWWWKKKWKKKWK",
+      "KWWWKKKWKKKWK",
+      "KWWWWWWWWWWWK",
+    ], {}),
+  };
 
   /* ---------- Flowers for the burst ---------- */
 
@@ -827,13 +1119,6 @@
       }
     }
 
-    // tilled patch where the crop grows
-    const cx = Math.round(W / 2);
-    const patchW = 20;
-    fill(T.soil, cx - patchW / 2, H - 8, patchW, 7);
-    for (let x = cx - patchW / 2; x < cx + patchW / 2; x += 2) fill(T.fenceDk, x, H - 5);
-    fill(T.fenceDk, cx - patchW / 2, H - 8, patchW, 1);
-
     // fence along the back of the yard
     const railY = [ground - 6, ground - 3];
     railY.forEach((y) => { fill(T.fence, 0, y, W, 2); fill(T.fenceDk, 0, y + 2, W, 1); });
@@ -870,7 +1155,7 @@
       // lantern posts out in the yard, where the grass stays in view
       for (let i = 0, n = Math.max(3, Math.round(W / 40)); i < n; i++) {
         const x = Math.round(((i + 0.5) / n) * W);
-        if (Math.abs(x - W / 2) < 14) continue; // leave the crop patch clear
+        if (Math.abs(x - W / 2) < 30) continue; // leave the two of them clear
         const y = ground + 3 + (i % 2) * 3;
         const body = i % 2 ? "#e2503c" : "#f6c23e";
         const glow = i % 2 ? "#ffb08a" : "#fff0a0";
@@ -899,16 +1184,23 @@
     set("--img-plate", FRAMES.plate());
     set("--img-slot", FRAMES.slot());
     set("--img-bubble", FRAMES.bubble());
+    set("--img-sign", FRAMES.sign());
+    set("--img-portrait", FRAMES.portrait());
     Object.entries(BUTTONS).forEach(([name, make]) => set("--img-btn-" + name, make()));
     Object.entries(SPRITES).forEach(([name, make]) => set("--img-" + name, make()));
     Object.entries(ITEMS).forEach(([name, make]) => set("--img-item-" + name, make()));
+    Object.entries(EMOTES).forEach(([name, make]) => set("--img-emote-" + name, make()));
+    set("--img-flower-lily", flower(0, 2));
+    set("--img-flower-pink", flower(1, 2));
+    set("--img-flower-sun", flower(2, 2));
+    set("--img-leaf", leafSprite(0));
     const icon = document.querySelector('link[rel="icon"]');
     if (icon) icon.href = SPRITES.heart().url();
     document.documentElement.classList.add("px-ready");
   }
 
   window.Pixel = {
-    Grid, fromRows, cat, crop, flower, leafSprite, cloud, scene, seeded,
+    Grid, fromRows, cat, person, portrait, flower, leafSprite, cloud, scene, seeded,
     heart: () => SPRITES.heart(),
     heartSmall: () => SPRITES.heartSmall(),
     sun: () => SPRITES.sun(),

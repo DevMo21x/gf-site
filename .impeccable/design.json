@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-28T22:42:44+00:00",
+  "generatedAt": "2026-09-29T01:57:55+00:00",
   "title": "Design System: For Gabrielle",
   "extensions": {
     "colorMeta": {
@@ -207,19 +207,23 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Dialogue and achievement titles; clamp(1.75rem, 1rem + 2vw, 2.5rem) from 760px."
+        "purpose": "Credits and achievement titles; clamp(1.75rem, 1rem + 2vw, 2.5rem) from 760px. Memory titles and the question's lead sit a step down."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Button labels; 1.5rem from 760px, begin plank 1.5rem / 1.75rem."
+        "purpose": "Button labels; 1.5rem from 760px, the Play plank 1.5rem / 1.75rem."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Dialogue text, max 36ch; 1.4375rem from 760px."
+        "purpose": "His lines, max 36ch; 1.4375rem from 760px. Her replies on choice planks use 600."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Clock and photo plaque; speech bubbles use 600 at 1.0625rem."
+        "purpose": "Clock, photo plaque, title ribbon, his name plate; speech bubbles and the title greeting use 1.0625rem."
+      },
+      "logo": {
+        "displayName": "Logo",
+        "purpose": "The game's name on the title sign, once; cream with a two-layer emboss."
       }
     },
     "shadows": [
@@ -253,7 +257,7 @@
       {
         "name": "two-frame-loop",
         "value": "steps(1, end)",
-        "purpose": "Bobs and nudges: arrow 800ms, hand 700ms, star 1400ms, cat hop 280ms (run 180ms)."
+        "purpose": "Bobs and nudges: arrow 800ms, pointing hand 700ms, star 1400ms, cat hop 280ms (run 180ms), his nervous fidget 760ms."
       },
       {
         "name": "pop",
@@ -263,7 +267,7 @@
       {
         "name": "drop",
         "value": "520ms steps(6, end)",
-        "purpose": "Picture frames drop in; found items rise at 560ms."
+        "purpose": "The title sign and picture frames drop in; a memory's item pops up at 560ms."
       },
       {
         "name": "word-rise",
@@ -273,7 +277,7 @@
       {
         "name": "depart",
         "value": "240ms steps(3, end)",
-        "purpose": "Page leaves: scale .96 and fade."
+        "purpose": "A screen leaves, or the talk box folds away between hours: scale .96 and fade."
       },
       {
         "name": "typewriter",
@@ -283,12 +287,37 @@
       {
         "name": "sky-crossfade",
         "value": "1400ms steps(7, end)",
-        "purpose": "Time-of-day scene change between pages."
+        "purpose": "Time-of-day scene change, once per hour of the story; the clock plate hops."
       },
       {
         "name": "reduced-motion",
         "value": "linear 200ms fade",
         "purpose": "prefers-reduced-motion: loops stop, text appears whole."
+      },
+      {
+        "name": "flower-burst",
+        "value": "170ms per bloom stage, ripple from the tap",
+        "purpose": "Play covers the screen in pixel flowers, swaps the title for the farm underneath, then fades them in 6 steps over 1800ms."
+      },
+      {
+        "name": "choice-drop",
+        "value": "200ms steps(2, end), 80ms stagger",
+        "purpose": "Her replies drop in one after another."
+      },
+      {
+        "name": "emote-pop",
+        "value": "360ms steps(3, end)",
+        "purpose": "A reaction bubble pops over a character's head and stays about 1.6s."
+      },
+      {
+        "name": "character-jump",
+        "value": "600ms steps(7, end), 10 art px",
+        "purpose": "Gabrielle and Mohaimen jump when she says yes."
+      },
+      {
+        "name": "sprite-tick",
+        "value": "~110ms",
+        "purpose": "Blinks and his mouth moving (every other tick) while his words type."
       }
     ],
     "breakpoints": [
@@ -418,9 +447,9 @@
       "name": "Wooden Plank Button",
       "kind": "button",
       "refersTo": "button-wood",
-      "description": "The primary action: Next, Tap to begin, reveal. Swaps to a lighter plank on hover and presses down one art pixel.",
-      "html": "<button class=\"ds-btn-wood\" type=\"button\">Next <i class=\"ds-btn-arrow\" aria-hidden=\"true\"></i></button>",
-      "css": ".ds-btn-wood { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 52px; min-height: 52px; padding: 0 calc(var(--px, 3px) * 4); background: none; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.3125rem; font-weight: 700; line-height: 1; cursor: pointer; filter: drop-shadow(0 var(--px, 3px) 0 #3b1d0b); border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJPJhojxXDFYMYi4Nk8WKw4mGlEObzOC0erBhrWOILcABvAKN1PdDsmAAAAABJRU5ErkJggg==\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; color: #fff3d1; text-shadow: 0 2px 0 #7a3b12; } .ds-btn-wood:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJfNocgxXDFYMYu1PU8WKw4mGlEObzbANerBhrWOILcAD5eq+TcwOqzQAAAABJRU5ErkJggg==\"); } .ds-btn-wood:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; } .ds-btn-wood:active { transform: translateY(var(--px, 3px)); filter: none; } .ds-btn-arrow { width: calc(var(--px, 3px) * 4); height: calc(var(--px, 3px) * 7); background: #fff3d1; clip-path: polygon(0 0, 100% 50%, 0 100%); filter: drop-shadow(0 2px 0 #7a3b12); }"
+      "description": "The primary action: Play, Back. Swaps to a lighter plank on hover and presses down one art pixel.",
+      "html": "<button class=\"ds-btn-wood\" type=\"button\">Play</button>",
+      "css": ".ds-btn-wood { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 52px; min-height: 52px; padding: 0 calc(var(--px, 3px) * 4); background: none; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; font-size: 1.3125rem; font-weight: 700; line-height: 1; cursor: pointer; filter: drop-shadow(0 var(--px, 3px) 0 #3b1d0b); border: calc(var(--px, 3px) * 3) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJPJhojxXDFYMYi4Nk8WKw4mGlEObzOC0erBhrWOILcABvAKN1PdDsmAAAAABJRU5ErkJggg==\") 3 fill / calc(var(--px, 3px) * 3) stretch; image-rendering: pixelated; color: #fff3d1; text-shadow: 0 2px 0 #7a3b12; } .ds-btn-wood:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAANElEQVR42mNggAJrWe7/2DADMgAJfNocgxXDFYMYu1PU8WKw4mGlEObzbANerBhrWOILcAD5eq+TcwOqzQAAAABJRU5ErkJggg==\"); } .ds-btn-wood:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; } .ds-btn-wood:active { transform: translateY(var(--px, 3px)); filter: none; }"
     },
     {
       "name": "Yes Button",
@@ -477,18 +506,58 @@
       "description": "Gold-framed parchment toast with a bobbing star; the reward moment.",
       "html": "<div class=\"ds-achievement\"><i class=\"ds-star\" aria-hidden=\"true\"></i><h2 class=\"ds-achievement-title\">Sand person <em>achievement unlocked</em></h2></div>",
       "css": ".ds-achievement { display: flex; align-items: center; gap: 12px; max-width: 34rem; padding: calc(var(--px, 3px) * 2) calc(var(--px, 3px) * 3); border: calc(var(--px, 3px) * 6) solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcElEQVR42mNggAJrWe7/pGAGZAAS+P9hAUkYbghM87dDdiThHQ0yEEOwGfBgqRZePl4DCPkdrwEgm0D892dbMPDvJyvAcjDX4HUBTAM6JuiCgTcAOQxwGUCfMCA7GqmSkEhOyrD8ABIgBWPNkeRkZwBN72JBXdt0xgAAAABJRU5ErkJggg==\") 6 fill / calc(var(--px, 3px) * 6) round; image-rendering: pixelated; color: #3b1d0b; font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; filter: drop-shadow(0 calc(var(--px, 3px) * 2) 0 rgb(40 18 6 / .38)); } .ds-achievement-title { margin: 0; font-size: clamp(1.375rem, 1rem + 2vw, 2.125rem); font-weight: 700; line-height: 1.1; } .ds-achievement-title em { font-style: normal; color: #c8243f; } .ds-star { flex: none; width: calc(var(--px, 3px) * 11); height: calc(var(--px, 3px) * 11); background: #f6c23e; clip-path: polygon(50% 0, 62% 38%, 100% 38%, 69% 60%, 80% 100%, 50% 76%, 20% 100%, 31% 60%, 0 38%, 38% 38%); animation: ds-shine 1400ms steps(1, end) infinite; } @keyframes ds-shine { 50% { transform: translateY(calc(var(--px, 3px) * -1)); } } @media (prefers-reduced-motion: reduce) { .ds-star { animation: none; } }"
+    },
+    {
+      "name": "Quiet Plank",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Parchment plank for things beside the main path: Load game, Credits, Play again.",
+      "html": "<button class=\"ds-btn-quiet\" type=\"button\">Load game</button>",
+      "css": ".ds-btn-quiet { font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; image-rendering: pixelated; display: inline-flex; align-items: center; justify-content: center; min-width: 52px; min-height: 52px; padding: 0 12px; background: none; font-size: 1.1875rem; font-weight: 700; line-height: 1; color: #3b1d0b; cursor: pointer; border: 9px solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAZElEQVR4AdSQsQmAMBQFn2mdwUnsxXlcQMSlxCIgmg2yga6grXIh5QfrBA4+3CWQ75RP29SvRdZKIcERvSxwxI5hXSY9126Co0kvcuOPIsJw3lXXj4rBm+Bo0mcYhnmTBY6NfAAAAP//RsCQTAAAAAZJREFUAwDdcFRh0s+r5AAAAABJRU5ErkJggg==\") 3 fill / 9px stretch; filter: drop-shadow(0 3px 0 #3b1d0b); } .ds-btn-quiet:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAZ0lEQVR4AdSQsQmAMBQFn2mdwUHExl3EDVzHIbSytDA4hFiJjb2doFxI+cE6gYMPdwnkO8VTFflrEbVCSLDspyxwxI5hXns912SCowkvcuOPJEJ/3FldNtr8aIKjCZ9haLtBFjg28gEAAP//0L6j9gAAAAZJREFUAwCuplRhIkHtFAAAAABJRU5ErkJggg==\"); } .ds-btn-quiet:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; } .ds-btn-quiet:active { transform: translateY(3px); filter: none; }"
+    },
+    {
+      "name": "Choice Menu",
+      "kind": "custom",
+      "refersTo": "choice",
+      "description": "Her replies as stacked parchment planks; the pointing pixel hand is the cursor, resting on the focused one.",
+      "html": "<div class=\"ds-choices\" role=\"group\" aria-label=\"Your reply\"><button class=\"ds-choice\" type=\"button\">Hi, sand person.</button><button class=\"ds-choice\" type=\"button\">Why are you sweating?</button><button class=\"ds-choice\" type=\"button\">Are you okay??</button></div>",
+      "css": ".ds-choices { display: grid; gap: 8px; max-width: 320px; } .ds-choice { font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; image-rendering: pixelated; position: relative; display: flex; align-items: center; width: 100%; min-height: 52px; padding: 6px 12px 6px 45px; background: none; text-align: left; font-size: 1.1875rem; font-weight: 600; line-height: 1.2; color: #3b1d0b; cursor: pointer; border: 9px solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAZElEQVR4AdSQsQmAMBQFn2mdwUnsxXlcQMSlxCIgmg2yga6grXIh5QfrBA4+3CWQ75RP29SvRdZKIcERvSxwxI5hXSY9126Co0kvcuOPIsJw3lXXj4rBm+Bo0mcYhnmTBY6NfAAAAP//RsCQTAAAAAZJREFUAwDdcFRh0s+r5AAAAABJRU5ErkJggg==\") 3 fill / 9px stretch; filter: drop-shadow(0 3px 0 #3b1d0b); } .ds-choice:hover { border-image-source: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAZ0lEQVR4AdSQsQmAMBQFn2mdwUHExl3EDVzHIbSytDA4hFiJjb2doFxI+cE6gYMPdwnkO8VTFflrEbVCSLDspyxwxI5hXns912SCowkvcuOPJEJ/3FldNtr8aIKjCZ9haLtBFjg28gEAAP//0L6j9gAAAAZJREFUAwCuplRhIkHtFAAAAABJRU5ErkJggg==\"); } .ds-choice::before { content: ''; position: absolute; left: 3px; top: 50%; width: 33px; height: 24px; margin-top: -12px; background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAICAYAAAAvOAWIAAAAZElEQVR4AWyN0Q2AMAgFkV9dQRfR8XURXUG/NUf6kgZpcmkfHNStnXUeX9FKvytkpP28TZAzTDpFJIIgZ/BisyTd2zJZ5rieoZTZyiCCIJcyjQpnki/7Jpl6X+Mdm2kgCDLNzAcAAP//d/SwQQAAAAZJREFUAwC7LUI3Nnb/zgAAAABJRU5ErkJggg==\") 0 0 / 100% 100% no-repeat; image-rendering: pixelated; opacity: 0; } .ds-choice:hover::before, .ds-choice:focus::before, .ds-choice:first-child::before { opacity: 1; } .ds-choices:hover .ds-choice:first-child:not(:hover)::before { opacity: 0; } .ds-choice:focus { outline: none; } .ds-choice:focus-visible { outline: 3px solid #f6c23e; outline-offset: 3px; }"
+    },
+    {
+      "name": "Title Sign",
+      "kind": "custom",
+      "refersTo": "title-sign",
+      "description": "The game's name on dark planks with brass nails, hanging on two pixel ropes, a flower on its corner.",
+      "html": "<div class=\"ds-sign-wrap\"><i class=\"ds-rope ds-rope-l\"></i><i class=\"ds-rope ds-rope-r\"></i><h1 class=\"ds-sign\">For Gabrielle</h1><i class=\"ds-bloom\"></i></div>",
+      "css": ".ds-sign-wrap { position: relative; display: inline-block; margin-top: 48px; } .ds-sign { font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; image-rendering: pixelated; position: relative; z-index: 1; margin: 0; padding: 6px 15px 12px; font-size: 2.5rem; font-weight: 700; line-height: 1; color: #fff3d1; text-shadow: 0 3px 0 #7a3b12, 0 6px 0 #3b1d0b; border: 18px solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABQ0lEQVR4AaSTP2vCUBTFb0NpqYUiFkqHtnRpP0KXDh26d+nST9JOnbqUfhKXDroLZhDETXDyD/hn0EVwUVEE5Tw8kpvkJdEETu7Nvef+8vJ4cWR7Pd+er9NoixEDBOj/51XSCAxAHSQA9ZpDOVTVclte7k4FLLNCkKF6YyiUWxvsctZsEbOUAqL48fmGINnMsYmT2crEsBu93p4Cdscz+f3KCyI1mS/VM+uI9FqB95cZiVP27CTgsQKjPo9DcVuhPjnOTCiizauAMEI2M3p+0ct6KJBNmpNsBWcigTTtA04E3AesgDhbSeQ/m3whogJ6z2DYefP2vTlAlAKiyN8pyb7RizkqAMz/Fc2vRkMU2O/FjAJe5S4Eenq4NhE59XiTC9TQgxcgyqkMpkfv3yUpuB2ptUYHy+0vBCyzQiQopBEYWOUGAAD//7MRVtEAAAAGSURBVAMAyltnWIB3gPsAAAAASUVORK5CYII=\") 6 fill / 18px round; filter: drop-shadow(0 6px 0 rgb(40 18 6 / .38)); } .ds-rope { position: absolute; bottom: calc(100% - 12px); width: 9px; height: 60px; background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAYAAABLLYUHAAAAMElEQVR4AUyIMREAMAgDc6zVUCW1VWuYgIUVNXBkIkv+X949lfprXrBGCTcmCglAAwAA//8aoPjKAAAABklEQVQDADViCDNNzZetAAAAAElFTkSuQmCC\") 0 100% / 9px 12px repeat-y; image-rendering: pixelated; } .ds-rope-l { left: 18%; } .ds-rope-r { right: 18%; } .ds-bloom { position: absolute; z-index: 2; left: -18px; top: -18px; width: 45px; height: 45px; background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAA3ElEQVR4AaSNPQ5BURCFL4WCLbAFnUovOqVEq1ZaiVprDaJX6VgCW9CIhPdNcm7mzb3ReMl5c+b83OmmP75qeToafADvMgE8oigTPG32CUT+s6ywQjzgOb52ZnEZUXhcrqLVmcu86i+RHk7GjAx8chKsjIAhkYv97TL15gcDuzxy5NmtDPHg4vu2yBJ7Xhyplv0lsnFHA1Y+35+d2W7NbuDS67hKArsZzY8c+YYmK0MQMOBCvIhPTn4uS/DTX/S6eKvMq7wuM3J8ecxWGYEAJRA5vkdRxqQEImf3+AIAAP//ErrvMwAAAAZJREFUAwAPznIf5THW8wAAAABJRU5ErkJggg==\") 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }"
+    },
+    {
+      "name": "Talk Box Speaker",
+      "kind": "custom",
+      "refersTo": "portrait-frame",
+      "description": "His portrait in a raised light frame, his name on a wooden plate, friendship hearts in two rows of five, then his typed line.",
+      "html": "<div class=\"ds-talk\"><div class=\"ds-speaker\"><span class=\"ds-portrait\"><img alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAADTElEQVR4AcSUT4hOURjGDzZkMTLJGEyysGEhNBuULCxNKQsrmaUNJsrGyhIjG3ZjYaH8mRoLCaH8mQiTLNQs5G8mIpKyEfM7fc/tPeee8917py8zzfO9533f532f59zv6851Nf82r1z4d21vd4BUDU6qTq2OVC1DLPv+Z35pX6oGKVWnxh767dDWEAtAuwVNe+wDubmsIYa4lZBbQH11TzchQKqmXUT2BwOtJGkIMkMtThBSQq+nvgYcklSNusB+dJQrlgxBgixCHKuEYn67HB30LKdkyDY7fU493Vij0lCdJfHSXF7n6QaGeHw8RruwzhLLb3pGD13NFYYo0lRjJnGmTxNd9NEsDJFUoUqwE0+zkaFOCOrSucs1MqRlnYi5yxWGHr7/NWfRvN9Of7kbqD9yZLc/Ei18cfqD2nQo/R+4865UQxd9GoUhEovcDcQZPHFZxyDKSKqPMGRFzjGyhmIiOWIxqMeIOcf3bPGUvbc+B9En0UcjQ9Fs4/TM9j4/o+iT6KO2IW4dzTZK9ZTamWFhpaHYyODwqAP9B88xnwUcEPNkLDcYGOKXbn9wMqNol6zrW2rT7NnyZEaRIfTQ5QwCQ7y+eY3T+F9AD13pBYZwimM1U3FkaJcTbP/jh082LThwg0aUoIeuyoEhFWczlgzhFteY0stNkVoKPJ3lK5Y5Yqqv2rGLD/xRER30fLH1UTJEHRJkMDR8wSk+mph0AA44fHbMgdPXngSRGn0A/+2Xn+7Updt+jyI70YFjkTQEAbIFNQtET+4fcFsXdLlUpG/5nO0+ztRiZA3FRBZcufu4KGNi7Pw9N7Bvm0tF+iIzx7zydrG2IZawlOV8DWDJ+l7/FeYiHPjMMV8HdQyV9iACRsdfuRzog9JwRaHSEC8tixsTL5yQ2319/H7BgWvnOefmqGcNMQhYaMGQcGhnv0tBfUU7z5m9QH0bS4YgAgYB5B/fpggF3kw+9+ejV1+6FDZu2uH74pHYHewF6AD6QmCIJkQgArFrcQ+hwKo1Gxxiz57eLGr2QJ0+PNXjHdTRAeiSg8IQRZoUgb0ReQwrFvfI1a/aAxdd9Dl7QyQUKQipG9VZrnnFeE9uB/r48IY0TMwN0IuXU2sKuyOl9Q8AAP//G7epVwAAAAZJREFUAwCV9w0UIwO1nQAAAABJRU5ErkJggg==\"></span><div class=\"ds-meta\"><p class=\"ds-name\">Mohaimen</p><div class=\"ds-hearts\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><p class=\"ds-line\">Okay. Can I tell you some things I love about you?</p></div>",
+      "css": ".ds-talk { font-family: \"Pixelify Sans\", \"Trebuchet MS\", system-ui, sans-serif; font-variant-ligatures: none; image-rendering: pixelated; display: grid; gap: 12px; max-width: 360px; padding: 9px 9px 15px; color: #3b1d0b; font-size: 1.1875rem; font-weight: 500; line-height: 1.35; border: 21px solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABFUlEQVR4AZyTMc8BQRCG57vmKyhUiISKRiuRiIJEq5CoVX6FQqXQ+Qd+gkShlVAIkWg1VAhCI5ErVOTdWNkZ7Mld8tzN7M48t1OsQ88nHw/c/fBsJyWCoNcqkR/QC5mDAILZaE1+KCT+CQ51IhhN9hfXTMkrR/GbaL460u58JXw1Ms+kw+hlMJH+83hzIxsw6FrEgIlioQDWFIN+gySjaVft4WXWImciLJgEI0kyMfdkbBXJYlvORHJuW6OsZSI5t00ka5nI1ui191VUrrSpmKu/8U3IRHruTi1NNiDTtYgBE2HubCpKi+WJDnv3xacctRBomEgvyiKvHH3OZOv+VZtDdrf0Hfvli6sEhzoRAiz4Ab040QMAAP//SRnVsAAAAAZJREFUAwAkLyKQ/Z6HvgAAAABJRU5ErkJggg==\") 7 fill / 21px round; filter: drop-shadow(0 6px 0 rgb(40 18 6 / .38)); } .ds-speaker { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; } .ds-portrait { display: block; width: 126px; border: 9px solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAfUlEQVR4AcSPPQ5AQBCFH61oVBqiJiKhdAISiVrpGNRcSMIJXMExXIG8yRZ+Vm2Sb3cy78tmx4SqLncOHSqGiBSqIoQOZpRNNhSCNMKTuG4wzAvoyItQZfsJrqixXDdRJh/Hn+K47sa0bHDzFpaXvejLAnTkj2w40MGM+50AAAD//7cYA7oAAAAGSURBVAMAfIkyuSaiCxwAAAAASUVORK5CYII=\") 3 fill / 9px stretch; filter: drop-shadow(0 3px 0 #3b1d0b); } .ds-portrait img { display: block; width: 108px; height: 108px; image-rendering: pixelated; } .ds-meta { display: grid; gap: 8px; justify-items: start; } .ds-name { margin: 0; padding: 0 6px; font-size: 1rem; font-weight: 700; line-height: 1.3; border: 12px solid transparent; border-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAmElEQVR4AcSOsQmDUBCG/7wmRWZIMkdIkYAjZITMkDJVyszgCI4gaCGKK2ijNi5gYaX8D4VTH9d68MFx93/cGUx1P58GjSkGKzAY/DxoMEPJsGEwi0poPC5HMGsv0CT/sIIL7mYWAodR6kPCmWQjyKWr30F43t6QrN9avPTxrnAhJZM03eH1DZEXrUpc92DWXmDDgQYzvDQCAAD//xZT4YUAAAAGSURBVAMA17OHKfyJPOcAAAAASUVORK5CYII=\") 4 fill / 12px stretch; } .ds-hearts { display: grid; grid-template-columns: repeat(5, 27px); row-gap: 3px; } .ds-hearts i { width: 27px; height: 24px; background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAAcUlEQVR4AWTMsQmFMACEYV/aB1Zi5yRuY6UTaeU2TmInVoK1+gUMoiFH7v47ErLr1NX/oMumKxMQmHHoMuJBr0x8/EmRF2UaKrFbabStS2TvARimef81bc9/hOvjTwzwXMk4FkcMoOC9Mk9pJCjeA/wEAAD//9GWCL0AAAAGSURBVAMAU+85cwrs8YMAAAAASUVORK5CYII=\") 0 0 / 100% 100% no-repeat; image-rendering: pixelated; } .ds-hearts i.on { background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAYAAAArzdW1AAAAcUlEQVR4AWTMMQ5FQACEYW/bV6rFQZR6B+B8HECvdBBRK9X4NrERNjvZmX8mG7LrVMX/oMumKxMQmD6vM+JBr0x8/ElRtk0aKrFbabQMY2TvARjmdf9128R/hOvjTwzwXMk4FkcMoOC9Mk9pJCjeA/wEAAD///PMC/EAAAAGSURBVAMAADQ5c1KIix4AAAAASUVORK5CYII=\"); } .ds-line { margin: 0; max-width: 36ch; }"
+    },
+    {
+      "name": "Emote",
+      "kind": "custom",
+      "refersTo": "speech-bubble",
+      "description": "A reaction bubble that pops over a character's head: heart, !, …, sweat drop, music note. Never words.",
+      "html": "<div class=\"ds-emote-row\"><div class=\"ds-actor\"><i class=\"ds-emote\"></i><img alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAqCAYAAAC3DKvtAAACgUlEQVR4AeyVPWiTURSGT8VJwUGoFjFakSpIBcGfwVIiDm4GHMRJcHBwEaR1Ezfd6ibi4KCTg4MQobM/pKIYJ61Da0yN1pBQEcUOLprn4rmc3O9+X5KWdigNee859z3nPLnfDSEbZIVe62B/sV1dxUhu818rP52RZIIVNjhyVqzUz+BKFKyDCgsB6mtfWGefANOsgzRkSfuYCfsS4LAh3Od25kIruu8IDkG1L7UoKDQ9mMdBNFhYtyBmEfPIgTH0vkbPjUm3MABIZ4mw8By4VPvdVy09kkajIeW3ZRfJexUMWB5MgrE480zG87IkMQsDFnInJolptHBRshSbUS8VDFCb0mJWTypYYZsOnZFjhUu69THN14YoeHpmXusyvGu7z22ivu219Sj4wNAO3/O6eFeu7xuShUrFeU+u3nIRH9leV/i/RMHUXhTvEZxOT4zL1J3HApTcma3F9rS2be8E2D6aHQSIdNrW1LMxAQ4fDUBMFmIPo34CTGHP3n6CPH9VdTG22Fp4GPo9mN94/uBuPPn0sekiy+e571J8t03GHsz6+HBympKTHoJZGM5sLR7cytveANV4Wp6SE4ePi0b1ifYQ7FWp4PzJ/drj4sTliry5P+DgzuiwpILDkxy5UBfUgefLCTBfimpwYItvjCXaRwzrCbBtqNZ/2m1PeSa4J1LQvDrgazdvCAo+vOOWGWQboyf+urAoqtL7uhzt/9MmAFonsg/lwfxfnSqcFzQ735Tm8BWnD1sLLuKhmM8MgqEf4MEYFBB5L2IG2Zk2sC0sN19D4B8vbwvaODfpol4NHgp9rWtc3avgG+779U2s8JD1yPH0lDamnpgBKx2yHrn6YfwHAAD//7pgFWMAAAAGSURBVAMAlX+FZG96nNoAAAAASUVORK5CYII=\"></div><div class=\"ds-actor ds-mo\"><i class=\"ds-emote ds-dots\"></i><img alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAqCAYAAAC3DKvtAAACz0lEQVR4AayVPWhUQRSFr6YxCCZkkQTFFJYqiI2N2GihtSCpghgQtFKWaGltIas22gUhYCEoxEZBsBELRRLSWFiI+INRiSQBMSD+vG927/POfTOb5yZhz5s75575ZnZ22WyWGn+Hdm39s3dHI4i6xhJJgllstfRrS8mitj3qsmmKCpggi61MPpS2R82a0DCPCtj01lVG4NTOnr57pOGtMPdrSzAN3hYKyc7Dg94sLHY6/wbWIBjqBjAGDTXtmAJp328KAxb9AKboRd02TYL9SXrZNICfvf++abBvVc4/eSf8dTsJ/ZxgwKIfwHovGDQZe1Hyjk89/tILK7smnJjujSOjgoa272QaaeriSbGKmsUk9ZkEMPeiV6D32w3ke3ZNsU94BTCVwtkA4R28cEsmWvcpI1mfrG5EqNUcFz6zEowJHFGjfaPDDBXlfBuMwLZBPdU8IYj644dPDEF4KEyKR7M1XTzbL627gtvRtZ+8S4B7xifl0dx8UBY8eXOmJFJfe/BCGJE2bK2ejkkwJ/i9ulKCDvcPhLyOABEZsqHpHkkwGbvg6Y9lAaojfaQZvgVcAZ4qCybMiRBhoDriITJ4KZVgQlacAH3tG5bPP/sj4dFDrPHg4wf2t/9L0yRkRfjt61mGpLSna3yoPLFvrHeeBC9/W6jNzWUjsIYGhkZqg32W++XbEoF9qDa9COqhijK8InBwOg8f7NjRYDNjR4+JnpZQFlzn9D7DFQBFSbA9CaFuymVL8Kvpq4KA+JPg5ZTLlmBdyBdfhXfvzhVJiZ7mGJlbBTB3w+8pOjt2WtDEpdtihYesR42HYFTAGDRUzP9HrPP5cGJvbsQ8C15ZWhQr3cx61Or7MQveNtgQK11oPWr1/VgB8xM683xOHt69HkkXep8sa7SvYwVMY372pXjhI+8zx/eqgPmEL587I174yPvM8dcEEyDohY+8zxzf6y8AAAD//6xcPQMAAAAGSURBVAMA90buZFPmzyEAAAAASUVORK5CYII=\"></div></div>",
+      "css": ".ds-emote-row { display: flex; gap: 24px; align-items: flex-end; padding-top: 40px; } .ds-actor { position: relative; width: 66px; } .ds-actor img { display: block; width: 66px; height: 126px; image-rendering: pixelated; } .ds-mo img { transform: scaleX(-1); } .ds-emote { position: absolute; left: 12px; bottom: calc(100% - 6px); width: 39px; height: 36px; background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAMCAYAAAC5tzfZAAAAmklEQVR4AYyNOw6DMBAFN25Tp4zIHVImZ0gd5YBR6pwBSu4AoqSmBsbSQ9gsEpZG+/EbO9h8HtfzeJQ5boFw2fR2FPLxJ2zR3t8GzFSgX5NIChSf1yIS1p4eEokFtN8/ZZdEKuqfG8z3iYSRB/KZzEZiqaAquzWuRGBP4C5U3XB63i4mWKr3Kvn4Ew0gCGYP7qNEI3idsGavTgAAAP//m2sGHwAAAAZJREFUAwDF+WfdnzpuDAAAAABJRU5ErkJggg==\") 0 0 / 100% 100% no-repeat; image-rendering: pixelated; animation: ds-emote-pop 360ms steps(3, end); } .ds-emote.ds-dots { background-image: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAMCAYAAAC5tzfZAAAAcElEQVR4AaSQMQqAQAwEY1prS8F/6PP1H4KltbXeBNJIhEiEIRtuN/FOpX3z2N9Zml0U87qfkgW/bSL9h3pomQYBtlLhrenrm/wxmPalOatvYkoG3Y6r48IOIddRxW+/hwACDn0E5xZCOEzH7H1UHwAAAP//Z1a9rgAAAAZJREFUAwC5/GHd7kIURQAAAABJRU5ErkJggg==\"); } @keyframes ds-emote-pop { 0% { opacity: 0; transform: translateY(12px); } 60% { opacity: 1; transform: translateY(-3px); } 100% { transform: none; } }"
     }
   ],
   "narrative": {
     "northStar": "One Saturday on the Farm",
-    "overview": "The site is a game she plays, not a page she reads. Every surface is a piece of cozy farming-game UI rebuilt from scratch: chunky wooden dialogue boxes around parchment, inventory slots, a heart meter, a choice menu, an achievement toast. Behind it all a banded, dithered sky owns the viewport and moves through one in-game day, dawn to festival night, one time of day per page. The inspiration is a well-loved farming sim, pinned by the user; the execution is entirely original pixel art drawn in code, and never the game's own assets, fonts, logo, music, or name.\n\nThe medium is the art pixel. One art pixel is one `--px` (3px on phones, 4px from 760px up), and every frame, sprite, sky band, shadow offset, and motion step is a whole multiple of it. Frames are generated at runtime as 9-slice PNGs and applied with `border-image`; sprites are drawn into small canvases and scaled up with `image-rendering: pixelated`. The two real photographs are the only rasters shipped and they are the one thing allowed to stay smooth.\n\nDensity is low and centered: one dialogue-driven moment per viewport, a HUD in the top-right corner, and a grass strip along the bottom where the crop grows and the two cats live. Motion is stepped, never tweened: things drop, pop and type in whole-pixel jumps, and text types out with a square-wave blip.",
+    "overview": "The site is a game she plays, not a page she reads. Every surface is a piece of cozy farming-game UI rebuilt from scratch: a hanging wooden title sign and menu, chunky wooden dialogue boxes around parchment with a character portrait, a choice menu with a pointing hand, inventory slots, friendship hearts, emotes, an achievement toast. Behind it all a banded, dithered sky owns the viewport and moves through one in-game day, dawn to festival night, one hour per beat of the conversation. The inspiration is a well-loved farming sim, pinned by the user; the execution is entirely original pixel art drawn in code, and never the game's own assets, fonts, logo, music, or name.\n\nThe medium is the art pixel. One art pixel is one `--px` (3px on phones, 4px from 760px up), and every frame, sprite, sky band, shadow offset, and motion step is a whole multiple of it. Frames are generated at runtime as 9-slice PNGs and applied with `border-image`; sprites are drawn into small canvases and scaled up with `image-rendering: pixelated`. The two real photographs are the only rasters shipped and they are the one thing allowed to stay smooth.\n\nDensity is low and centered: one dialogue-driven moment per viewport, a HUD in the top-right corner, and a grass strip along the bottom where Gabrielle and Mohaimen stand as pixel characters and the two cats live. Motion is stepped, never tweened: things drop, pop and type in whole-pixel jumps, and text types out with a square-wave blip while the speaker's mouth moves.",
     "keyCharacteristics": [
       "One art-pixel unit (`--px`) governs size, offset, shadow and motion.",
       "Wood-framed parchment is the only container; the sky is the only background.",
       "Pixelify Sans everywhere, at weights 500 to 700; no second face.",
       "Hard, zero-blur drop shadows, stepped (notched) corners, no radius anywhere.",
-      "Motion in `steps()` easings only; a typewriter with sound is the signature.",
-      "Time of day is the color story: seven scene palettes, one per page."
+      "Motion in `steps()` easings only; a typewriter with sound, a changing portrait and a choice menu are the signature.",
+      "Time of day is the color story: seven scene palettes, one per hour of the story."
     ],
     "rules": [
       {
@@ -498,7 +567,7 @@
       },
       {
         "name": "The Sky Owns The Page Rule",
-        "body": "No flat or gradient page background: the dithered, banded scene sky is the backdrop, and it changes only when the page (the hour) changes.",
+        "body": "No flat or gradient page background: the dithered, banded scene sky is the backdrop, and it changes only when the hour changes (one per beat of the conversation).",
         "section": "colors"
       },
       {
@@ -510,6 +579,11 @@
         "name": "The Color-Not-Italic Rule",
         "body": "`*word*` in copy becomes an `em` rendered upright in Text Red. The face has no italic and the world does not fake one.",
         "section": "typography"
+      },
+      {
+        "name": "The Faces Stay Clear Rule",
+        "body": "From a 390×844 phone up, nothing sits on Gabrielle's or Mohaimen's face: not a cat's bubble, not the No button, not a box. Position chrome around them first; only on phones shorter than that may the talk box overlap their heads.",
+        "section": "layout"
       },
       {
         "name": "The Zero-Blur Rule",
@@ -537,7 +611,8 @@
       "**Do** draw new frames and sprites in code on the pixel grid with a 1-art-pixel ink outline, and set `image-rendering: pixelated` on them.",
       "**Do** put every container in a wood-and-parchment 9-slice with stepped corners; use gold only for reward moments.",
       "**Do** use `steps()` easing for every transition and animation, and a zero-blur, whole-pixel drop shadow for every raised thing.",
-      "**Do** repaint the scene from the time-of-day palette when the page (the hour) changes.",
+      "**Do** repaint the scene from the time-of-day palette when the hour (the beat of the conversation) changes.",
+      "**Do** draw people from the real photos: their actual hair, hat, jackets and colors, in the same outline-and-ellipse grammar as the cats.",
       "**Do** keep Pixelify Sans as the only face, ligatures off, emphasis in Text Red."
     ],
     "donts": [
