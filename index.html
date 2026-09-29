@@ -10,10 +10,35 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap">
-  <link rel="stylesheet" href="style.css">
-  <script src="pixels.js" defer></script>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/world.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/characters.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script src="js/art/pixels.js" defer></script>
   <script src="content.js" defer></script>
-  <script src="script.js" defer></script>
+  <!-- game modules: order matters, each can use the ones above it -->
+  <script src="js/core/dom.js" defer></script>
+  <script src="js/core/text.js" defer></script>
+  <script src="js/world/scene.js" defer></script>
+  <script src="js/world/clock.js" defer></script>
+  <script src="js/ui/pages.js" defer></script>
+  <script src="js/ui/meter.js" defer></script>
+  <script src="js/ui/dodge.js" defer></script>
+  <script src="js/audio/music.js" defer></script>
+  <script src="js/cats/cat.js" defer></script>
+  <script src="js/cats/mei.js" defer></script>
+  <script src="js/cats/tufo.js" defer></script>
+  <script src="js/fx/petals.js" defer></script>
+  <script src="js/fx/fireworks.js" defer></script>
+  <script src="js/fx/lilies.js" defer></script>
+  <script src="js/story/actors.js" defer></script>
+  <script src="js/story/portrait.js" defer></script>
+  <script src="js/story/dialogue.js" defer></script>
+  <script src="js/story/story.js" defer></script>
+  <script src="js/story/boom.js" defer></script>
+  <script src="js/main.js" defer></script>
 </head>
 <body data-time="dawn" data-scene="title">
 
@@ -54,7 +79,7 @@
 
       <div class="title__row">
         <figure class="frame frame--title">
-          <img data-photo="title" src="images/us-cheek.webp" width="960" height="1280" alt="" decoding="async" fetchpriority="high">
+          <img data-photo="title" src="assets/images/us-cheek.webp" width="960" height="1280" alt="" decoding="async" fetchpriority="high">
           <figcaption class="plaque" data-text="title.plaque"></figcaption>
         </figure>
         <div class="dialog dialog--greeting" data-dialog>

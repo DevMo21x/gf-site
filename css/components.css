@@ -1,0 +1,136 @@
+/* ---------- The dialogue box ---------- */
+
+.dialog {
+  position: relative;
+  padding: calc(var(--px) * 2) calc(var(--px) * 3) calc(var(--px) * 3);
+  border: calc(var(--px) * 7) solid transparent;
+  border-image: var(--img-frame) 7 fill / calc(var(--px) * 7) round;
+  filter: drop-shadow(0 calc(var(--px) * 2) 0 rgb(40 18 6 / .38));
+}
+
+.dialog__title,
+.question,
+.achievement__title {
+  margin: 0;
+  font-weight: 700;
+  text-wrap: balance;
+}
+.dialog__title {
+  font-size: clamp(1.5rem, 1.05rem + 2vw, 2.125rem);
+  line-height: 1.12;
+  margin-bottom: .5rem;
+}
+.dialog__body {
+  margin: 0;
+  max-width: 36ch;
+  text-wrap: pretty;
+}
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* typewriter text: the real sentence is read aloud, the letters are for eyes */
+.typed .ch { visibility: hidden; }
+.typed .ch.on,
+.is-typed > .typed .ch { visibility: visible; }
+
+.dialog__more {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--px) * -1);
+  width: calc(var(--px) * 7);
+  height: calc(var(--px) * 4);
+  background: var(--img-more) 0 0 / 100% 100% no-repeat;
+  opacity: 0;
+}
+.has-typed > .dialog__more {
+  opacity: 1;
+  animation: bob 800ms steps(1, end) infinite;
+}
+@keyframes bob {
+  50% { transform: translateY(var(--px)); }
+}
+
+/* ---------- Buttons: wooden planks ---------- */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 52px;
+  min-height: 52px;
+  padding: 0 calc(var(--px) * 4);
+  border: calc(var(--px) * 3) solid transparent;
+  border-image: var(--img-btn-wood) 3 fill / calc(var(--px) * 3) stretch;
+  background: none;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cream);
+  text-shadow: 0 2px 0 var(--wood-dk);
+  filter: drop-shadow(0 var(--px) 0 var(--ink));
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.btn:hover { border-image-source: var(--img-btn-woodHi); }
+.btn:active { transform: translateY(var(--px)); filter: none; }
+
+.btn__arrow {
+  width: calc(var(--px) * 4);
+  height: calc(var(--px) * 7);
+  background: var(--img-next) 0 0 / 100% 100% no-repeat;
+  filter: drop-shadow(0 2px 0 var(--wood-dk));
+}
+.btn:hover .btn__arrow { animation: nudge 500ms steps(1, end) infinite; }
+@keyframes nudge {
+  50% { transform: translateX(var(--px)); }
+}
+
+/* the quieter plank: parchment, ink label (Load game, Credits, Play again) */
+.btn--quiet {
+  border-image-source: var(--img-btn-parch);
+  color: var(--ink);
+  text-shadow: none;
+  font-size: 1.1875rem;
+}
+.btn--quiet:hover { border-image-source: var(--img-btn-parchHi); }
+
+/* ---------- Picture frames ---------- */
+
+.frame {
+  position: relative;
+  margin: 0;
+  border: calc(var(--px) * 5) solid transparent;
+  border-image: var(--img-photo) 5 / calc(var(--px) * 5) round;
+  background: var(--ink);
+  filter: drop-shadow(0 calc(var(--px) * 2) 0 rgb(40 18 6 / .38));
+}
+.frame img {
+  image-rendering: auto; /* the frame is pixel art; the photo inside must stay smooth */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: var(--wood-dk);
+}
+
+.plaque {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--px) * -8);
+  translate: -50% 0;
+  padding: 0 6px;
+  border: calc(var(--px) * 4) solid transparent;
+  border-image: var(--img-plate) 4 fill / calc(var(--px) * 4) stretch;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--ink);
+}

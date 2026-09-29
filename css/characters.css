@@ -1,0 +1,193 @@
+/* ---------- Gabrielle and Mohaimen, on the grass ---------- */
+
+/* behind the boxes: on a very short phone the talk box may cover their heads, never the reverse */
+.actors {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+body[data-scene="title"] .actors { visibility: hidden; }
+
+/* they stand back by the fence, so the cats' speech bubbles open below their faces */
+.actor {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + var(--px) * var(--stand));
+  width: calc(var(--px) * 22);
+}
+.actor--gab { margin-left: calc(var(--px) * -26); }
+.actor--mo { margin-left: calc(var(--px) * 4); }
+
+.actor__hop,
+.actor__flip,
+.actor__px { display: block; width: 100%; }
+.actor__px { height: calc(var(--px) * 42); }
+.actor__hop { transform-origin: 50% 100%; }
+.actor--mo .actor__flip { transform: scaleX(-1); } /* he faces her */
+.actor.is-gone { visibility: hidden; }
+
+.actor.is-jumping .actor__hop { animation: actor-jump 600ms steps(7, end); }
+@keyframes actor-jump {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(calc(var(--px) * -10)); }
+  100% { transform: translateY(0); }
+}
+.actor[data-face="nervous"] .actor__hop { animation: fidget 760ms steps(1, end) infinite; }
+@keyframes fidget {
+  50% { transform: translateX(var(--px)); }
+}
+
+.emote {
+  position: absolute;
+  left: calc(var(--px) * 4);
+  bottom: calc(100% - var(--px) * 2);
+  width: calc(var(--px) * 13);
+  height: calc(var(--px) * 12);
+  background: 0 0 / 100% 100% no-repeat;
+  opacity: 0;
+}
+.emote[data-kind="heart"] { background-image: var(--img-emote-heart); }
+.emote[data-kind="exclaim"] { background-image: var(--img-emote-exclaim); }
+.emote[data-kind="dots"] { background-image: var(--img-emote-dots); }
+.emote[data-kind="sweat"] { background-image: var(--img-emote-sweat); }
+.emote[data-kind="note"] { background-image: var(--img-emote-note); }
+.emote.is-showing {
+  opacity: 1;
+  animation: emote-pop 360ms steps(3, end);
+}
+@keyframes emote-pop {
+  0% { opacity: 0; transform: translateY(calc(var(--px) * 4)); }
+  60% { opacity: 1; transform: translateY(calc(var(--px) * -1)); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------- The cats (Mei & Tufo) ---------- */
+
+.cat-wrap {
+  --cat-w: calc(var(--cat-px) * 26);
+  position: fixed;
+  z-index: 12;
+  left: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 4px);
+  width: var(--cat-w);
+  transform: translate3d(-140px, 0, 0);
+  pointer-events: none;
+}
+
+.cat {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 26 / 23;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.cat:focus-visible { outline-offset: 0; }
+
+.cat__flip,
+.cat__hop,
+.cat__px { display: block; width: 100%; height: 100%; }
+.cat-wrap.is-facing-right .cat__flip { transform: scaleX(-1); }
+.cat__hop { transform-origin: 50% 100%; }
+
+.cat-wrap.is-walking .cat__hop { animation: cat-hop 280ms steps(1, end) infinite; }
+.cat-wrap.is-running .cat__hop { animation-duration: 180ms; }
+@keyframes cat-hop {
+  50% { transform: translateY(calc(var(--cat-px) * -2)); }
+}
+.cat-wrap.is-jumping .cat__hop { animation: cat-jump 560ms steps(7, end); }
+@keyframes cat-jump {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(calc(var(--cat-px) * -9)); }
+  100% { transform: translateY(0); }
+}
+.cat-wrap.is-purring .cat__hop { animation: cat-purr 120ms steps(1, end) infinite; }
+@keyframes cat-purr {
+  50% { transform: translateX(1px); }
+}
+.cat-wrap.is-hissing .cat__hop { animation: cat-hiss 600ms steps(1, end); }
+@keyframes cat-hiss {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(calc(var(--cat-px) * -1)); }
+  40% { transform: translateX(var(--cat-px)); }
+  60% { transform: translateX(calc(var(--cat-px) * -1)); }
+  80% { transform: translateX(var(--cat-px)); }
+}
+.cat-wrap.is-startled .cat__hop { animation: cat-jump 480ms steps(6, end); }
+
+.cat__bubble {
+  position: absolute;
+  bottom: calc(100% + var(--px) * 3);
+  left: 0;
+  margin: 0;
+  width: max-content;
+  max-width: min(230px, calc(100vw - 32px));
+  padding: 2px 6px 3px;
+  border: calc(var(--px) * 3) solid transparent;
+  border-image: var(--img-bubble) 3 fill / calc(var(--px) * 3) stretch;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.2;
+  filter: drop-shadow(0 var(--px) 0 rgb(40 18 6 / .3));
+  opacity: 0;
+  transform: translate3d(0, calc(var(--px) * 2), 0);
+  transition: opacity 180ms steps(3, end), transform 180ms steps(3, end);
+  pointer-events: none;
+}
+.cat__bubble::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + var(--px) * 2);
+  left: 12px;
+  width: calc(var(--px) * 7);
+  height: calc(var(--px) * 4);
+  background: var(--img-tail) 0 0 / 100% 100% no-repeat;
+}
+.cat-wrap.is-right .cat__bubble { left: auto; right: 0; }
+.cat-wrap.is-right .cat__bubble::after { left: auto; right: 12px; }
+.cat__bubble.is-showing { opacity: 1; transform: none; }
+
+.cat__heart {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  width: calc(var(--px) * 9);
+  height: calc(var(--px) * 8);
+  margin-left: calc(var(--px) * -4.5);
+  background: var(--img-heart) 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* ---------- Canvases on top ---------- */
+
+.petals,
+.lilies {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+.petals { z-index: 1; } /* confetti falls behind the boxes, never over his face or the words */
+.lilies { z-index: 28; }
+.lilies.is-fading {
+  opacity: 0;
+  transition: opacity 1800ms steps(6, end);
+}
+.lilies.is-quick.is-fading { transition-duration: 600ms; }
+
+.noscript {
+  position: fixed;
+  inset: auto 16px 50% 16px;
+  z-index: 40;
+  text-align: center;
+  font-size: 1.125rem;
+  color: var(--cream);
+}

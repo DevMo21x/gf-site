@@ -1,0 +1,113 @@
+/* ---------- Small phones ---------- */
+
+@media (max-width: 349px) {
+  :root { --hpx: 2px; --gutter: 10px; }
+}
+
+@media (max-width: 759px) {
+  /* she's read the memory's title by now: fold it away so her replies fit above the two of them */
+  .dialog--talk.is-choosing .talk__title { display: none; }
+  /* the hearts already filled in the talk box; on a phone the room goes to the two of them cheering */
+  .yay__words .meter--full { display: none; }
+}
+
+@media (max-height: 700px) and (max-width: 759px) {
+  .stage { padding-top: calc(env(safe-area-inset-top) + 70px); }
+  .page--title { gap: 16px; }
+  .frame--title { width: clamp(90px, 28vw, 120px); }
+}
+
+/* ---------- Larger screens ---------- */
+
+@media (min-width: 760px) {
+  :root {
+    --px: 4px;
+    --cat-px: 4px;
+    --hpx: 4px;
+    --ground-h: 172px;
+    --stand: 20;            /* the cats sit far enough away on a wide screen */
+  }
+
+  body { font-size: 1.4375rem; }
+
+  .stage { padding-top: 96px; }
+
+  .dialog__title { font-size: clamp(1.75rem, 1rem + 2vw, 2.5rem); }
+  .btn { font-size: 1.5rem; min-height: 60px; }
+  .btn--quiet { font-size: 1.3125rem; }
+  .btn--play { font-size: 1.75rem; min-height: 68px; }
+  .cat__bubble { font-size: 1.1875rem; max-width: 280px; }
+
+  /* photo on the left, sign, greeting and menu on the right */
+  .page--title {
+    max-width: 62rem;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      "photo logo"
+      "photo greet"
+      "photo menu";
+    align-content: center;
+    align-items: center;
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    row-gap: 22px;
+  }
+  .title__row { display: contents; }
+  .frame--title { grid-area: photo; width: 100%; max-width: 340px; justify-self: end; }
+  .logo { grid-area: logo; justify-self: start; }
+  .dialog--greeting { grid-area: greet; width: 100%; }
+  .dialog--greeting .dialog__body { font-size: inherit; line-height: 1.35; }
+  .menu { grid-area: menu; }
+
+  /* talk: words on the left, his portrait, name and hearts on the right */
+  .page--talk { max-width: 46rem; }
+  .dialog--talk {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: 22px;
+  }
+  .speaker {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: auto;
+    justify-items: center;
+  }
+  .speaker__meta { justify-items: center; }
+  .talk__main { grid-column: 1; grid-row: 1; align-content: start; }
+  .talk__text { min-height: 0; } /* the portrait column already holds the box's height */
+  .btn.choice { font-size: 1.3125rem; }
+
+  .page--question { max-width: 44rem; }
+
+  .page--yay { max-width: 60rem; }
+  .yay__row {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  .frame--yay { width: 280px; }
+  .yay__words { justify-items: start; }
+
+  .clock { font-size: 1.125rem; min-height: 60px; }
+  .sound-toggle { width: 60px; height: 60px; }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud, .fly, .sparkle, .btn__hand, .achievement__star, .has-typed > .dialog__more,
+  .talk__next .dialog__more, .choice:focus::before,
+  .cat-wrap.is-walking .cat__hop,
+  .cat-wrap.is-jumping .cat__hop,
+  .cat-wrap.is-purring .cat__hop,
+  .cat-wrap.is-hissing .cat__hop,
+  .cat-wrap.is-startled .cat__hop,
+  .actor.is-jumping .actor__hop,
+  .actor[data-face="nervous"] .actor__hop,
+  .emote.is-showing,
+  .credits[open] .credits__box,
+  .meter i.is-new,
+  .meter i.is-lost,
+  .btn:hover .btn__arrow { animation: none; }
+  .world__sky, .world__clouds, .world__flies { transition-duration: 300ms; }
+  .btn--yes, .btn--no.is-loose, .cat__bubble { transition-duration: 1ms; }
+}

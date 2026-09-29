@@ -1,0 +1,103 @@
+/* ==========================================================================
+   A little pixel farm, for Gabrielle
+   One art pixel = var(--px) CSS pixels. Frames and sprites are drawn in
+   pixels.js and arrive here as --img-* custom properties.
+   ========================================================================== */
+
+@property --yes-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+:root {
+  --px: 3px;
+  --cat-px: 3px;
+  --hpx: 3px;               /* heart meter pixels */
+  --gutter: 14px;
+  --ground-h: 146px;        /* the grass strip: tall enough that cat bubbles never reach the pages */
+  --stand: 29;              /* how far up the grass Gabrielle and Mohaimen stand, in art pixels */
+
+  --ink: #3b1d0b;
+  --ink-soft: #5a3216;
+  --parch: #fbe4a8;
+  --parch-deep: #efcd84;
+  --wood: #b0602a;
+  --wood-dk: #7a3b12;
+  --red: #c8243f;
+  --gold: #f6c23e;
+  --cream: #fff3d1;
+  --sky: #5a78c8;
+
+  --font: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
+
+  color-scheme: light;
+  accent-color: var(--red);
+  scrollbar-color: var(--wood) var(--parch-deep);
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--sky);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  font-family: var(--font);
+  font-size: 1.1875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+  background: var(--sky);
+  /* Pixelify's "fi" ligature draws as a block letter A */
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--gold); color: var(--ink); }
+
+img { display: block; max-width: 100%; }
+
+button { font: inherit; color: inherit; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+[tabindex="-1"]:focus-visible { outline: none; }
+
+em {
+  font-style: normal;
+  color: var(--red);
+}
+
+/* everything drawn in pixels stays crisp */
+.dialog, .frame, .plaque, .slot, .item, .sparkle, .meter, .meter i, .btn, .btn__arrow, .btn__hand,
+.achievement, .achievement__star, .clock, .clock__icon, .sound-toggle, .sound-toggle__icon,
+.cat__px, .cat__bubble, .cat__bubble::after, .cat__heart, .world canvas, .cloud,
+.signoff__heart, .dialog__more, .petals, .lilies,
+.logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .nameplate, .choice::before,
+.credits__list li::before, .actor__px, .emote {
+  image-rendering: pixelated;
+}

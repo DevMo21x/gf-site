@@ -1,0 +1,150 @@
+/* ---------- The farm behind everything ---------- */
+
+.world {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.world__sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 1400ms steps(7, end);
+}
+.world__sky.is-front { opacity: 1; }
+
+.world__clouds { position: absolute; inset: 0; transition: opacity 1200ms steps(6, end); }
+.cloud {
+  position: absolute;
+  left: 0;
+  background-size: 100% 100%;
+  animation: cloud-drift var(--dur, 120s) steps(480, end) infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+}
+@keyframes cloud-drift {
+  from { transform: translate3d(-40vw, 0, 0); }
+  to { transform: translate3d(110vw, 0, 0); }
+}
+body[data-time="dawn"] .world__clouds,
+body[data-time="sunset"] .world__clouds,
+body[data-time="night"] .world__clouds,
+body[data-time="festival"] .world__clouds { opacity: 0; }
+
+.world__flies {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1400ms steps(7, end);
+}
+body[data-time="night"] .world__flies,
+body[data-time="festival"] .world__flies { opacity: 1; }
+.fly {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--px);
+  height: var(--px);
+  background: #fffbd0;
+  box-shadow: 0 0 0 var(--px) #ffe45a;
+  animation: fly var(--d, 5s) steps(10, end) infinite alternate;
+}
+@keyframes fly {
+  0% { transform: translate3d(0, 0, 0); opacity: .75; }
+  40% { opacity: 1; }
+  100% { transform: translate3d(calc(var(--px) * 9), calc(var(--px) * -6), 0); opacity: .9; }
+}
+
+.fireworks {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* ---------- HUD: the clock and the sound switch ---------- */
+
+.hud {
+  position: fixed;
+  z-index: 30;
+  top: calc(env(safe-area-inset-top) + 10px);
+  right: max(10px, env(safe-area-inset-right));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 300ms steps(3, end);
+}
+.px-ready .hud { opacity: 1; }
+body[data-scene="title"] .clock { visibility: hidden; } /* the day starts when she presses Play */
+
+.clock {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 6px;
+  min-height: 52px;
+  padding: 0 4px;
+  border: calc(var(--px) * 4) solid transparent;
+  border-image: var(--img-plate) 4 fill / calc(var(--px) * 4) stretch;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.clock__icon {
+  grid-row: 1 / 3;
+  width: calc(var(--px) * 9);
+  height: calc(var(--px) * 9);
+}
+.clock__time { font-weight: 600; color: var(--ink-soft); }
+
+.sound-toggle {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: calc(var(--px) * 3) solid transparent;
+  border-image: var(--img-btn-wood) 3 fill / calc(var(--px) * 3) stretch;
+  background: none;
+  filter: drop-shadow(0 var(--px) 0 var(--ink));
+  cursor: pointer;
+}
+.sound-toggle:hover { border-image-source: var(--img-btn-woodHi); }
+.sound-toggle:active { transform: translateY(var(--px)); filter: none; }
+.sound-toggle__icon {
+  width: calc(var(--px) * 10);
+  height: calc(var(--px) * 8);
+  background: var(--img-soundOn) 0 0 / 100% 100% no-repeat;
+}
+.sound-toggle[aria-pressed="true"] .sound-toggle__icon { background-image: var(--img-soundOff); }
+
+/* ---------- Stage & pages ---------- */
+
+.stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding:
+    calc(env(safe-area-inset-top) + 74px)
+    max(var(--gutter), env(safe-area-inset-right))
+    calc(env(safe-area-inset-bottom) + var(--ground-h))
+    max(var(--gutter), env(safe-area-inset-left));
+}
+
+.page {
+  grid-area: 1 / 1;
+  align-self: center;
+  justify-self: center;
+  width: 100%;
+  max-width: 34rem;
+}
+.page[hidden] { display: none; }
+
+.w, .wi { display: inline-block; }

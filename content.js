@@ -183,8 +183,8 @@ const CONTENT = {
   },
 
   photos: {
-    title: { src: "images/us-cheek.webp", alt: "Gabrielle and Mohaimen cheek to cheek under the trees, smiling" },
-    celebration: { src: "images/us-cake.webp", alt: "Gabrielle holding a slice of cake next to Mohaimen doing a peace sign" },
+    title: { src: "assets/images/us-cheek.webp", alt: "Gabrielle and Mohaimen cheek to cheek under the trees, smiling" },
+    celebration: { src: "assets/images/us-cake.webp", alt: "Gabrielle holding a slice of cake next to Mohaimen doing a peace sign" },
   },
 
   sound: {
@@ -246,9 +246,9 @@ const CONTENT = {
     },
   },
 
-  // Background music. Swap the file in /audio and change src to use another song.
+  // Background music. Swap the file in /assets/audio and change src to use another song.
   music: {
-    src: "audio/gymnopedie.m4a",
+    src: "assets/audio/gymnopedie.m4a",
     volume: 1,     // 0–1 (the file itself is already mixed soft; iPhones ignore this and play at 1)
     startAt: 0,    // seconds into the song to begin from
     credit: "Music: original cozy farm loop in the spirit of Stardew Valley",
