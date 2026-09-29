@@ -160,7 +160,6 @@ body[data-scene="title"] .kiss-hit,
 .emote[data-kind="exclaim"] { background-image: var(--img-emote-exclaim); }
 .emote[data-kind="dots"] { background-image: var(--img-emote-dots); }
 .emote[data-kind="sweat"] { background-image: var(--img-emote-sweat); }
-.emote[data-kind="note"] { background-image: var(--img-emote-note); }
 .emote.is-showing {
   opacity: 1;
   animation: emote-pop 360ms steps(3, end);

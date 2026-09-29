@@ -81,17 +81,6 @@
 .btn:hover { border-image-source: var(--img-btn-woodHi); }
 .btn:active { transform: translateY(var(--px)); filter: none; }
 
-.btn__arrow {
-  width: calc(var(--px) * 4);
-  height: calc(var(--px) * 7);
-  background: var(--img-next) 0 0 / 100% 100% no-repeat;
-  filter: drop-shadow(0 2px 0 var(--wood-dk));
-}
-.btn:hover .btn__arrow { animation: nudge 500ms steps(1, end) infinite; }
-@keyframes nudge {
-  50% { transform: translateX(var(--px)); }
-}
-
 /* the quieter plank: parchment, ink label (Load game, Credits, Play again) */
 .btn--quiet {
   border-image-source: var(--img-btn-parch);

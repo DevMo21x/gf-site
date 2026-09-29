@@ -106,7 +106,6 @@
   .credits[open] .credits__box,
   .meter i.is-new,
   .meter i.is-lost,
-  .btn:hover .btn__arrow,
   .logo, .btn--tile .tile__icon, .btn--tile::before,
   .meter--talk.is-jolted, .star.is-next::after { animation: none; }
   .world__title { display: none; }

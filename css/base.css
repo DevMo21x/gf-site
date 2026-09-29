@@ -93,11 +93,11 @@ em {
 }
 
 /* everything drawn in pixels stays crisp */
-.dialog, .frame, .plaque, .slot, .item, .sparkle, .meter, .meter i, .btn, .btn__arrow, .btn__hand,
+.dialog, .frame, .plaque, .slot, .item, .sparkle, .meter, .meter i, .btn, .btn__hand,
 .achievement, .achievement__star, .clock, .clock__icon, .sound-toggle, .sound-toggle__icon,
 .cat__px, .cat__bubble, .cat__bubble::after, .cat__heart, .world canvas, .cloud,
 .signoff__heart, .dialog__more, .petals, .lilies,
-.logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .nameplate, .choice::before,
+.logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .choice::before,
 .credits__list li::before, .actor__px, .emote, .garden,
 .polaroid, .polaroid__pin, .tile__icon, .btn--tile::before, .bird, .drift,
 .nametab, .tail, .reply, .btn.choice, .held, .constellation__lines, .place-card__sign {

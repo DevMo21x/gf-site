@@ -376,15 +376,6 @@
       "..KRK..",
       "...K...",
     ], { K, R: RED }),
-    next: () => fromRows([
-      "W...",
-      "WW..",
-      "WWW.",
-      "WWWW",
-      "WWW.",
-      "WW..",
-      "W...",
-    ], { W: CREAM }),
     hand: () => fromRows([
       "..KKK......",
       ".KWWWKKKKK.",
@@ -953,16 +944,6 @@
       "KWWWWBBWWWWWK",
       "KWWWWWWWWWWWK",
     ], { B: "#4a9fd6", H: "#cdeefc" }),
-    note: () => emote([
-      "KWWWWWWWWWWWK",
-      "KWWWWWKKKKWWK",
-      "KWWWWWKWWKWWK",
-      "KWWWWWKWWKWWK",
-      "KWWWWWKWWKWWK",
-      "KWWWKKKWKKKWK",
-      "KWWWKKKWKKKWK",
-      "KWWWWWWWWWWWK",
-    ], {}),
   };
 
   /* ---------- Flowers for the burst ---------- */
@@ -1793,7 +1774,6 @@
     Object.entries(EMOTES).forEach(([name, make]) => set("--img-emote-" + name, make()));
     set("--img-flower-lily", flower(0, 2));
     set("--img-flower-pink", flower(1, 2));
-    set("--img-flower-sun", flower(2, 2));
     set("--img-leaf", leafSprite(0));
     const icon = document.querySelector('link[rel="icon"]');
     if (icon) icon.href = SPRITES.heart().url();
@@ -1801,8 +1781,7 @@
   }
 
   window.Pixel = {
-    Grid, fromRows, cat, person, portrait, flower, plant, leafSprite, cloud, scene, seeded,
-    heart: () => SPRITES.heart(),
+    cat, person, portrait, flower, plant, leafSprite, cloud, scene, seeded,
     heartSmall: () => SPRITES.heartSmall(),
     sun: () => SPRITES.sun(),
     moon: () => SPRITES.moon(),
