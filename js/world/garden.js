@@ -26,6 +26,7 @@ const Garden = (() => {
   }
 
   return {
+    reset: () => draw(-1),
     plant: () => { draw(0, true); Music.pickup(); },
     // later in the day, taller (it only ever grows)
     grow: (n) => { if (stage >= 0) draw(Math.max(stage, Math.min(n, 3)), true); },
@@ -37,6 +38,5 @@ const Garden = (() => {
     },
     // already in bloom (the farm, opened from a save)
     full: () => draw(5),
-    reset: () => draw(-1),
   };
 })();

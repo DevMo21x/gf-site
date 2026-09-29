@@ -268,6 +268,24 @@ const Tufo = (() => {
     cat.place(cat.spotFor(side), true, 8);
   }
 
+  // Zoomies: he runs back and forth across the screen until stopZoom (the jacket moment)
+  let zooming = false;
+  async function zoom() {
+    clearTimeout(chaseTimer);
+    zooming = true;
+    const vw = () => document.documentElement.clientWidth;
+    while (zooming) {
+      const target = 8 + Math.random() * (vw() - cat.width() - 16);
+      cat.mood(["is-excited"], 600);
+      await cat.place(target, true, 2);
+      await new Promise((r) => setTimeout(r, reducedMotion() ? 900 : 120 + Math.random() * 280));
+    }
+  }
+  function stopZoom() {
+    zooming = false;
+    setTimeout(() => cat.place(cat.spotFor(side), true, 8), 900);
+  }
+
   // A line from the story; knock: true means he swats the dialogue box crooked
   function speak(line, knockIt) {
     if (knockIt) knock($("[data-talk]"), line);
@@ -298,5 +316,5 @@ const Tufo = (() => {
   // "Load game" on the title: there are no saves
   const scoff = (line) => { clearTimeout(introTimer); cat.face(false); hiss(line); };
 
-  return { init, onPage, onBeat, onDodge, sitOn, jealous, speak, scoff, say: (line, ms) => cat.say(line, ms), get rect() { return cat.rect; } };
+  return { init, onPage, onBeat, onDodge, sitOn, jealous, speak, scoff, zoom, stopZoom, say: (line, ms) => cat.say(line, ms), get rect() { return cat.rect; } };
 })();

@@ -50,11 +50,13 @@ const Dialogue = (() => {
   function ask(options, { action = false } = {}) {
     choosing = true;
     nextBtn.hidden = true;
-    const buttons = options.map((label) => {
+    // an option is its words, or { label, item } for a gift with its picture
+    const buttons = options.map((o) => {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "btn choice";
-      b.innerHTML = `<span>${format(label)}</span>`;
+      b.innerHTML = (o.item ? `<i class="item item--${o.item} choice__item" aria-hidden="true"></i>` : "") +
+        `<span>${format(o.label || o)}</span>`;
       b.addEventListener("pointerenter", () => b.focus({ preventScroll: true })); // the cursor follows the pointer
       return b;
     });

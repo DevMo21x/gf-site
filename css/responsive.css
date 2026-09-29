@@ -107,7 +107,8 @@
   .meter i.is-new,
   .meter i.is-lost,
   .logo, .btn--tile .tile__icon, .btn--tile::before,
-  .meter--talk.is-jolted, .star.is-next::after { animation: none; }
+  .meter--talk.is-jolted, .star.is-next::after, .moment__heart { animation: none; }
+  .moment__jacket { transition: none; }
   .world__title { display: none; }
   .world__sky, .world__clouds, .world__flies { transition-duration: 300ms; }
   .btn--yes, .btn--no.is-loose, .cat__bubble { transition-duration: 1ms; }

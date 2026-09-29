@@ -474,6 +474,12 @@ body:not([data-scene="title"]) .stage {
 .item--jacket { background-image: var(--img-item-jacket); }
 .item--shawarma { background-image: var(--img-item-shawarma); }
 .item--bouquet { background-image: var(--img-item-bouquet); }
+.item--coffee { background-image: var(--img-item-coffee); }
+.item--rtx { background-image: var(--img-item-rtx); }
+.item--rock { background-image: var(--img-item-rock); }
+.item--tufo { background-image: var(--img-item-tufo); }
+.item--mei { background-image: var(--img-item-mei); }
+.item--hug { background-image: var(--img-item-hug); }
 
 .sparkle {
   position: absolute;

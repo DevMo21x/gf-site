@@ -72,20 +72,21 @@ const CONTENT = {
      A beat is a list of lines, played in order:
        { mo: "…", face: "…" }         Mohaimen says something. face: neutral, nervous, happy, blush, soft, shocked
        { memory: 0, face: "…" }       He shows her a memory (from memories above), with its item
-       { quiz: "…", answers: [ … ], correct: 0 }
-                                      A question. correct is the number of the right answer (0 = first).
-                                      The answers get shuffled, so the right one isn't always first.
-                                      Add right: "…" / wrong: "…" for his own reaction, or leave them out
-                                      and he picks one from quiz.right / quiz.wrong below.
+       { gift: "dawn" }               She picks a gift for him from her bag (gifts below). The ones he
+                                      loves fill hearts; the rest break one
+       { moment: "heart" }            A little thing she does with her fingers, against the clock (moments below):
+                                      "heart" calms his heart, "jacket" gets her his jacket back from Tufo,
+                                      "shawarma" catches falling shawarma before Tufo eats it.
+                                      In time: two hearts. Too slow: one breaks
        { mei: "…" } / { tufo: "…" }   A cat chimes in (it doesn't wait for a tap)
        { tufo: "…", knock: true }     Tufo knocks the dialogue box crooked
        { loves: true }                He tells her the three things he loves (loves.items above)
        { plant: true }                He gives her a seed to plant (garden below). It grows all day
-       { stars: true }                She joins up stars in the night sky (stars below)
+       { stars: true }                She joins up stars in the night sky (stars below). It fills the rest of the hearts
      A beat can also have place: "airport" | "docks" | "airbnb": the farm turns into that place
      for the whole beat (drawn in js/art/pixels.js, PLACES). In the Airbnb the two of them sit on the bed.
-     A right answer fills a heart, a wrong one breaks one. Ten hearts and he asks the question.
-     Zero hearts and… well. */
+     He starts with heartsAtStart hearts. Ten and he asks the question.
+     Zero and… well (boom below). */
   story: [
     // 6:10am
     {
@@ -93,9 +94,8 @@ const CONTENT = {
         { mo: "Oh! Gabrielle! Hi. Hey. Good morning. Hi.", face: "nervous" },
         { mei: "psst… he's been out here since 5am. I've been out here since 5:05. for the lighting." },
         { plant: true },
-        { mo: "Okay. I'm going to ask you some questions. Every right answer, my heart gets fuller. Every wrong one… let's not talk about that.", face: "nervous" },
-        { quiz: "First one. What do you call me?", answers: ["Sand person", "Sunshine", "Farm boy"], correct: 0,
-          right: "Sand person. Correct. Unfortunately." },
+        { mo: "Okay. Farm rules: you give someone a gift, their heart fills up. I didn't make that up. I did make that up.", face: "nervous" },
+        { gift: "dawn" },
       ],
     },
     // 9:00am, at the airport
@@ -104,8 +104,7 @@ const CONTENT = {
       lines: [
         { memory: 0, face: "blush" },
         { tufo: "he was SO nervous. pathetic." },
-        { quiz: "The first time we met in person, how was I?", answers: ["So, so nervous", "Totally chill", "Asleep"], correct: 0,
-          right: "Shaking. I'm kind of shaking right now, honestly." },
+        { moment: "heart" },
       ],
     },
     // 12:30pm, on the docks of Halifax
@@ -114,8 +113,7 @@ const CONTENT = {
       lines: [
         { memory: 1, face: "soft" },
         { tufo: "oops. not sorry.", knock: true },
-        { quiz: "Where was our jacket moment?", answers: ["The docks of Halifax", "A Tim Hortons", "The airport"], correct: 0,
-          right: "Halifax. I still think about it." },
+        { moment: "jacket" },
       ],
     },
     // 3:40pm, back at the Airbnb
@@ -124,8 +122,7 @@ const CONTENT = {
       lines: [
         { memory: 2, face: "happy" },
         { tufo: "and nobody saved me any" },
-        { quiz: "What did we eat late at night?", answers: ["Leftover shawarma", "Fresh sushi", "Cereal"], correct: 0,
-          right: "Leftover shawarma. Elite." },
+        { moment: "shawarma" },
         { mei: "shawarma? at 2am? I only eat off fine china, darling" },
       ],
     },
@@ -136,8 +133,7 @@ const CONTENT = {
         { loves: true },
         { mei: "all true. almost as true as things about me." },
         { tufo: "eh. I'm funnier" },
-        { quiz: "So which one is true?", answers: ["You're the funniest girl I've ever met", "You're mid, honestly", "Tufo is funnier"], correct: 0,
-          right: "Exactly. Tufo is NOT funnier." },
+        { gift: "sunset" },
       ],
     },
     // 10:20pm
@@ -145,32 +141,92 @@ const CONTENT = {
       lines: [
         { mo: "Okay. Okay okay okay.", face: "nervous" },
         { stars: true },
-        { quiz: "What does Mei think of you?", answers: ["Mei approves of you", "Mei ignores you", "Mei bites you"], correct: 0,
-          right: "She approves. And Mei is never wrong." },
       ],
     },
   ],
 
-  // The quiz game around the questions above
-  quiz: {
-    start: 4,   // hearts he starts with (out of 10)
-    // what he says when she's right or wrong, when a question has no right/wrong of its own
-    right: ["Yes! Correct!", "You remembered!", "That's my girl.", "See, this is why I like you."],
-    wrong: ["…no. That hurt a little.", "Wrong! My heart!", "Ouch. Okay. I'm fine. I'm fine.", "Did you forget?? Already??"],
-    // Tufo, every time she gets one wrong
-    tufo: ["HA.", "wrong. obviously.", "he's doomed", "do it again"],
-    // the day is over but the hearts aren't full: he asks the missed ones again
-    retry: "Wait. Not yet. I need a few more hearts before I ask. Let me try that one again…",
-    // ten hearts
-    full: "Ten hearts. That's all of them. Okay. Gabrielle…",
-    // zero hearts
-    boom: {
-      rush: "Zero hearts?! Gabrielle, wait, I— I'm coming over there—",
-      tufo: "worth it.",
-      title: "Mohaimen and Gabrielle have *exploded*",
-      body: "Zero hearts was too much for them both. Luckily, sand people respawn.",
-      tryAgain: "Try again",
+  // The gifts in her bag. item: its picture (drawn in js/art/pixels.js, GIFTS or ITEMS);
+  // hearts: 2 for the ones he loves, 1 for the rest; mei / tufo: what a cat says about it
+  gifts: {
+    dawn: {
+      ask: "So… did you bring me anything?",
+      options: [
+        { item: "rtx", label: "An RTX 5090", hearts: 2, face: "happy",
+          reply: "An RTX 5090?? For ME?? Okay. I'm keeping you. And it." },
+        { item: "rock", label: "A very nice rock", hearts: -1, face: "shocked",
+          reply: "…a rock. Cool. Cool cool cool. I'll treasure it. I won't." },
+        { item: "tufo", label: "Tufo", hearts: -1, face: "shocked",
+          reply: "He bit me. He bit me and he's looking at me like I owe him money.", tufo: "I'm not a gift. I'm a warning." },
+      ],
     },
+    sunset: {
+      ask: "Okay… your turn. Got anything else in that bag?",
+      options: [
+        { item: "shawarma", label: "The last bite of shawarma", hearts: 2, face: "happy",
+          reply: "You saved me the LAST BITE?? That's love. That's actual love.", tufo: "traitor." },
+        { item: "hug", label: "A big hug", hearts: 2, face: "blush",
+          reply: "…okay, I'm not letting go. We live here now." },
+        { item: "mei", label: "Mei", hearts: -1, face: "shocked",
+          reply: "She sat down, looked at me, and left. I think I just got rejected by a cat.", mei: "I'm not a gift, darling. I'm a treasure." },
+      ],
+    },
+  },
+
+  // The little things she does with her fingers, one per memory
+  moments: {
+    // at the airport: his heart is racing, she taps it calm
+    heart: {
+      ask: "Seeing you again… my heart's doing the airport thing. It's going crazy. Can you calm it down?",
+      hint: "Tap his heart to calm it down",
+      taps: 5,
+      seconds: 6,
+      slow: "Too slow… it's still racing. I think I'm dying a little.",
+      done: "…better. It's still beating fast, but that part's just you.",
+      mei: "there. he's normal now. ish.",
+    },
+    // on the docks: he gives her his jacket, Tufo steals it, she gets it back
+    jacket: {
+      ask: "It's freezing out here. Here, take my jacket.",
+      hint: "Tap the jacket to put it on",
+      steal: "mine now.",
+      chase: "Catch Tufo and tap him: {n} left",
+      taps: 3,
+      seconds: 12,
+      dodge: ["nope.", "too slow."],
+      slow: "Tufo has my jacket now. Tufo lives in my jacket now.",
+      slowTufo: "it's mine. I live here.",
+      caught: "fine. it smells like sand anyway.",
+      done: "It looks better on you. It always did.",
+    },
+    // at the Airbnb: shawarma bites fall, she catches them before Tufo does
+    shawarma: {
+      ask: "Leftover shawarma, CaseOh on the TV. Quick, catch the bites before Tufo gets them!",
+      hint: "Catch the shawarma: {n} of {total}",
+      label: "Catch the shawarma bite",
+      goal: 5,
+      seconds: 14,
+      stolen: ["MINE.", "delicious.", "thank you for your service."],
+      slow: "…Tufo ate all of it. Every bite. He's lying down now.",
+      slowTufo: "worth it.",
+      done: "Elite. Honestly the best date night I've ever had.",
+    },
+  },
+
+  // hearts he starts the day with
+  heartsAtStart: 2,
+
+  // zero hearts: he runs to her and they both blow up
+  boom: {
+    rush: "Zero hearts?! Gabrielle, wait, I— I'm coming over there—",
+    tufo: "worth it.",
+    title: "Mohaimen and Gabrielle have *exploded*",
+    body: "Zero hearts was too much for them both. Luckily, sand people respawn.",
+    tryAgain: "Try again",
+  },
+
+  // ten hearts: the night is almost over
+  ending: {
+    full: "Ten hearts. That's all of them. Okay. Gabrielle…",
   },
 
   // The seed she plants at dawn. It grows through the day and blooms right before he asks.
@@ -272,6 +328,7 @@ const CONTENT = {
       kiss: { title: "Smooch", hint: "he looks kissable. tap tap." },
       stars: { title: "Stargazer", hint: "stay up late with me." },
       no: { title: "Caught the No button", hint: "impossible. obviously." },
+      boom: { title: "Kaboom", hint: "let his hearts run all the way out." },
     },
     // every secret found: a golden moment, once
     complete: {

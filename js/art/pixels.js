@@ -641,10 +641,72 @@
     ], { K, P: "#f58aa8", Y: "#fbd24e", W: "#fbf6ec", L: LEAF, C: CREAM, c: PARCH_SH, R: RED }),
   };
 
+  /* ---------- Gifts she can give him (16×16) ---------- */
+
+  // a cat's face, for Tufo or Mei offered up as a gift
+  function catHead(fur, stripe, eye) {
+    const g = new Grid(16, 16);
+    g.poly([[2, 8], [3, 1], [8, 5]], fur).poly([[13, 8], [12, 1], [7, 5]], fur);
+    g.ellipse(7.5, 9.5, 6, 5, fur);
+    g.outline(K);
+    g.px([[4, 4], [4, 5], [11, 4], [11, 5]], "#eba7ab");
+    if (stripe) g.px([[7, 5], [7, 6], [8, 5], [8, 6], [5, 6], [10, 6]], stripe);
+    g.rect(5, 9, 1, 2, eye).rect(10, 9, 1, 2, eye);
+    g.set(7, 12, "#e07a8a").set(8, 12, "#e07a8a");
+    return g;
+  }
+
+  const GIFTS = {
+    // a warm coffee, steaming
+    coffee: () => {
+      const g = new Grid(16, 16);
+      g.rect(3, 6, 9, 8, "#f3ecdc").rect(12, 8, 2, 4, "#f3ecdc");
+      g.outline(K);
+      g.rect(13, 9, 1, 2, null);
+      g.rect(4, 7, 7, 1, "#8a5a2b").rect(3, 12, 9, 1, "#d3c6aa");
+      g.set(7, 10, RED).set(6, 9, RED).set(8, 9, RED);
+      g.px([[5, 1], [5, 3], [6, 2], [8, 1], [8, 3], [9, 2]], "#ffffff");
+      return g;
+    },
+    // an RTX 5090: a big black graphics card, two fans, gold contacts
+    rtx: () => {
+      const g = new Grid(16, 16);
+      g.rect(1, 4, 14, 8, "#2b2b30");
+      g.rect(1, 4, 14, 1, "#b8bcc4").rect(1, 11, 14, 1, "#6b6e75");
+      g.ellipse(4.5, 7.5, 2.6, 2.6, "#4a4c52").ellipse(11.5, 7.5, 2.6, 2.6, "#4a4c52");
+      g.set(4, 7, "#8a8d94").set(11, 7, "#8a8d94").set(5, 8, "#1c1c20").set(12, 8, "#1c1c20");
+      g.rect(4, 12, 8, 2, GOLD);
+      g.outline(K);
+      g.rect(4, 13, 8, 1, GOLD_DK);
+      g.set(8, 5, "#8fd05a").set(9, 5, "#8fd05a");
+      return g;
+    },
+    // a very nice rock
+    rock: () => {
+      const g = new Grid(16, 16);
+      g.ellipse(7.5, 10, 6, 4, "#9a948c");
+      g.tint((x, y) => y >= 12, "#77716a");
+      g.outline(K);
+      g.px([[5, 8], [6, 8], [5, 9]], "#c9c3ba");
+      return g;
+    },
+    tufo: () => catHead("#fbf8f2", null, "#e0708a"),
+    mei: () => catHead("#a39c95", "#6f6862", "#2b1d16"),
+    // a big hug: a heart with two arms around it
+    hug: () => {
+      const g = new Grid(16, 16);
+      g.ellipse(5, 6, 3, 3, RED).ellipse(10, 6, 3, 3, RED).poly([[2, 7], [13, 7], [7.5, 13.5]], RED);
+      g.outline(K);
+      g.set(4, 5, RED_HI).set(5, 4, RED_HI);
+      g.rect(1, 9, 3, 2, "#f5cfae").rect(12, 9, 3, 2, "#f5cfae");
+      return g;
+    },
+  };
+
   /* ---------- Gabrielle and Mohaimen, standing on the farm ---------- */
 
   // pose: { eyes: open|blink|happy|wide, look: -1..1, mouth: smile|flat|open|o,
-  //         blush, sweat, arm: down|head|up|eat|hold, sit }
+  //         blush, sweat, arm: down|head|up|eat|hold, sit, jacket }
   // sit: seated on the edge of the Airbnb bed; arm "eat": holding a shawarma wrap at the chest
   // Both are drawn facing the viewer; the page mirrors Mohaimen so they face each other.
   const GAB = {
@@ -657,6 +719,8 @@
     coat: "#f3ecdc", coatSh: "#d3c6aa", coatDot: "#e4dac4", shirt: "#262022",
     jeans: "#353c4a", jeansSh: "#272c37", knee: "#4f5868", shoe: "#ece6da", sole: "#bdb4a6",
   };
+  // Mohaimen once he's given her his jacket: just the black shirt
+  const MO_BARE = { ...MO, coat: MO.shirt, coatSh: "#15110f", coatDot: "#332c2e", coatHi: "#3d3538" };
   const WRAP = { bread: "#e9c98a", breadSh: "#c9a060", foil: "#dfe3ea", foilSh: "#9aa0ab", lettuce: "#6fb04a", sauce: "#d9433b" };
   const EYE = "#2b1d16";
   const MOUTH = "#a8433b";
@@ -666,7 +730,8 @@
 
   function person(kind, p) {
     const mo = kind === "mo";
-    const C = mo ? MO : GAB;
+    // jacket: Gabrielle in his white sherpa jacket, and Mohaimen without it, after the docks
+    const C = mo ? (p.jacket ? MO_BARE : MO) : p.jacket ? { ...GAB, coat: MO.coat, coatSh: MO.coatSh, coatHi: "#ffffff" } : GAB;
     const g = new Grid(22, 42);
     const arm = p.arm || "down";
 
@@ -805,8 +870,8 @@
   /* ---------- Mohaimen's portrait, for the dialogue box ---------- */
 
   // expr: neutral | nervous | happy | blush | soft | shocked
-  function portrait(expr) {
-    const C = MO;
+  function portrait(expr, bare) {
+    const C = bare ? MO_BARE : MO;
     const g = new Grid(36, 36);
 
     // shoulders: the white sherpa collar over a black shirt
@@ -1771,6 +1836,7 @@
     Object.entries(BUTTONS).forEach(([name, make]) => set("--img-btn-" + name, make()));
     Object.entries(SPRITES).forEach(([name, make]) => set("--img-" + name, make()));
     Object.entries(ITEMS).forEach(([name, make]) => set("--img-item-" + name, make()));
+    Object.entries(GIFTS).forEach(([name, make]) => set("--img-item-" + name, make()));
     Object.entries(EMOTES).forEach(([name, make]) => set("--img-emote-" + name, make()));
     set("--img-flower-lily", flower(0, 2));
     set("--img-flower-pink", flower(1, 2));

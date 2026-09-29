@@ -6,14 +6,16 @@
 
 const Story = (() => {
   const beats = CONTENT.story;
-  const quiz = CONTENT.quiz;
-  const questions = beats.flatMap((b) => b.lines).filter((l) => l.quiz);
   const NIGHT = 5; // the question comes at night; the festival is saved for her answer
   const wait = (ms) => new Promise((r) => setTimeout(r, reducedMotion() ? Math.min(ms, 150) : ms));
-  const pick = (list) => list[Math.floor(Math.random() * list.length)];
-  const missed = new Set(); // questions she got wrong, asked again after the last beat
   let started = false;
-  let over = false;         // zero hearts or ten: the story stops where it is
+  let over = false; // zero hearts: the day stops where it is and he runs over to her
+
+  // hearts change; at zero the day is over
+  function hearts(n) {
+    Meter.add(n);
+    if (Meter.filled === 0) over = true;
+  }
 
   async function play(l) {
     if (l.mei) { Mei.say(l.mei, 2800); return; }
@@ -32,24 +34,39 @@ const Story = (() => {
       return;
     }
 
-    if (l.quiz) {
-      await Dialogue.speak({ text: l.quiz, face: "nervous" });
-      const order = l.answers.map((_, k) => k).sort(() => Math.random() - 0.5);
-      const right = order[await Dialogue.ask(order.map((k) => l.answers[k]))] === l.correct;
-      Meter.add(right ? 1 : -1);
-      over = Meter.filled === 0 || Meter.filled === Meter.max;
-      if (right) {
-        missed.delete(l);
+    // she gives him something from her bag; she holds it up, he reacts, the cats have opinions
+    if (l.gift) {
+      const g = CONTENT.gifts[l.gift];
+      await Dialogue.speak({ text: g.ask, face: "nervous" });
+      // shuffled, so the one he loves isn't always first
+      const options = g.options.slice().sort(() => Math.random() - 0.5);
+      const o = options[await Dialogue.ask(options)];
+      Music.pickup();
+      (await Actors.gab.holdUp(o.item, 900)).remove();
+      hearts(o.hearts);
+      Actors.mo.emote(o.hearts > 0 ? "heart" : "sweat");
+      if (o.tufo) Tufo.speak(o.tufo);
+      if (o.mei) setTimeout(() => Mei.say(o.mei, 2600), 700);
+      await Dialogue.say({ text: o.reply, face: o.face });
+      return;
+    }
+
+    // a little thing she does with her fingers, with the box put away
+    if (l.moment) {
+      const m = CONTENT.moments[l.moment];
+      await Dialogue.say({ text: m.ask, face: l.moment === "heart" ? "nervous" : "soft" });
+      await Dialogue.close();
+      const inTime = await Moments[l.moment]();
+      Dialogue.open();
+      await wait(320);
+      hearts(inTime ? 2 : -1);
+      if (inTime) {
         Actors.gab.emote("heart");
-        Actors.gab.setFace("happy", 1600);
+        if (m.mei) setTimeout(() => Mei.say(m.mei, 2400), 600);
       } else {
-        missed.add(l);
         Actors.mo.emote("sweat");
-        Actors.gab.setFace("shocked", 1600);
-        Tufo.speak(pick(quiz.tufo));
       }
-      const reply = right ? l.right || pick(quiz.right) : l.wrong || pick(quiz.wrong);
-      await Dialogue.say({ text: reply, face: right ? "happy" : "shocked" });
+      await Dialogue.say({ text: inTime ? m.done : m.slow, face: inTime ? "blush" : "shocked" });
       return;
     }
 
@@ -71,6 +88,7 @@ const Story = (() => {
       await Stars.run();
       Dialogue.open();
       await wait(320);
+      Meter.set(Meter.max); // the stars fill whatever hearts are left
       await Dialogue.say({ text: s.done, face: "blush" });
       return;
     }
@@ -131,28 +149,24 @@ const Story = (() => {
       Dialogue.open();
       await wait(320);
     }
-    const lines = beats[i].lines;
-    for (let k = 0; k < lines.length && !over; k++) await play(lines[k]);
+    for (const line of beats[i].lines) {
+      if (over) return;
+      await play(line);
+    }
   }
 
   async function start() {
     if (started) return;
     started = true;
     for (let i = 0; i < beats.length && !over; i++) await beat(i);
-    // the day is done but the hearts aren't: the ones she missed come back
-    // (every question, if she has since fixed them all)
-    while (!over) {
-      await Dialogue.say({ text: quiz.retry, face: "soft" });
-      await play(missed.size ? missed.values().next().value : pick(questions));
-    }
-    if (Meter.filled === 0) { Boom.run(); return; }
+    if (over) { Boom.run(); return; }
     // ten hearts, and he finally asks
     Scene.set(NIGHT);
     Actors.sit(false);
     Clock.set(NIGHT);
     Garden.bloom();
     await Dialogue.say({ text: CONTENT.garden.bloom, face: "blush" });
-    await Dialogue.say({ text: quiz.full, face: "soft" });
+    await Dialogue.say({ text: CONTENT.ending.full, face: "soft" });
     // he holds the bouquet up, then out to her, and keeps holding it while he asks
     Music.pickup();
     (await Actors.mo.holdUp("bouquet")).remove();
@@ -165,16 +179,18 @@ const Story = (() => {
     Pages.show("question");
   }
 
-  // After the explosion: a fresh morning, a fresh Mohaimen
+  // After the explosion: a fresh morning, a fresh Mohaimen (in his jacket again)
   async function restart() {
     started = false;
     over = false;
-    missed.clear();
     Garden.reset();
-    Meter.set(quiz.start, true);
+    Meter.set(CONTENT.heartsAtStart, true);
     Scene.set(0);
     Actors.sit(false);
     Actors.mo.hold(false);
+    Actors.mo.swapJacket(false);
+    Actors.gab.swapJacket(false);
+    Portrait.jacketOff(false);
     Clock.set(0);
     Actors.mo.setFace("neutral");
     Actors.gab.setFace("neutral");

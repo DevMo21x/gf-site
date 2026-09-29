@@ -100,6 +100,6 @@ em {
 .logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .choice::before,
 .credits__list li::before, .actor__px, .emote, .garden,
 .polaroid, .polaroid__pin, .tile__icon, .btn--tile::before, .bird, .drift,
-.nametab, .tail, .reply, .btn.choice, .held, .constellation__lines, .place-card__sign {
+.nametab, .tail, .reply, .btn.choice, .held, .constellation__lines, .place-card__sign, .moment__thing {
   image-rendering: pixelated;
 }

@@ -9,12 +9,14 @@ const Portrait = (() => {
   const cache = new Map();
   let current = "neutral";
   let timer = 0;
+  let bare = false; // he's given her his jacket
 
   function paint(expr) {
-    let g = cache.get(expr);
+    const key = expr + bare;
+    let g = cache.get(key);
     if (!g) {
-      g = Pixel.portrait(expr);
-      cache.set(expr, g);
+      g = Pixel.portrait(expr, bare);
+      cache.set(key, g);
     }
     ctxs.forEach((ctx) => g.paint(ctx));
   }
@@ -28,5 +30,11 @@ const Portrait = (() => {
   }
 
   paint(current);
-  return { set };
+  // without the jacket once he's given it to her (and back on after a fresh start)
+  function jacketOff(on) {
+    bare = on;
+    paint(current);
+  }
+
+  return { set, jacketOff };
 })();

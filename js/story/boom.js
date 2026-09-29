@@ -8,11 +8,12 @@ const Boom = (() => {
   const box = $("[data-boom]");
   const mo = $('[data-actor="mo"]');
   const gab = $('[data-actor="gab"]');
-  const text = CONTENT.quiz.boom;
+  const text = CONTENT.boom;
   box.addEventListener("cancel", (e) => e.preventDefault()); // only Try again gets him back
 
   async function run() {
     await Dialogue.say({ text: text.rush, face: "shocked" });
+    Achievements.unlock("boom");
     await Dialogue.close();
     const from = Actors.mo.rect;
     const to = Actors.gab.rect;

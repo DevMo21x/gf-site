@@ -32,16 +32,18 @@ const Actors = (() => {
     let seated = false;     // on the Airbnb bed, shawarma in hand, eyes on the TV
     let lifting = false;    // both arms up, holding a memory's item over his head
     let holding = false;    // the bouquet held out in front of him
+    let jacket = false;     // since the docks the jacket is hers: she wears it, he doesn't
 
     function draw() {
       const rest = seated ? { arm: "eat", sit: true, look: kind === "gab" ? -1 : 1 } : {};
       const p = Object.assign({ eyes: "open", mouth: "smile", look: 1, arm: "down" }, rest, FACES[face]);
       if (seated) p.sit = true;
       if (holding) p.arm = "hold";
+      p.jacket = jacket;
       if (lifting) Object.assign(p, { arm: "up", eyes: "happy", mouth: "open" });
       if (blink > 0 && p.eyes === "open") p.eyes = "blink";
       if (talking && tick % 2 === 0) p.mouth = "open";
-      const key = [p.eyes, p.mouth, p.look, p.arm, p.blush, p.sweat, p.sit].join();
+      const key = [p.eyes, p.mouth, p.look, p.arm, p.blush, p.sweat, p.sit, p.jacket].join();
       if (key === last) return;
       last = key;
       let g = cache.get(key);
@@ -124,6 +126,11 @@ const Actors = (() => {
       draw();
     }
 
+    function swapJacket(on) {
+      jacket = on;
+      draw();
+    }
+
     function sit(on) {
       seated = on;
       wrap.classList.toggle("is-sitting", on);
@@ -132,7 +139,7 @@ const Actors = (() => {
 
     draw();
     return {
-      setFace, emote, jump, sit, holdUp, hold,
+      setFace, emote, jump, sit, holdUp, hold, swapJacket,
       talk(on) { talking = on; draw(); },
       get rect() { return $("canvas", wrap).getBoundingClientRect(); },
     };

@@ -42,6 +42,6 @@ const Meter = (() => {
     }
   }
 
-  set(CONTENT.quiz.start, true);
+  set(CONTENT.heartsAtStart, true);
   return { set, add: (n) => set(filled + n), get filled() { return filled; }, get max() { return hearts.length; } };
 })();

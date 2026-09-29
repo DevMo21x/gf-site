@@ -51,8 +51,9 @@
   <script src="js/story/actors.js" defer></script>
   <script src="js/story/portrait.js" defer></script>
   <script src="js/story/dialogue.js" defer></script>
-  <script src="js/story/story.js" defer></script>
+  <script src="js/story/moments.js" defer></script>
   <script src="js/story/boom.js" defer></script>
+  <script src="js/story/story.js" defer></script>
   <script src="js/main.js" defer></script>
 </head>
 <body data-time="dawn" data-scene="title">
@@ -170,13 +171,14 @@
       <!-- Zero hearts: game over -->
       <dialog class="credits" data-boom aria-labelledby="boom-title">
         <div class="dialog credits__box">
-          <h2 class="credits__title" id="boom-title" data-text="quiz.boom.title"></h2>
-          <p data-text="quiz.boom.body"></p>
+          <h2 class="credits__title" id="boom-title" data-text="boom.title"></h2>
+          <p data-text="boom.body"></p>
           <div class="credits__actions">
-            <button class="btn btn--primary" type="button" data-action="try-again"><span data-text="quiz.boom.tryAgain"></span></button>
+            <button class="btn btn--primary" type="button" data-action="try-again"><span data-text="boom.tryAgain"></span></button>
           </div>
         </div>
       </dialog>
+
     </section>
 
     <!-- 3 · The question -->
@@ -276,6 +278,11 @@
   <div class="constellation" data-stars role="group" hidden>
     <canvas class="constellation__lines" aria-hidden="true"></canvas>
     <p class="constellation__count plaque" data-stars-count aria-live="polite"></p>
+  </div>
+
+  <!-- the little things she does with her fingers: calm his heart, get the jacket back, catch shawarma -->
+  <div class="moment" data-moment hidden>
+    <p class="moment__hint plaque" data-moment-hint aria-live="polite"></p>
   </div>
 
   <!-- where they are now: a little sign drops in when the scene moves -->
