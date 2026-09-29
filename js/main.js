@@ -68,6 +68,17 @@ function showEnvelope() {
 
 /* ---------- The farm after yes: free play ---------- */
 
+// Once she's said yes she has a save, and "Load game" brings her back here
+const SAVE = "gab-saved";
+const hasSave = () => { try { return localStorage.getItem(SAVE) === "1"; } catch (e) { return false; } };
+const makeSave = () => { try { localStorage.setItem(SAVE, "1"); } catch (e) { /* no save, just the joke */ } };
+
+// where the flower burst starts: the tap, or the button's middle for a key press
+const tapOrigin = (e, el) => {
+  const r = el.getBoundingClientRect();
+  return e.clientX || e.clientY ? { x: e.clientX, y: e.clientY } : { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+};
+
 function goFarm() {
   document.body.dataset.scene = "talk";
   Scene.set(6);
@@ -136,19 +147,30 @@ document.addEventListener("click", (e) => {
     target.dataset.used = "true";
     Music.start(); // the tap is the permission browsers need
     Music.gliss();
-    const r = target.getBoundingClientRect();
-    const origin = e.clientX || e.clientY
-      ? { x: e.clientX, y: e.clientY }
-      : { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    const covered = Lilies.bloom(origin);
+    const covered = Lilies.bloom(tapOrigin(e, target));
     // swap to the farm underneath while the flowers cover everything
     setTimeout(() => {
       document.body.dataset.scene = "talk";
       Pages.show("talk", () => setTimeout(Story.start, reducedMotion() ? 200 : 1300));
     }, covered + 300);
   } else if (action === "load") {
-    Tufo.scoff(CONTENT.title.loadJoke.tufo);
-    setTimeout(() => Mei.say(CONTENT.title.loadJoke.mei, 2400), 1100);
+    if (!hasSave()) {
+      Tufo.scoff(CONTENT.title.loadJoke.tufo);
+      setTimeout(() => Mei.say(CONTENT.title.loadJoke.mei, 2400), 1100);
+      return;
+    }
+    // she has a save: straight back to the farm, festival and all
+    if (target.dataset.used) return;
+    target.dataset.used = "true";
+    Music.start();
+    Music.gliss();
+    const covered = Lilies.bloom(tapOrigin(e, target));
+    const saved = CONTENT.title.loadSaved;
+    setTimeout(() => {
+      goFarm();
+      setTimeout(() => Tufo.scoff(saved.tufo), 2600);
+      setTimeout(() => Mei.say(saved.mei, 2800), 4000);
+    }, covered + 300);
   } else if (action === "credits") {
     Achievements.render();
     openBox(credits);
@@ -158,6 +180,7 @@ document.addEventListener("click", (e) => {
   } else if (action === "moon") {
     wish();
   } else if (action === "yes") {
+    makeSave();
     Dodge.retire();
     Music.start();
     Music.chime();

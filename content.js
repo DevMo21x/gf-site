@@ -19,6 +19,8 @@ const CONTENT = {
     credits: "Credits",
     // what the cats say when she taps "Load game"
     loadJoke: { tufo: "no saves. you get ONE try.", mei: "just press Play!" },
+    // …and once she's said yes, "Load game" takes her back to the farm
+    loadSaved: { tufo: "ugh. fine. you have a save now.", mei: "welcome home, darling." },
     creditsTitle: "Credits",
     creditsLines: [
       "Made by Mohaimen, with love <3",
