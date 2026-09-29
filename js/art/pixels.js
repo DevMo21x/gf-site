@@ -312,6 +312,21 @@
       "..KRK..",
       "...K...",
     ], { K, R: RED, H: RED_HI }),
+    // Tufo's stuffed cat (Kevin): faded lavender, one stitched-X eye, one button eye
+    plush: () => fromRows([
+      ".K...K..........",
+      "KLK.KLK.........",
+      "KLLKLLK......KK.",
+      "KXLLLBK.....KLK.",
+      "KLLNLLLKKKKKLK..",
+      ".KLLLLLLLLLLLK..",
+      "..KLLSLLLLSLLK..",
+      "..KLLLSLLLLLLK..",
+      "..KLLLLLLLLLLK..",
+      "..KLLKLLLLKLLK..",
+      "..KLK.KKKK.KLK..",
+      "..KK........KK..",
+    ], { K, L: "#c9a6d6", X: "#5a3d6b", B: "#2b1d16", N: "#eba7ab", S: "#a27fb3" }),
     more: () => fromRows([
       "KKKKKKK",
       ".KRRRK.",

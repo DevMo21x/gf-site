@@ -122,6 +122,31 @@ body[data-scene="title"] .actors { visibility: hidden; }
 }
 .cat-wrap.is-startled .cat__hop { animation: cat-jump 480ms steps(6, end); }
 
+/* Tufo and Kevin, his stuffed cat. Sits in front of him (the flip keeps it there) */
+.cat__flip { position: relative; }
+.cat-wrap--tufo .cat__hop { position: relative; }
+.cat__plush {
+  position: absolute;
+  left: calc(var(--cat-px) * -6);
+  bottom: 0;
+  width: calc(var(--cat-px) * 16);
+  height: calc(var(--cat-px) * 12);
+  background: var(--img-plush) 0 0 / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  opacity: 0;
+  transform: translateY(calc(var(--cat-px) * 3));
+  transition: opacity 200ms steps(2, end), transform 200ms steps(2, end);
+}
+.cat-wrap.has-plush .cat__plush { opacity: 1; transform: none; }
+.cat-wrap.is-humping .cat__hop { animation: cat-hump 240ms steps(1, end) infinite; }
+.cat-wrap.is-humping .cat__plush { animation: plush-squish 240ms steps(1, end) infinite; }
+@keyframes cat-hump {
+  50% { transform: translateX(calc(var(--cat-px) * -2)) rotate(-5deg); }
+}
+@keyframes plush-squish {
+  50% { transform: translateX(calc(var(--cat-px) * -1)) scaleY(.92); }
+}
+
 .cat__bubble {
   position: absolute;
   bottom: calc(100% + var(--px) * 3);

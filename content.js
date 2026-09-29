@@ -76,7 +76,7 @@ const CONTENT = {
     {
       lines: [
         { mo: "Oh! Gabrielle! Hi. Hey. Good morning. Hi.", face: "nervous" },
-        { mei: "psst… he's been out here since 5am" },
+        { mei: "psst… he's been out here since 5am. I've been out here since 5:05. for the lighting." },
         { mo: "Okay. I'm going to ask you some questions. Every right answer, my heart gets fuller. Every wrong one… let's not talk about that.", face: "nervous" },
         { quiz: "First one. What do you call me?", answers: ["Sand person", "Sunshine", "Farm boy"], correct: 0,
           right: "Sand person. Correct. Unfortunately." },
@@ -117,7 +117,7 @@ const CONTENT = {
           right: "Leftover shawarma. Elite." },
         { quiz: "Who were we watching?", answers: ["CaseOh", "MrBeast", "The news"], correct: 0,
           right: "CaseOh. The third wheel. A very funny third wheel." },
-        { mei: "I would've eaten that shawarma" },
+        { mei: "shawarma? at 2am? I only eat off fine china, darling" },
       ],
     },
     // 6:50pm
@@ -125,7 +125,7 @@ const CONTENT = {
       lines: [
         { mo: "Okay. Can I tell you some things I love about you?", face: "soft" },
         { loves: true },
-        { mei: "all true, I checked" },
+        { mei: "all true. almost as true as things about me." },
         { tufo: "eh. I'm funnier" },
         { quiz: "So which one is true?", answers: ["You're the funniest girl I've ever met", "You're mid, honestly", "Tufo is funnier"], correct: 0,
           right: "Exactly. Tufo is NOT funnier." },
@@ -203,19 +203,30 @@ const CONTENT = {
 
   // Mei the cat: everything she says
   mei: {
-    label: "Mei the cat. Tap to pet her.",
-    hint: "psst… you can pet me",
-    hello: "hi! I'm Mei",
-    purr: "prrrrrr…",
-    blink: "*slow blink* (that means I love you)",
-    lines: ["mrrp?", "meow!", "Mei approves of you", "again. pet me again.", "you smell like shawarma", "I'm on your side"],
+    label: "Mei the cat. Tap to pet her. She expects it.",
+    hint: "psst… you may pet me. you're welcome.",
+    hello: "hi. I'm Mei. yes, THE Mei.",
+    purr: "prrrr… don't stop. I didn't say stop.",
+    blink: "*slow blink* (you've been blessed. no photos.)",
+    lines: [
+      "left side. it's my good side.",
+      "did I SAY you could stop?",
+      "Mei approves of you. don't make it weird.",
+      "I woke up like this",
+      "you smell like shawarma. unacceptable.",
+      "I'm the main character. you're the love interest.",
+      "no photos. okay ONE photo.",
+      "my fur costs more than his car",
+    ],
     // things she says when these screens open
     pages: {
-      question: "psst… say yes",
-      yay: "achievement unlocked!",
+      question: "say yes, darling. I didn't do my fur for nothing.",
+      yay: "I'd like to thank me. mostly me.",
     },
-    dodge: ["hehe, nope", "that button's shy", "try the big one"],
-    startled: "eep!",
+    dodge: ["hehe, the drama", "that button has no star power", "the big one, sweetie. the BIG one"],
+    startled: "EXCUSE me??",
+    // when Tufo gets his stuffed cat out
+    plush: ["EW. not in front of me.", "I'm calling my agent.", "this is beneath me. literally.", "I need a new brother. and a spa day."],
   },
 
   // Tufo the cat: white, pink-eyed, mean. Everything he says.
@@ -229,7 +240,14 @@ const CONTENT = {
     rude: ["your hands are cold", "mid petting, honestly", "I was here first", "don't look at me", "go pet the other one"],
     allow: "…fine. ONE pet.",
     allowAfter: "okay that's enough",
-    jealous: ["why does SHE get pets", "ew. affection.", "Mei is a suck-up"],
+    jealous: ["why does SHE get pets", "ew. affection.", "Mei is a diva and a narc"],
+    // Kevin, his stuffed cat. Sometimes he gets him out and… gets busy
+    plush: {
+      start: ["don't look. this is private.", "me and Kevin need a minute.", "avert your eyes, human."],
+      during: ["Kevin knows what he did.", "this is cardio. mind your business.", "*aggressive biscuits*"],
+      end: ["…what. it's cardio.", "Kevin and I are done. for now.", "you saw nothing."],
+      caught: ["DO YOU MIND.", "can't a cat have ONE moment", "KNOCK first??"],
+    },
     hissAtMei: "hsss. MY human.",
     // things he says when these screens open
     pages: {
@@ -241,8 +259,8 @@ const CONTENT = {
     chase: {
       start: ["zoomies.", "RUN, Mei.", "tag. you're it."],
       end: ["that's cardio.", "she started it", "I let her win"],
-      meiStart: "not again!!",
-      meiEnd: "he does this EVERY day",
+      meiStart: "NOT THE FUR!!",
+      meiEnd: "he does this EVERY day. I'm suing.",
     },
   },
 

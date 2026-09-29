@@ -101,6 +101,8 @@
   .cat-wrap.is-purring .cat__hop,
   .cat-wrap.is-hissing .cat__hop,
   .cat-wrap.is-startled .cat__hop,
+  .cat-wrap.is-humping .cat__hop,
+  .cat-wrap.is-humping .cat__plush,
   .actor.is-jumping .actor__hop,
   .actor[data-face="nervous"] .actor__hop,
   .emote.is-showing,

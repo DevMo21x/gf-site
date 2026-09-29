@@ -20,7 +20,7 @@ const Tufo = (() => {
 
   // Like at home: he goes after his sister, she leaps over him and bolts, he follows
   function chase() {
-    if (chasing || reducedMotion()) return;
+    if (chasing || humping || reducedMotion()) return;
     chasing = true;
     chases += 1;
     const token = pageToken;
@@ -74,6 +74,43 @@ const Tufo = (() => {
     })();
   }
 
+  // Now and then he drags out Kevin, his stuffed cat, and gets… busy. Tapping him ends it.
+  let humping = false;
+  let humps = 0;
+  let humpTimer = 0;
+  let humpSteps = [];
+  function hump() {
+    if (humping || chasing) return;
+    humping = true;
+    humps += 1;
+    const token = cat.hush();
+    const later = (ms, fn) => humpSteps.push(setTimeout(() => { if (cat.current(token)) fn(); }, ms));
+    cat.wrap.classList.add("has-plush");
+    cat.say(cat.pick(text.plush.start, memo), 1800);
+    later(500, () => { cat.wrap.classList.add("is-humping"); cat.mood(["is-happy"], 3400); });
+    later(1500, () => Mei.say(cat.pick(CONTENT.mei.plush, memo), 2200));
+    later(2300, () => cat.say(cat.pick(text.plush.during, memo), 1800));
+    later(4000, () => {
+      cat.wrap.classList.remove("is-humping");
+      cat.say(cat.pick(text.plush.end, memo), 2200);
+    });
+    later(5600, () => stopHump());
+  }
+  function stopHump(line) {
+    humpSteps.forEach(clearTimeout);
+    humpSteps = [];
+    if (!humping) return false;
+    humping = false;
+    cat.wrap.classList.remove("is-humping", "has-plush");
+    if (line) hiss(line);
+    return true;
+  }
+  // pages and beats: a fresh chance, after whatever was already planned
+  function planHump(ms) {
+    clearTimeout(humpTimer);
+    humpTimer = setTimeout(hump, ms);
+  }
+
   const hiss = (line) => {
     cat.mood(["is-hissing", "is-meowing"], 900);
     Music.hiss();
@@ -117,6 +154,7 @@ const Tufo = (() => {
 
   function touch() {
     clearTimeout(introTimer);
+    if (stopHump(cat.pick(text.plush.caught, memo))) return; // walked in on him
     touched += 1;
     if (touched === 1) {
       hiss(text.hello);
@@ -163,6 +201,8 @@ const Tufo = (() => {
   function onPage(page) {
     clearTimeout(introTimer);
     clearTimeout(chaseTimer);
+    clearTimeout(humpTimer);
+    stopHump();
     pageToken += 1;
     chasing = false;
     const token = cat.hush();
@@ -190,6 +230,8 @@ const Tufo = (() => {
     if (index >= 1 && index <= 4 && chases < 4 && (chases === 0 || Math.random() < 0.4)) {
       const mine = pageToken;
       chaseTimer = setTimeout(() => { if (mine === pageToken) chase(); }, 5200 + Math.random() * 2500);
+    } else if (humps < 3 && (index >= 2 && humps === 0 || Math.random() < 0.4)) {
+      planHump(6000 + Math.random() * 4000);
     }
   }
 
@@ -213,6 +255,8 @@ const Tufo = (() => {
     setTimeout(() => {
       cat.place(cat.spotFor("right"), true, 8).then(() => {
         introTimer = setTimeout(() => { if (!touched) cat.say(text.intro, 3000); }, 5200);
+        // left alone on the start menu long enough, he gets Kevin out
+        planHump(15000);
       });
     }, 2600);
     window.addEventListener("resize", () => cat.place(cat.spotFor(side), false));
