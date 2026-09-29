@@ -23,7 +23,7 @@ const CONTENT = {
     loadSaved: { tufo: "ugh. fine. you have a save now.", mei: "welcome home, darling." },
     creditsTitle: "Credits",
     creditsLines: [
-      "Made by Mohaimen, with love <3",
+      "Made by Mohaimen, with love",
       "Starring Gabrielle, Mohaimen, Mei and Tufo",
       "Tufo did not agree to be in this",
     ],
@@ -272,6 +272,13 @@ const CONTENT = {
       kiss: { title: "Smooch", hint: "he looks kissable. tap tap." },
       stars: { title: "Stargazer", hint: "stay up late with me." },
       no: { title: "Caught the No button", hint: "impossible. obviously." },
+    },
+    // every secret found: a golden moment, once
+    complete: {
+      title: "Every secret found",
+      line: "{n} of {total}. You know us too well, darling.",
+      mei: "I always knew you'd find them all.",
+      tufo: "fine. you're… acceptable.",
     },
   },
 

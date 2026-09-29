@@ -158,6 +158,7 @@ const Dodge = (() => {
     no.setAttribute("aria-label", CONTENT.question.noBecomesYes);
     Music.chime();
     animate(no, [{ scale: "0.6" }, { scale: "1.2", offset: 0.6 }, { scale: "1" }], { duration: 360, easing: "steps(4, end)" });
+    Achievements.unlock("no"); // the only way to catch it: Tufo does
   }
 
   function dodge(event) {

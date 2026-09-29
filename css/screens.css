@@ -748,6 +748,21 @@ body:not([data-scene="title"]) .stage {
 .toast__label { display: block; font-size: .85rem; color: var(--ink-soft); }
 .toast__title { font-size: 1.1rem; }
 
+/* every secret found: the same gold frame, one size up, a star either side */
+.toast--grand {
+  top: calc(env(safe-area-inset-top) + 74px);
+  z-index: 36;
+  gap: 14px;
+  padding: calc(var(--px) * 3) calc(var(--px) * 5);
+  text-align: center;
+}
+.toast--grand .toast__words { display: grid; gap: 4px; }
+.toast--grand .toast__title { font-size: clamp(1.375rem, 1rem + 2vw, 2.125rem); line-height: 1.1; }
+.toast--grand .toast__line { font-size: 1rem; font-weight: 600; color: var(--ink-soft); }
+.toast--grand .achievement__star:last-child { animation-delay: -700ms; }
+.credits__count.is-complete { color: #7a5410; }
+.credits__count.is-complete::after { content: "  \2605"; color: var(--gold); }
+
 /* ---------- Where they are: the sign that drops in when the scene moves ---------- */
 
 .place-card {

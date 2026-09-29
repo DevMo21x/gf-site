@@ -82,6 +82,7 @@
   .frame--yay { width: 280px; }
   .yay__words { justify-items: start; }
 
+  .toast--grand { top: calc(env(safe-area-inset-top) + 14px); } /* clear of the boxes; the HUD is off to the side */
   .clock { font-size: 1.125rem; min-height: 60px; }
   .sound-toggle { width: 60px; height: 60px; }
 }
