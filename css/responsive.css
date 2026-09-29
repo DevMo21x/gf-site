@@ -16,6 +16,14 @@
   .yay__words .meter--full { display: none; }
 }
 
+/* shorter phones: the talk box sits closer to their heads and her replies pack tighter */
+@media (max-height: 780px) and (max-width: 759px) {
+  :root { --hang: calc(var(--px) * 7); }
+  .page--talk { gap: calc(var(--px) * 13); }
+  .btn.choice { min-height: 44px; padding-top: 5px; padding-bottom: 5px; }
+  .talk__text { min-height: calc(1.35em * 2); }
+}
+
 @media (max-height: 700px) and (max-width: 759px) {
   .stage { padding-top: calc(env(safe-area-inset-top) + 70px); }
   .page--title { gap: 16px; }
@@ -51,23 +59,17 @@
   .btn--tile { font-size: 1.3125rem; min-height: calc(var(--px) * 31); }
   .menu { gap: 14px; }
 
-  /* talk: words on the left, his portrait, name and hearts on the right */
-  .page--talk { max-width: 46rem; }
-  .dialog--talk {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    column-gap: 22px;
-  }
-  .speaker {
-    grid-column: 2;
-    grid-row: 1;
-    grid-template-columns: auto;
-    justify-items: center;
-  }
-  .speaker__meta { justify-items: center; }
-  .talk__main { grid-column: 1; grid-row: 1; align-content: start; }
-  .talk__text { min-height: 0; } /* the portrait column already holds the box's height */
-  .btn.choice { font-size: 1.3125rem; }
+  /* talk: the same box, wider, his face at 3x */
+  :root { --port: 108px; }
+  :root { --hang: calc(var(--px) * 8); }
+  .page--talk { max-width: 44rem; gap: calc(var(--px) * 10); }
+  body:not([data-scene="title"]) .stage { padding-top: 80px; }
+  .talk__text { font-size: 1.4375rem; min-height: 0; } /* his face holds the box's height */
+  .tail--mo { right: 30%; }
+  .tail--gab { left: 30%; }
+  .dialog--talk .meter--talk { --hpx: 3px; bottom: calc(var(--px) * -11); }
+  .btn.choice { font-size: 1.3125rem; min-height: 48px; }
+  .nametab { font-size: 1.125rem; }
 
   .page--question { max-width: 44rem; }
 
@@ -104,7 +106,8 @@
   .meter i.is-new,
   .meter i.is-lost,
   .btn:hover .btn__arrow,
-  .logo, .btn--tile .tile__icon, .btn--tile::before { animation: none; }
+  .logo, .btn--tile .tile__icon, .btn--tile::before,
+  .meter--talk.is-jolted, .star.is-next::after { animation: none; }
   .world__title { display: none; }
   .world__sky, .world__clouds, .world__flies { transition-duration: 300ms; }
   .btn--yes, .btn--no.is-loose, .cat__bubble { transition-duration: 1ms; }

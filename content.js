@@ -31,6 +31,14 @@ const CONTENT = {
   },
 
   mohaimen: { name: "Mohaimen" },
+  gabrielle: { name: "Gabrielle" },
+
+  // the sign that drops in when a memory takes them somewhere else (the clock gives the time)
+  places: {
+    airport: "The airport",
+    docks: "The docks of Halifax",
+    airbnb: "Our Airbnb",
+  },
 
   // The memories he shows her. item: the little picture that pops up (nervous, jacket, shawarma)
   memories: [

@@ -26,6 +26,15 @@ body[data-scene="title"] .actors { visibility: hidden; }
 .actor__px { height: calc(var(--px) * 42); }
 .actor__hop { transform-origin: 50% 100%; }
 .actor--mo .actor__flip { transform: scaleX(-1); } /* he faces her */
+.actor__hop { position: relative; }
+/* the bouquet in his hand, held out toward her while he asks */
+.actor__bouquet {
+  position: absolute;
+  left: calc(var(--px) * 1);
+  top: calc(var(--px) * 21); /* at his chest, clear of his face */
+  display: none;
+}
+.actor.is-holding .actor__bouquet { display: block; }
 .actor.is-gone { visibility: hidden; }
 
 /* the seed she plants, on the grass in front of the two of them */
@@ -52,20 +61,20 @@ body[data-place]:not([data-place=""]) .garden { visibility: hidden; } /* it stay
   aspect-ratio: 5 / 4;
 }
 .constellation[hidden] { display: none; }
-.constellation svg {
+.constellation__lines {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  overflow: visible;
 }
-.constellation line {
-  stroke: var(--gold);
-  stroke-width: 3px;
-  stroke-linecap: square;
-  vector-effect: non-scaling-stroke;
+.constellation__count {
+  bottom: auto;
+  top: calc(100% + var(--px) * 8);
+  font-variant-numeric: tabular-nums;
 }
-.constellation.is-done line { stroke: var(--cream); filter: drop-shadow(0 0 4px var(--gold)); }
+/* the sky dims a step while she joins them, so the stars she needs stand out */
+.world__sky { transition-property: opacity, filter; }
+body.is-stargazing .world__sky { filter: brightness(.62); }
 .star {
   position: absolute;
   translate: -50% -50%;
@@ -82,15 +91,28 @@ body[data-place]:not([data-place=""]) .garden { visibility: hidden; } /* it stay
 }
 .star::before {
   content: "";
-  width: calc(var(--px) * 7);
-  height: calc(var(--px) * 7);
+  width: calc(var(--px) * 11);
+  height: calc(var(--px) * 11);
   background: var(--img-star) 0 0 / 100% 100% no-repeat;
   image-rendering: pixelated;
-  opacity: .5;
+  opacity: .35;
+  filter: grayscale(.6);
 }
-.star.is-next::before { opacity: 1; animation: twinkle 700ms steps(1, end) infinite; }
-.star.is-lit::before { opacity: 1; }
-.constellation.is-done .star::before { width: calc(var(--px) * 9); height: calc(var(--px) * 9); }
+/* the one to tap: full gold, a sparkle beside it, twinkling */
+.star.is-next::before { opacity: 1; filter: none; animation: twinkle 700ms steps(1, end) infinite; }
+.star.is-next::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: calc(var(--px) * 5);
+  height: calc(var(--px) * 5);
+  background: var(--img-sparkle) 0 0 / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  animation: twinkle 1200ms steps(1, end) infinite;
+}
+.star.is-lit::before { opacity: 1; filter: none; }
+.constellation.is-done .star::before { width: calc(var(--px) * 13); height: calc(var(--px) * 13); }
 .star:focus-visible { outline: 3px solid var(--cream); outline-offset: -6px; }
 @keyframes twinkle { 50% { scale: 1.35; } }
 
@@ -239,7 +261,8 @@ body[data-scene="title"] .kiss-hit,
   left: 0;
   margin: 0;
   width: max-content;
-  max-width: min(230px, calc(100vw - 32px));
+  /* wide and short: three lines at most, so it stays under Gabrielle's and Mohaimen's faces */
+  max-width: min(300px, calc(100vw - 24px));
   padding: 2px 6px 3px;
   border: calc(var(--px) * 3) solid transparent;
   border-image: var(--img-bubble) 3 fill / calc(var(--px) * 3) stretch;
@@ -262,6 +285,11 @@ body[data-scene="title"] .kiss-hit,
   height: calc(var(--px) * 4);
   background: var(--img-tail) 0 0 / 100% 100% no-repeat;
 }
+/* each cat's bubble takes its colour: Mei's grey tabby, Tufo's pink eyes */
+.cat-wrap--mei .cat__bubble { border-image-source: var(--img-bubbleMei); }
+.cat-wrap--mei .cat__bubble::after { background-image: var(--img-tailMei); }
+.cat-wrap--tufo .cat__bubble { border-image-source: var(--img-bubbleTufo); }
+.cat-wrap--tufo .cat__bubble::after { background-image: var(--img-tailTufo); }
 .cat-wrap.is-right .cat__bubble { left: auto; right: 0; }
 .cat-wrap.is-right .cat__bubble::after { left: auto; right: 12px; }
 .cat__bubble.is-showing { opacity: 1; transform: none; }

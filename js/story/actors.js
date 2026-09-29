@@ -30,11 +30,15 @@ const Actors = (() => {
     let faceTimer = 0;
     let emoteTimer = 0;
     let seated = false;     // on the Airbnb bed, shawarma in hand, eyes on the TV
+    let lifting = false;    // both arms up, holding a memory's item over his head
+    let holding = false;    // the bouquet held out in front of him
 
     function draw() {
       const rest = seated ? { arm: "eat", sit: true, look: kind === "gab" ? -1 : 1 } : {};
       const p = Object.assign({ eyes: "open", mouth: "smile", look: 1, arm: "down" }, rest, FACES[face]);
       if (seated) p.sit = true;
+      if (holding) p.arm = "hold";
+      if (lifting) Object.assign(p, { arm: "up", eyes: "happy", mouth: "open" });
       if (blink > 0 && p.eyes === "open") p.eyes = "blink";
       if (talking && tick % 2 === 0) p.mouth = "open";
       const key = [p.eyes, p.mouth, p.look, p.arm, p.blush, p.sweat, p.sit].join();
@@ -86,6 +90,40 @@ const Actors = (() => {
       setTimeout(() => wrap.classList.remove("is-jumping"), 620);
     }
 
+    // Hold an item up over the head, with sparkles; resolves with the item (still showing) after ms
+    function holdUp(item, ms = 1100) {
+      const P = PX();
+      const r = $("canvas", wrap).getBoundingClientRect();
+      const x = Math.round(r.left + r.width / 2 - P * 8);
+      const y = Math.round(r.top - P * 18);
+      const el = document.createElement("div");
+      el.className = "held";
+      el.setAttribute("aria-hidden", "true");
+      el.innerHTML = `<i class="item item--${item}"></i><i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>`;
+      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      document.body.appendChild(el);
+      lifting = true;
+      draw();
+      if (!reducedMotion()) {
+        el.animate([
+          { opacity: 0, transform: `translate3d(${x}px, ${y + P * 10}px, 0)` },
+          { opacity: 1, transform: `translate3d(${x}px, ${y - P * 2}px, 0)`, offset: 0.6 },
+          { opacity: 1, transform: `translate3d(${x}px, ${y}px, 0)` },
+        ], { duration: 360, easing: "steps(4, end)" });
+      }
+      return new Promise((resolve) => setTimeout(() => {
+        lifting = false;
+        draw();
+        resolve(el);
+      }, reducedMotion() ? 0 : ms));
+    }
+
+    function hold(on) {
+      holding = on;
+      wrap.classList.toggle("is-holding", on);
+      draw();
+    }
+
     function sit(on) {
       seated = on;
       wrap.classList.toggle("is-sitting", on);
@@ -94,7 +132,7 @@ const Actors = (() => {
 
     draw();
     return {
-      setFace, emote, jump, sit,
+      setFace, emote, jump, sit, holdUp, hold,
       talk(on) { talking = on; draw(); },
       get rect() { return $("canvas", wrap).getBoundingClientRect(); },
     };
@@ -140,6 +178,7 @@ const Actors = (() => {
 
   // She said yes
   function celebrate() {
+    mo.hold(false); // she took the flowers
     Portrait.set("happy");
     mo.setFace("cheer");
     gab.setFace("cheer");

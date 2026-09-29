@@ -23,6 +23,10 @@ const Meter = (() => {
       heart.classList.toggle("is-full", i < (quiet ? n : Math.min(from, n)));
     });
     if (quiet) return;
+    // the plaque it hangs on jolts when a heart changes
+    meter.classList.remove("is-jolted");
+    void meter.offsetWidth;
+    if (n !== from) meter.classList.add("is-jolted");
     for (let i = from; i < n; i++) {
       const heart = hearts[i];
       setTimeout(() => {

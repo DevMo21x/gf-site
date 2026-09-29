@@ -6,23 +6,55 @@
 
 const Stars = (() => {
   const layer = $("[data-stars]");
-  const svg = $("svg", layer);
+  const canvas = $(".constellation__lines", layer);
+  const count = $("[data-stars-count]", layer);
   const text = CONTENT.stars;
   const points = text.points;
+  const segments = [];
   layer.setAttribute("aria-label", text.intro);
 
-  function line(a, b) {
-    const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    [["x1", a[0]], ["y1", a[1]], ["x2", b[0]], ["y2", b[1]]].forEach(([k, v]) => l.setAttribute(k, v));
-    svg.appendChild(l);
+  // the lines between the stars, one art pixel wide, on the pixel grid
+  function draw(color) {
+    const P = PX();
+    const W = Math.round(layer.clientWidth / P);
+    const H = Math.round(layer.clientHeight / P);
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = color;
+    const at = ([x, y]) => [Math.round((x / 100) * (W - 1)), Math.round((y / 100) * (H - 1))];
+    segments.forEach(([a, b]) => {
+      let [x0, y0] = at(a);
+      const [x1, y1] = at(b);
+      const dx = Math.abs(x1 - x0);
+      const dy = -Math.abs(y1 - y0);
+      const sx = x0 < x1 ? 1 : -1;
+      const sy = y0 < y1 ? 1 : -1;
+      let err = dx + dy;
+      for (;;) {
+        ctx.fillRect(x0, y0, 1, 1);
+        if (x0 === x1 && y0 === y1) break;
+        const e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+      }
+    });
   }
+  function line(a, b) {
+    segments.push([a, b]);
+    draw("#fff3d1");
+  }
+  const counted = (n) => { count.textContent = text.label.replace("{n}", n).replace("{total}", points.length); };
 
   // Resolves once every star is joined and the heart has had its moment
   function run() {
-    svg.replaceChildren();
+    segments.length = 0;
     $$("button", layer).forEach((b) => b.remove());
     layer.classList.remove("is-done");
     layer.hidden = false;
+    draw("#fff3d1");
+    counted(1);
+    document.body.classList.add("is-stargazing");
     let next = 0;
     const stars = points.map(([x, y], i) => {
       const b = document.createElement("button");
@@ -53,16 +85,18 @@ const Stars = (() => {
         Music.blip(1 + next * 0.12);
         if (next > 0) line(points[next - 1], points[next]);
         next += 1;
+        counted(Math.min(next + 1, stars.length));
         mark();
         if (next < stars.length) { stars[next].focus({ preventScroll: true }); return; }
         // the last one closes the heart
-        line(points[next - 1], points[0]);
+        segments.push([points[next - 1], points[0]]);
+        draw("#f6c23e");
         layer.classList.add("is-done");
         Music.chime();
         Achievements.unlock("stars");
         setTimeout(() => {
           const a = reducedMotion() ? null : animate(layer, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: "steps(4, end)" });
-          const done = () => { if (a) a.cancel(); layer.hidden = true; resolve(); };
+          const done = () => { if (a) a.cancel(); layer.hidden = true; document.body.classList.remove("is-stargazing"); resolve(); };
           if (a) a.onfinish = done; else done();
         }, reducedMotion() ? 900 : 1600);
       }));

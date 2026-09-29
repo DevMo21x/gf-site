@@ -8,6 +8,7 @@ const Dialogue = (() => {
   const box = $("[data-talk]");
   const titleEl = $("[data-talk-title]");
   const textEl = $("[data-talk-text]");
+  const reply = $("[data-reply]");
   const choicesEl = $("[data-choices]");
   const nextBtn = $("[data-talk-next]");
   const found = $("[data-found]");
@@ -45,8 +46,8 @@ const Dialogue = (() => {
     Music.blip();
   }
 
-  // Offer her replies; resolves with the one she picks
-  function ask(options) {
+  // Offer her replies (or, with action, one thing to do); resolves with the one she picks
+  function ask(options, { action = false } = {}) {
     choosing = true;
     nextBtn.hidden = true;
     const buttons = options.map((label) => {
@@ -58,21 +59,28 @@ const Dialogue = (() => {
       return b;
     });
     choicesEl.replaceChildren(...buttons);
-    choicesEl.hidden = false;
+    reply.classList.toggle("is-action", action);
+    reply.hidden = false;
     box.classList.add("is-choosing");
     const P = PX();
+    if (!action) {
+      animateIn(reply, reducedMotion()
+        ? [{ opacity: 0 }, { opacity: 1 }]
+        : [{ opacity: 0, transform: `translateY(${P * 4}px)` }, { opacity: 1, transform: "none" }],
+      { duration: 200, easing: "steps(2, end)" });
+    }
     buttons.forEach((b, i) => animateIn(b, reducedMotion()
       ? [{ opacity: 0 }, { opacity: 1 }]
       : [{ opacity: 0, transform: `translateY(${P * 2}px)` }, { opacity: 1, transform: "none" }],
-    { duration: 200, delay: i * 80, easing: "steps(2, end)" }));
+    { duration: 200, delay: 120 + i * 80, easing: "steps(2, end)" }));
     buttons[0].focus({ preventScroll: true });
-    choicesEl.scrollIntoView({ block: "nearest" }); // on a short phone they can start below the fold
+    reply.scrollIntoView({ block: "nearest" }); // on a short phone they can start below the fold
 
     return new Promise((resolve) => {
       buttons.forEach((b, i) => b.addEventListener("click", () => {
         if (!choosing) return;
         choosing = false;
-        choicesEl.hidden = true;
+        reply.hidden = true;
         choicesEl.replaceChildren();
         box.classList.remove("is-choosing");
         box.focus({ preventScroll: true });
@@ -119,19 +127,33 @@ const Dialogue = (() => {
     advance();
   });
 
-  // A memory's item pops up on top of the box
-  function showItem(item) {
+  // A memory's item: he holds it up over his head, then it drops into the slot on his box
+  async function showItem(item) {
     foundItem.className = "item item--" + item;
-    found.hidden = false;
     Music.pickup();
-    const P = PX();
-    animateIn(found, reducedMotion()
-      ? [{ opacity: 0 }, { opacity: 1 }]
-      : [
-        { opacity: 0, transform: `translateY(${P * 12}px) scale(.5)` },
-        { opacity: 1, transform: `translateY(${-P * 5}px) scale(1.1)`, offset: 0.6 },
-        { opacity: 1, transform: "none" },
-      ], { duration: 560, easing: "steps(6, end)" });
+    if (reducedMotion()) {
+      found.hidden = false;
+      animateIn(found, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "linear" });
+      return;
+    }
+    const held = await Actors.mo.holdUp(item);
+    const from = held.getBoundingClientRect();
+    const to = foundItem.getBoundingClientRect(); // the slot keeps its room while hidden
+    const at = (x, y) => `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
+    const fly = held.animate([
+      { transform: at(from.left, from.top) },
+      { transform: at((from.left + to.left) / 2, Math.min(from.top, to.top) - PX() * 10), offset: 0.5 },
+      { transform: at(to.left, to.top) },
+    ], { duration: 480, easing: "steps(6, end)", fill: "forwards" });
+    await fly.finished.catch(() => {});
+    held.remove();
+    found.hidden = false;
+    Music.blip(2);
+    animateIn(found, [
+      { transform: "scale(1)" },
+      { transform: "scale(1.15)", offset: 0.5 },
+      { transform: "scale(1)" },
+    ], { duration: 240, easing: "steps(3, end)" });
   }
 
   // Between hours the box folds away while the sky changes
@@ -141,11 +163,16 @@ const Dialogue = (() => {
       : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.96)" }],
     { duration: reducedMotion() ? 140 : 240, easing: "steps(3, end)" });
     if (!found.hidden) animate(found, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: "steps(2, end)" });
+    reply.hidden = true;
     return a ? a.finished.catch(() => {}) : Promise.resolve();
   }
 
   function open() {
     box.getAnimations().forEach((a) => a.cancel()); // also straightens anything Tufo knocked over
+    // a clean page for the new hour: the last hour's words don't linger while he holds something up
+    textEl.replaceChildren();
+    titleEl.hidden = true;
+    nextBtn.hidden = true;
     found.getAnimations().forEach((a) => a.cancel());
     found.hidden = true;
     animateIn(box, reducedMotion()

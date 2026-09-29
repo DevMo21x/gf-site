@@ -99,6 +99,7 @@ em {
 .signoff__heart, .dialog__more, .petals, .lilies,
 .logo__sign, .logo__rope, .logo__bloom, .portrait, .portrait canvas, .nameplate, .choice::before,
 .credits__list li::before, .actor__px, .emote, .garden,
-.polaroid, .polaroid__pin, .tile__icon, .btn--tile::before, .bird, .drift {
+.polaroid, .polaroid__pin, .tile__icon, .btn--tile::before, .bird, .drift,
+.nametab, .tail, .reply, .btn.choice, .held, .constellation__lines, .place-card__sign {
   image-rendering: pixelated;
 }

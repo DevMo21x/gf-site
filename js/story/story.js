@@ -21,7 +21,7 @@ const Story = (() => {
 
     if (l.memory != null) {
       const m = CONTENT.memories[l.memory];
-      if (m.item) Dialogue.showItem(m.item);
+      if (m.item) await Dialogue.showItem(m.item);
       const line = { title: m.title, text: m.body, face: l.face };
       await Dialogue.say(line);
       return;
@@ -56,7 +56,7 @@ const Story = (() => {
     if (l.plant) {
       const g = CONTENT.garden;
       await Dialogue.say({ text: g.give, face: "soft" });
-      await Dialogue.ask([g.plant]);
+      await Dialogue.ask([g.plant], { action: true });
       Garden.plant();
       Actors.gab.emote("heart");
       setTimeout(() => Mei.say(g.mei, 2600), 600);
@@ -87,6 +87,35 @@ const Story = (() => {
     }
   }
 
+  // A little wooden sign drops in under the clock: where they are now, and when
+  const card = $("[data-place-card]");
+  let cardTimer = 0;
+  function placeCard(place) {
+    const name = CONTENT.places[place];
+    if (!name) return;
+    clearTimeout(cardTimer);
+    card.getAnimations().forEach((a) => a.cancel());
+    $("[data-place-name]", card).textContent = name;
+    $("[data-place-time]", card).textContent = $("[data-clock-time]").textContent;
+    card.hidden = false;
+    const P = PX();
+    animateIn(card, reducedMotion()
+      ? [{ opacity: 0 }, { opacity: 1 }]
+      : [
+        { transform: `translateY(${-P * 50}px)` },
+        { transform: `translateY(${P * 2}px)`, offset: 0.7 },
+        { transform: "none" },
+      ], { duration: reducedMotion() ? 200 : 560, easing: "steps(6, end)" });
+    cardTimer = setTimeout(() => {
+      const a = animate(card, reducedMotion()
+        ? [{ opacity: 1 }, { opacity: 0 }]
+        : [{ transform: "none" }, { transform: `translateY(${-P * 70}px)` }],
+      { duration: 420, easing: "steps(5, end)" });
+      const done = () => { card.hidden = true; if (a) a.cancel(); };
+      if (a) a.finished.then(done, done); else done();
+    }, 2600);
+  }
+
   async function beat(i) {
     const hour = Math.min(i, NIGHT);
     Tufo.onBeat(i);
@@ -95,6 +124,7 @@ const Story = (() => {
       Scene.set(hour, beats[i].place);
       Actors.sit(beats[i].place === "airbnb");
       Clock.set(hour);
+      if (beats[i].place) placeCard(beats[i].place);
       Garden.grow(i - 2); // it grows while they're away; she sees it again at sunset
       Actors.mo.setFace("neutral");
       await wait(1200);
@@ -123,7 +153,10 @@ const Story = (() => {
     Garden.bloom();
     await Dialogue.say({ text: CONTENT.garden.bloom, face: "blush" });
     await Dialogue.say({ text: quiz.full, face: "soft" });
-    Dialogue.showItem("bouquet");
+    // he holds the bouquet up, then out to her, and keeps holding it while he asks
+    Music.pickup();
+    (await Actors.mo.holdUp("bouquet")).remove();
+    Actors.mo.hold(true);
     await Dialogue.say({ text: CONTENT.bouquet.give, face: "blush" });
     Actors.mo.setFace("soft");
     Actors.gab.emote("exclaim");
@@ -141,6 +174,7 @@ const Story = (() => {
     Meter.set(quiz.start, true);
     Scene.set(0);
     Actors.sit(false);
+    Actors.mo.hold(false);
     Clock.set(0);
     Actors.mo.setFace("neutral");
     Actors.gab.setFace("neutral");

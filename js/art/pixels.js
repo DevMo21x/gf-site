@@ -221,6 +221,27 @@
         default: return null;
       }
     }),
+    // her reply tray: a lighter frame than his, in the brown of her leather jacket (slice 5)
+    reply: () => frame(14, (ring, tl) => {
+      switch (ring) {
+        case 0: return K;
+        case 1: return tl ? GAB.coatHi : GAB.coatSh;
+        case 2: return GAB.coat;
+        case 3: return K;
+        case 4: return tl ? PARCH_SH : PARCH;
+        default: return PARCH;
+      }
+    }),
+    // her name plate, in the same brown (slice 4)
+    plateGab: () => frame(12, (ring, tl) => {
+      switch (ring) {
+        case 0: return K;
+        case 1: return tl ? GAB.coatHi : GAB.coatSh;
+        case 2: return GAB.coat;
+        case 3: return K;
+        default: return PARCH;
+      }
+    }),
     // small wooden plate: HUD, name plaque, heart meter (slice 4)
     plate: () => frame(12, (ring, tl) => {
       switch (ring) {
@@ -240,8 +261,10 @@
         default: return "#f4d496";
       }
     }),
-    // speech bubble (slice 3)
+    // speech bubble (slice 3); each cat's has its own outline
     bubble: () => frame(8, (ring) => (ring === 0 ? K : "#fffdf6")),
+    bubbleMei: () => frame(8, (ring) => (ring === 0 ? CAT_INK.mei : "#fffdf6")),
+    bubbleTufo: () => frame(8, (ring) => (ring === 0 ? CAT_INK.tufo : "#fffdf6")),
     // the title sign: dark planks with a nail in every corner (slice 6)
     sign: () => {
       const g = frame(20, (ring, tl, along, side) => {
@@ -282,6 +305,9 @@
     }),
   };
 
+  // the band under the reply her cursor is on (slice 2)
+  const rowHi = () => frame(6, (ring) => (ring === 0 ? "#d9a64e" : PARCH_SH));
+
   // raised buttons (slice 3)
   const button = (face, hi, dk) => frame(10, (ring, tl, along, side) => {
     if (ring === 0) return K;
@@ -298,6 +324,15 @@
   };
 
   /* ---------- Small sprites ---------- */
+
+  // the cats' speech bubbles take a colour from each cat: Mei's grey tabby, Tufo's pink eyes
+  const CAT_INK = { mei: "#5d566b", tufo: "#a8425f" };
+  const catTail = (ink) => fromRows([
+    "KWWWWWK",
+    ".KWWWK.",
+    "..KWK..",
+    "...K...",
+  ], { K: ink, W: "#fffdf6" });
 
   const HEART_ROWS = [
     ".KK...KK.",
@@ -450,6 +485,19 @@
       "..KWK..",
       "...K...",
     ], { K, W: "#fffdf6" }),
+    // the wooden point under a dialogue box, slanting down toward whoever is speaking
+    tailDown: () => fromRows([
+      "..KMMMMMMMK",
+      ".KHMMMMMMDK",
+      ".KHMMMDKK..",
+      "KHMMDK.....",
+      "KMDK.......",
+      "KK.........",
+    ], { K, M: WOOD.mid, H: WOOD.hi2, D: WOOD.dk }),
+    tailMei: () => catTail(CAT_INK.mei),
+    tailTufo: () => catTail(CAT_INK.tufo),
+    // a stitched line under a memory's title
+    stitch: () => fromRows(["SS.."], { S: "#d9b574" }),
     // one twist of rope; it tiles down from the top of the screen
     rope: () => fromRows([
       "KTK",
@@ -605,7 +653,7 @@
   /* ---------- Gabrielle and Mohaimen, standing on the farm ---------- */
 
   // pose: { eyes: open|blink|happy|wide, look: -1..1, mouth: smile|flat|open|o,
-  //         blush, sweat, arm: down|head|up|eat, sit }
+  //         blush, sweat, arm: down|head|up|eat|hold, sit }
   // sit: seated on the edge of the Airbnb bed; arm "eat": holding a shawarma wrap at the chest
   // Both are drawn facing the viewer; the page mirrors Mohaimen so they face each other.
   const GAB = {
@@ -642,8 +690,8 @@
       if (arm === "head") {
         g.line(17, 25, 19, 17, sleeve, 3);
         g.ellipse(18.5, 14.5, 1.6, 1.6, C.skin);
-      } else if (arm === "eat") {
-        g.rect(17, 23, mo ? 3 : 2, 5, sleeve); // the forearm and the wrap go on over the body, below
+      } else if (arm === "eat" || arm === "hold") {
+        g.rect(17, 23, mo ? 3 : 2, 5, sleeve); // the forearm (and the wrap) go on over the body, below
       } else {
         g.rect(17, 23, mo ? 3 : 2, 8, sleeve);
         g.rect(mo ? 18 : 17, 31, 2, 2, C.skin);
@@ -750,6 +798,12 @@
       g.rect(10, 22, 3, 3, WRAP.bread).set(10, 22, WRAP.lettuce).set(11, 22, WRAP.sauce).set(12, 22, WRAP.lettuce);
       g.rect(12, 23, 1, 2, WRAP.breadSh);
       g.rect(10, 25, 3, 4, WRAP.foil).rect(12, 25, 1, 4, WRAP.foilSh);
+      g.rect(12, 27, 2, 2, C.skin);
+    }
+
+    if (arm === "hold") {
+      // forearm across to the chest, the hand out in front: the page puts the bouquet in it
+      g.rect(11, 26, 8, 4, K).rect(13, 27, 6, 2, sleeve);
       g.rect(12, 27, 2, 2, C.skin);
     }
 
@@ -1724,9 +1778,14 @@
     set("--img-plate", FRAMES.plate());
     set("--img-slot", FRAMES.slot());
     set("--img-bubble", FRAMES.bubble());
+    set("--img-bubbleMei", FRAMES.bubbleMei());
+    set("--img-bubbleTufo", FRAMES.bubbleTufo());
     set("--img-sign", FRAMES.sign());
     set("--img-portrait", FRAMES.portrait());
     set("--img-polaroid", FRAMES.polaroid());
+    set("--img-frame-reply", FRAMES.reply());
+    set("--img-plate-gab", FRAMES.plateGab());
+    set("--img-row", rowHi());
     Object.entries(ICONS).forEach(([name, make]) => set("--img-icon-" + name, make()));
     Object.entries(BUTTONS).forEach(([name, make]) => set("--img-btn-" + name, make()));
     Object.entries(SPRITES).forEach(([name, make]) => set("--img-" + name, make()));

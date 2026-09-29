@@ -139,30 +139,32 @@
 
     <!-- 2 · Talking with Mohaimen, from dawn to night -->
     <section class="page page--talk" data-page="talk" hidden aria-label="Talking with Mohaimen">
-      <div class="found" data-found hidden aria-hidden="true">
-        <span class="slot"><i class="item" data-found-item></i></span>
-        <i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>
-      </div>
+      <!-- his words, hanging over the two of them -->
       <div class="dialog dialog--talk" data-dialog data-talk tabindex="-1">
-        <div class="speaker">
+        <p class="nametab" data-text="mohaimen.name"></p>
+        <span class="slot talk__slot" data-found hidden aria-hidden="true">
+          <i class="item" data-found-item></i>
+          <i class="sparkle"></i><i class="sparkle"></i><i class="sparkle"></i>
+        </span>
+        <div class="talk__lines" aria-live="polite">
           <span class="portrait" aria-hidden="true"><canvas data-portrait width="36" height="36"></canvas></span>
-          <div class="speaker__meta">
-            <p class="nameplate" data-text="mohaimen.name"></p>
-            <div class="meter meter--talk" data-meter role="img">
-              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            </div>
-          </div>
-        </div>
-        <div class="talk__main">
-          <div class="talk__lines" aria-live="polite">
-            <h2 class="talk__title" data-talk-title hidden></h2>
-            <p class="dialog__body talk__text" data-talk-text></p>
-          </div>
-          <div class="choices" data-choices role="group" aria-label="Your reply" hidden></div>
+          <h2 class="talk__title" data-talk-title hidden></h2>
+          <p class="dialog__body talk__text" data-talk-text></p>
         </div>
         <button class="talk__next" type="button" data-talk-next aria-label="Continue" hidden>
           <i class="dialog__more" aria-hidden="true"></i>
         </button>
+        <i class="tail tail--mo" aria-hidden="true"></i>
+        <div class="meter meter--talk" data-meter role="img">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </div>
+
+      <!-- her replies, over her -->
+      <div class="dialog reply" data-reply hidden>
+        <p class="nametab nametab--gab" data-text="gabrielle.name"></p>
+        <div class="choices" data-choices role="group" aria-label="Your reply"></div>
+        <i class="tail tail--gab" aria-hidden="true"></i>
       </div>
 
       <!-- Zero hearts: game over -->
@@ -180,7 +182,7 @@
     <!-- 3 · The question -->
     <section class="page page--question" data-page="question" hidden aria-labelledby="question-title">
       <div class="dialog dialog--question">
-        <i class="item item--bouquet question__bouquet" aria-hidden="true"></i>
+        <p class="nametab" data-text="mohaimen.name"></p>
         <span class="portrait portrait--question" aria-hidden="true"><canvas data-portrait width="36" height="36"></canvas></span>
         <h2 class="question" id="question-title" tabindex="-1">
           <span class="question__lead" data-text="question.lead"></span>
@@ -194,6 +196,7 @@
             <button class="btn btn--no" type="button" data-no></button>
           </span>
         </div>
+        <i class="tail tail--mo" aria-hidden="true"></i>
       </div>
     </section>
 
@@ -252,7 +255,7 @@
     </div>
     <div class="actor actor--mo" data-actor="mo">
       <i class="emote" data-emote></i>
-      <span class="actor__hop"><span class="actor__flip"><canvas class="actor__px" data-actor-canvas width="22" height="42"></canvas></span></span>
+      <span class="actor__hop"><span class="actor__flip"><canvas class="actor__px" data-actor-canvas width="22" height="42"></canvas></span><i class="item item--bouquet actor__bouquet"></i></span>
     </div>
     <canvas class="garden" data-garden width="15" height="24" hidden></canvas>
   </div>
@@ -271,7 +274,15 @@
 
   <!-- Connect the stars, at night -->
   <div class="constellation" data-stars role="group" hidden>
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <canvas class="constellation__lines" aria-hidden="true"></canvas>
+    <p class="constellation__count plaque" data-stars-count aria-live="polite"></p>
+  </div>
+
+  <!-- where they are now: a little sign drops in when the scene moves -->
+  <div class="place-card" data-place-card role="status" hidden>
+    <i class="logo__rope logo__rope--l" aria-hidden="true"></i>
+    <i class="logo__rope logo__rope--r" aria-hidden="true"></i>
+    <p class="place-card__sign"><span data-place-name></span><small data-place-time></small></p>
   </div>
 
   <!-- an invisible button over Mohaimen: tap him twice for a kiss -->
