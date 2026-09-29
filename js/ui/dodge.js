@@ -18,7 +18,11 @@ const Dodge = (() => {
 
   const MARGIN = 12;
   const MAX_YES = 1.8;
+  const SHRINK_AT = 6; // from here it gets smaller every dodge
+  const DROP_AT = 10;  // here it gives up, falls on the grass and Tufo sits on it
   let dodges = 0;
+  let noScale = 1;
+  let tamed = false;
   let yesScale = 1;
   let loose = false;
   let pos = { x: 0, y: 0 };
@@ -54,7 +58,7 @@ const Dodge = (() => {
     const hadFocus = document.activeElement === no;
     slot.hidden = true; // Yes gets the row to itself
     pos = { x: r.left, y: r.top };
-    no.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+    no.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(${noScale})`;
     no.classList.add("is-loose");
     layer.appendChild(no);
     if (hadFocus) {
@@ -131,11 +135,33 @@ const Dodge = (() => {
       x: Math.min(Math.max(spot.x, MARGIN), Math.max(MARGIN, vw - no.offsetWidth - MARGIN)),
       y: Math.min(Math.max(spot.y, MARGIN), Math.max(MARGIN, vh - no.offsetHeight - MARGIN)),
     };
-    no.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+    no.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(${noScale})`;
+  }
+
+  // Out of breath: it drops onto the grass, Tufo sits on it, and it gets up as a Yes
+  async function drop() {
+    tamed = true;
+    noScale = 1;
+    no.classList.add("is-dropped");
+    const { h: vh } = viewport();
+    const acts = Actors.rects();
+    let x = pos.x;
+    const box = (at) => ({ left: at, top: 0, right: at + no.offsetWidth, bottom: 1 });
+    // not on top of Gabrielle and Mohaimen
+    acts.forEach((r) => { if (overlaps(box(x), { ...r, top: 0, bottom: 1 })) x = r.right + 16; });
+    place({ x, y: vh });
+    await Tufo.sitOn(no);
+    no.classList.remove("is-dropped");
+    no.classList.add("btn--yes");
+    no.textContent = CONTENT.question.noBecomesYes;
+    no.dataset.action = "yes";
+    no.setAttribute("aria-label", CONTENT.question.noBecomesYes);
+    Music.chime();
+    animate(no, [{ scale: "0.6" }, { scale: "1.2", offset: 0.6 }, { scale: "1" }], { duration: 360, easing: "steps(4, end)" });
   }
 
   function dodge(event) {
-    if (refocusing) return;
+    if (refocusing || tamed) return;
     if (event && event.cancelable) event.preventDefault();
 
     // one touch fires pointerenter + pointerdown + touchstart: count it once
@@ -150,6 +176,8 @@ const Dodge = (() => {
     yesScale = Math.min(MAX_YES, yesScale * 1.1);
     yes.style.setProperty("--yes-scale", yesScale.toFixed(3));
 
+    if (dodges >= SHRINK_AT) noScale = Math.max(0.6, 1 - (dodges - SHRINK_AT + 1) * 0.1);
+    if (dodges >= DROP_AT) { drop(); return; }
     place(pickSpot());
     Mei.onDodge();
     Tufo.onDodge();
@@ -167,7 +195,7 @@ const Dodge = (() => {
   no.addEventListener("focus", () => { pointer = null; dodge(); });
   no.addEventListener("click", (e) => { e.preventDefault(); dodge(); });
   no.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dodge(); }
+    if (!tamed && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); dodge(); }
   });
   window.addEventListener("pointermove", rememberPointer, { passive: true });
 

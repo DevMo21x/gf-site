@@ -131,6 +131,8 @@ function renderContent() {
     el.insertAdjacentHTML("afterbegin", `<span class="visually-hidden">${escapeHTML(text)}</span>`);
   });
   $$("[data-type]").forEach(Typer.prepare);
+  $("[data-letter-body]").innerHTML = CONTENT.letter.body.map((p) => `<p>${format(p)}</p>`).join("");
+  $("[data-moon]").setAttribute("aria-label", CONTENT.eggs.moon.label);
   $("[data-credits-list]").innerHTML = CONTENT.title.creditsLines.map((line) => `<li>${format(line)}</li>`).join("");
   $$("[data-photo]").forEach((img) => {
     const photo = CONTENT.photos[img.dataset.photo];

@@ -505,3 +505,33 @@ body:not([data-scene="title"]) .stage {
   vertical-align: -.05em;
   background: var(--img-heartSmall) 0 0 / 100% 100% no-repeat;
 }
+
+/* out of breath: it falls onto the grass, slower than it dodges */
+.btn--no.is-dropped { transition: transform 600ms steps(8, end); }
+
+/* ---------- The letter ---------- */
+
+.btn--letter { font-size: 1.1875rem; }
+/* a little pixel envelope: parchment with a red seal */
+.btn__envelope {
+  position: relative;
+  width: calc(var(--px) * 9);
+  height: calc(var(--px) * 6);
+  background:
+    radial-gradient(circle, var(--red) calc(var(--px) * 1.2), transparent calc(var(--px) * 1.3)) 50% 60% / 100% 100% no-repeat,
+    linear-gradient(to bottom right, transparent 49%, var(--wood-dk) 49% 55%, transparent 55%) 0 0 / 50% 70% no-repeat,
+    linear-gradient(to bottom left, transparent 49%, var(--wood-dk) 49% 55%, transparent 55%) 100% 0 / 50% 70% no-repeat,
+    var(--cream);
+  box-shadow: 0 0 0 calc(var(--px) * .7) var(--wood-dk);
+}
+.letter .credits__box {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+}
+.letter__body { display: grid; gap: .8rem; }
+.letter__body p {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}

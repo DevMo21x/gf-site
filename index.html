@@ -186,6 +186,9 @@
             <p class="dialog__body" data-type data-text="celebration.body"></p>
             <p class="signoff"><span data-text="celebration.signoff"></span><i class="signoff__heart" aria-hidden="true"></i></p>
             <div class="dialog__actions">
+              <button class="btn btn--letter" type="button" data-action="letter" hidden>
+                <i class="btn__envelope" aria-hidden="true"></i><span data-text="letter.envelope"></span>
+              </button>
               <button class="btn btn--quiet btn--replay" type="button" data-action="replay">
                 <span data-text="celebration.replay"></span>
               </button>
@@ -193,6 +196,18 @@
           </article>
         </div>
       </div>
+
+      <!-- The letter, once she's said yes -->
+      <dialog class="credits letter" data-letter aria-labelledby="letter-title">
+        <div class="dialog credits__box">
+          <h2 class="credits__title" id="letter-title" data-text="letter.title"></h2>
+          <div class="letter__body" data-letter-body></div>
+          <p class="signoff"><span data-text="letter.signoff"></span><i class="signoff__heart" aria-hidden="true"></i></p>
+          <form method="dialog" class="credits__actions">
+            <button class="btn btn--primary" type="submit"><span data-text="letter.close"></span></button>
+          </form>
+        </div>
+      </dialog>
     </section>
 
   </main>
@@ -232,6 +247,7 @@
   <canvas class="petals" data-petals aria-hidden="true"></canvas>
   <canvas class="lilies" data-lilies aria-hidden="true"></canvas>
   <div class="dodge-layer" data-dodge-layer></div>
+  <button class="moon-hit" type="button" data-action="moon" data-moon hidden></button>
 
   <noscript><p class="noscript">This little game needs JavaScript turned on.</p></noscript>
 </body>

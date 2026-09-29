@@ -9,18 +9,19 @@ const Petals = (() => {
   const ctx = canvas.getContext("2d");
   const heart = Pixel.heartSmall().canvas();
   const COLORS = ["#e0304e", "#f6c23e", "#7fcdf2", "#8fd05a", "#f58aa8", "#fff3d1", "#b79af0"];
+  const SAND = ["#e8c98a", "#d9b26a", "#f3dfae", "#c79a52"];
   const DURATION = 7000;
   const SPAWN_FOR = 4800;
   let raf = 0;
   let size = null;
 
-  function make(W, H, burst) {
+  function make(W, H, burst, colors, hearts, speed) {
     return {
-      heart: Math.random() < 0.3,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      heart: Math.random() < hearts,
+      color: colors[Math.floor(Math.random() * colors.length)],
       x: Math.random() * W,
       y: burst ? -Math.random() * H * 0.6 : -8,
-      vy: 12 + Math.random() * 16,
+      vy: (12 + Math.random() * 16) * speed,
       sway: 2 + Math.random() * 4,
       swaySpeed: 1 + Math.random() * 1.6,
       phase: Math.random() * Math.PI * 2,
@@ -29,14 +30,16 @@ const Petals = (() => {
     };
   }
 
-  function run() {
+  // hearts: the share of bits that are little hearts instead of confetti;
+  // density and speed scale how many fall and how fast
+  function run({ colors = COLORS, hearts = 0.3, density = 1, speed = 1 } = {}) {
     if (reducedMotion()) return;
     cancelAnimationFrame(raf);
     size = artSize();
     fitCanvas(canvas, size);
     const { W, H } = size;
-    const count = Math.round(Math.min(90, Math.max(50, W / 2)));
-    const bits = Array.from({ length: Math.round(count * 0.35) }, () => make(W, H, true));
+    const count = Math.round(Math.min(90, Math.max(50, W / 2)) * density);
+    const bits = Array.from({ length: Math.round(count * 0.35) }, () => make(W, H, true, colors, hearts, speed));
     const spawnRate = (count * 0.65) / SPAWN_FOR;
     let spawned = 0;
     const start = performance.now();
@@ -47,7 +50,7 @@ const Petals = (() => {
       last = now;
       const elapsed = now - start;
       const due = Math.min(count * 0.65, elapsed * spawnRate);
-      while (spawned < due) { bits.push(make(W, H, false)); spawned += 1; }
+      while (spawned < due) { bits.push(make(W, H, false, colors, hearts, speed)); spawned += 1; }
 
       const fade = elapsed > DURATION - 900 ? Math.max(0, (DURATION - elapsed) / 900) : 1;
       ctx.clearRect(0, 0, W, H);
@@ -79,5 +82,8 @@ const Petals = (() => {
     raf = requestAnimationFrame(frame);
   }
 
-  return { run };
+  // "sand person", typed anywhere
+  const sand = () => run({ colors: SAND, hearts: 0, density: 5, speed: 2.5 });
+
+  return { run, sand };
 })();

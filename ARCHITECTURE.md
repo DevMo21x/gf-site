@@ -72,6 +72,10 @@ index.html
 
 `content.js` holds the start menu, memories, the story beats (lines, memories, quizzes, cat interjections), quiz reactions, the question, the celebration, every cat line, photo paths and the music path. The comment above `story` documents the beat format. Wrap a word in `*asterisks*` to make it red.
 
+It also holds the letter that floats down after she says yes (`letter`) and the copy for two secrets (`eggs`): tapping the moon at night sends a shooting star (`Scene` positions an invisible button over the moon, `Fireworks.star` draws the star), and typing "sand person" anywhere makes it rain sand (`Petals.sand`, wired in `main.js`).
+
+The No button on the question page shrinks from the 6th dodge. On the 10th it drops to the grass, Tufo sits on it (`Tufo.sitOn`), and it gets back up as a second Yes (`Dodge`, `SHRINK_AT` / `DROP_AT`).
+
 ## 4. Deployment
 
 Static hosting on Netlify: publish the repository root. There is no build. For local work, open `index.html` directly, or run `python3 -m http.server` in the root.

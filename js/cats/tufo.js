@@ -235,6 +235,38 @@ const Tufo = (() => {
     }
   }
 
+  // The No button gave up on the grass: he walks over and sits on it, then hops off
+  async function sitOn(el) {
+    clearTimeout(chaseTimer);
+    clearTimeout(humpTimer);
+    stopHump();
+    chasing = false;
+    const token = cat.hush();
+    const alive = () => cat.current(token);
+    const wait = (ms) => new Promise((r) => setTimeout(r, reducedMotion() ? Math.min(ms, 300) : ms));
+    const r = el.getBoundingClientRect();
+    cat.mood(["is-excited"], 700);
+    cat.say(text.sitOnNo.go, 1600);
+    await wait(500);
+    await cat.place(r.left + r.width / 2 - cat.width() / 2, true, 4.5);
+    if (!alive()) return;
+    // feet a little way into the top of the button, so he looks sat, not floating
+    const floor = cat.rect.bottom;
+    cat.wrap.style.setProperty("--perch", Math.max(0, Math.round(floor - el.getBoundingClientRect().top - r.height * 0.3)) + "px");
+    cat.wrap.classList.add("is-perched");
+    cat.mood(["is-happy", "is-purring"], 2600);
+    Music.purr();
+    cat.say(text.sitOnNo.sit, 2400);
+    setTimeout(() => { if (alive()) Mei.say(CONTENT.mei.sitOnNo, 2200); }, 1200);
+    await wait(2800);
+    cat.wrap.classList.remove("is-perched");
+    if (!alive()) return;
+    cat.mood(["is-jumping"], 500);
+    cat.say(text.sitOnNo.off, 2400);
+    await wait(400);
+    cat.place(cat.spotFor(side), true, 8);
+  }
+
   // A line from the story; knock: true means he swats the dialogue box crooked
   function speak(line, knockIt) {
     if (knockIt) knock($("[data-talk]"), line);
@@ -265,5 +297,5 @@ const Tufo = (() => {
   // "Load game" on the title: there are no saves
   const scoff = (line) => { clearTimeout(introTimer); cat.face(false); hiss(line); };
 
-  return { init, onPage, onBeat, onDodge, jealous, speak, scoff, say: (line, ms) => cat.say(line, ms), get rect() { return cat.rect; } };
+  return { init, onPage, onBeat, onDodge, sitOn, jealous, speak, scoff, say: (line, ms) => cat.say(line, ms), get rect() { return cat.rect; } };
 })();

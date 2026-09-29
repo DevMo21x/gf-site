@@ -80,10 +80,6 @@ const CONTENT = {
         { mo: "Okay. I'm going to ask you some questions. Every right answer, my heart gets fuller. Every wrong one… let's not talk about that.", face: "nervous" },
         { quiz: "First one. What do you call me?", answers: ["Sand person", "Sunshine", "Farm boy"], correct: 0,
           right: "Sand person. Correct. Unfortunately." },
-        { quiz: "What time did I get out here this morning?", answers: ["5am", "Noon", "I never went to bed"], correct: 0,
-          right: "5am. Mei told you, didn't she. Snitch." },
-        { quiz: "How far apart do we live?", answers: ["About 2000km", "About 20km", "Same street"], correct: 0,
-          right: "2000km. Way too far. Still worth it." },
       ],
     },
     // 9:00am
@@ -93,8 +89,6 @@ const CONTENT = {
         { tufo: "he was SO nervous. pathetic." },
         { quiz: "The first time we met in person, how was I?", answers: ["So, so nervous", "Totally chill", "Asleep"], correct: 0,
           right: "Shaking. I'm kind of shaking right now, honestly." },
-        { quiz: "Which cat is the mean one?", answers: ["Tufo", "Mei", "They're both angels"], correct: 0,
-          right: "Tufo. Obviously Tufo." },
       ],
     },
     // 12:30pm
@@ -104,8 +98,6 @@ const CONTENT = {
         { tufo: "oops. not sorry.", knock: true },
         { quiz: "Where was our jacket moment?", answers: ["The docks of Halifax", "A Tim Hortons", "The airport"], correct: 0,
           right: "Halifax. I still think about it." },
-        { quiz: "And whose jacket was it?", answers: ["Mine", "Yours", "Tufo's"], correct: 0,
-          right: "Mine. Well. Basically yours now." },
       ],
     },
     // 3:40pm
@@ -115,8 +107,6 @@ const CONTENT = {
         { tufo: "and nobody saved me any" },
         { quiz: "What did we eat late at night?", answers: ["Leftover shawarma", "Fresh sushi", "Cereal"], correct: 0,
           right: "Leftover shawarma. Elite." },
-        { quiz: "Who were we watching?", answers: ["CaseOh", "MrBeast", "The news"], correct: 0,
-          right: "CaseOh. The third wheel. A very funny third wheel." },
         { mei: "shawarma? at 2am? I only eat off fine china, darling" },
       ],
     },
@@ -129,8 +119,6 @@ const CONTENT = {
         { tufo: "eh. I'm funnier" },
         { quiz: "So which one is true?", answers: ["You're the funniest girl I've ever met", "You're mid, honestly", "Tufo is funnier"], correct: 0,
           right: "Exactly. Tufo is NOT funnier." },
-        { quiz: "What colour are Tufo's eyes?", answers: ["Pink", "Green", "Blue"], correct: 0,
-          right: "Pink. Evil pink." },
       ],
     },
     // 10:20pm
@@ -139,15 +127,13 @@ const CONTENT = {
         { mo: "Okay. Okay okay okay.", face: "nervous" },
         { quiz: "What does Mei think of you?", answers: ["Mei approves of you", "Mei ignores you", "Mei bites you"], correct: 0,
           right: "She approves. And Mei is never wrong." },
-        { quiz: "What's the best kind of night?", answers: ["Shawarma and CaseOh with you", "Doing taxes", "Any night without you"], correct: 0,
-          right: "Top three nights ever. Maybe top one." },
       ],
     },
   ],
 
   // The quiz game around the questions above
   quiz: {
-    start: 2,   // hearts he starts with (out of 10)
+    start: 4,   // hearts he starts with (out of 10)
     // what he says when she's right or wrong, when a question has no right/wrong of its own
     right: ["Yes! Correct!", "You remembered!", "That's my girl.", "See, this is why I like you."],
     wrong: ["…no. That hurt a little.", "Wrong! My heart!", "Ouch. Okay. I'm fine. I'm fine.", "Did you forget?? Already??"],
@@ -173,6 +159,8 @@ const CONTENT = {
     yes: "Yes",
     // The No button cycles through these every time it runs away
     no: ["No", "Are you sure?", "Really?", "Think again", "Nope, try Yes", "Bruh"],
+    // after Tufo sits on the No button long enough, it gets up as this
+    noBecomesYes: "Yes (obviously)",
   },
 
   celebration: {
@@ -180,6 +168,33 @@ const CONTENT = {
     body: "Got the girl. Now the real mistakes begin.",
     signoff: "Mohaimen, your new owner :)",
     replay: "Play again",
+  },
+
+  // The letter that floats down after she says yes. Write the real thing here.
+  // body is a list of paragraphs; *word* makes a word red.
+  letter: {
+    envelope: "A letter for you",
+    title: "Dear Gabrielle,",
+    body: [
+      "TODO: write the first paragraph here.",
+      "TODO: and the second one. As many as you like.",
+    ],
+    signoff: "Mohaimen",
+    close: "Keep it",
+  },
+
+  // Secrets for the curious
+  eggs: {
+    // tap the moon at night
+    moon: {
+      label: "Make a wish on the moon",
+      wish: ["a shooting star! quick, make a wish.", "wish granted. probably. I have connections.", "I wished for tuna. don't tell."],
+    },
+    // type "sand person" anywhere
+    sand: {
+      tufo: "great. now I'm itchy.",
+      mei: "sand?? in MY fur??",
+    },
   },
 
   photos: {
@@ -226,6 +241,7 @@ const CONTENT = {
     dodge: ["hehe, the drama", "that button has no star power", "the big one, sweetie. the BIG one"],
     startled: "EXCUSE me??",
     // when Tufo gets his stuffed cat out
+    sitOnNo: "finally, he's useful.",
     plush: ["EW. not in front of me.", "I'm calling my agent.", "this is beneath me. literally.", "I need a new brother. and a spa day."],
   },
 
@@ -253,6 +269,12 @@ const CONTENT = {
     pages: {
       question: "press No. I dare you.",
       yay: "ugh. fine. welcome, I guess",
+    },
+    // the No button runs out of steam and he sits on it
+    sitOnNo: {
+      go: "mine.",
+      sit: "this button is taken. forever.",
+      off: "there. fixed it for you.",
     },
     dodge: ["HA. coward button", "even No is scared of you", "just press it. oh wait."],
     // when he chases Mei around (like he does at home)

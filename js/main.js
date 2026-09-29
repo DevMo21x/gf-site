@@ -47,9 +47,52 @@ playButton.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") Music.warm();
 });
 
-// Credits: a wooden box over the farm; tapping outside it closes it too
+// Credits and the letter: wooden boxes over the farm; tapping outside one closes it too
 const credits = $("[data-credits]");
-credits.addEventListener("click", (e) => { if (e.target === credits) credits.close(); });
+const letter = $("[data-letter]");
+[credits, letter].forEach((box) => box.addEventListener("click", (e) => { if (e.target === box) box.close(); }));
+const openBox = (box) => (box.showModal ? box.showModal() : box.setAttribute("open", ""));
+
+// The envelope floats down onto the celebration once the fireworks have had a moment
+function showEnvelope() {
+  const envelope = $('[data-action="letter"]');
+  envelope.hidden = false;
+  if (reducedMotion()) return;
+  animateIn(envelope, [
+    { opacity: 0, transform: `translateY(${-PX() * 30}px) rotate(-6deg)` },
+    { opacity: 1, transform: `translateY(${-PX() * 10}px) rotate(4deg)`, offset: 0.5 },
+    { opacity: 1, transform: `translateY(${-PX() * 3}px) rotate(-2deg)`, offset: 0.8 },
+    { opacity: 1, transform: "none" },
+  ], { duration: 1400, easing: "steps(12, end)" });
+}
+
+/* ---------- Secrets ---------- */
+
+// Tap the moon: a shooting star, and a wish
+let lastWish = 0;
+function wish() {
+  const now = performance.now();
+  if (now - lastWish < 2500) return;
+  lastWish = now;
+  const r = $("[data-moon]").getBoundingClientRect();
+  Fireworks.star(r.left + r.width / 2, r.top + r.height / 2);
+  Music.chime();
+  setTimeout(() => Mei.say(CONTENT.eggs.moon.wish[Math.floor(Math.random() * CONTENT.eggs.moon.wish.length)], 2800), 700);
+}
+
+// Type "sand person" anywhere: it rains sand
+let typed = "";
+let lastSand = -Infinity;
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey || !/^[a-z]$/i.test(e.key)) return;
+  typed = (typed + e.key.toLowerCase()).slice(-10);
+  if (typed !== "sandperson" || performance.now() - lastSand < 10000) return;
+  lastSand = performance.now();
+  Petals.sand();
+  Actors.mo.emote("sweat");
+  Tufo.say(CONTENT.eggs.sand.tufo, 2600);
+  setTimeout(() => Mei.say(CONTENT.eggs.sand.mei, 2400), 1200);
+});
 
 document.addEventListener("click", (e) => {
   const target = e.target.closest("[data-action]");
@@ -75,8 +118,12 @@ document.addEventListener("click", (e) => {
     Tufo.scoff(CONTENT.title.loadJoke.tufo);
     setTimeout(() => Mei.say(CONTENT.title.loadJoke.mei, 2400), 1100);
   } else if (action === "credits") {
-    if (credits.showModal) credits.showModal();
-    else credits.setAttribute("open", "");
+    openBox(credits);
+  } else if (action === "letter") {
+    Music.chime();
+    openBox(letter);
+  } else if (action === "moon") {
+    wish();
   } else if (action === "yes") {
     Dodge.retire();
     Music.start();
@@ -87,6 +134,7 @@ document.addEventListener("click", (e) => {
     Pages.show("yay", () => {
       Fireworks.run();
       setTimeout(Petals.run, reducedMotion() ? 0 : 250);
+      setTimeout(showEnvelope, reducedMotion() ? 0 : 4000);
     });
   } else if (action === "try-again") {
     Boom.reset();

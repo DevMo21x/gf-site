@@ -148,3 +148,27 @@ body[data-scene="title"] .clock { visibility: hidden; } /* the day starts when s
 .page[hidden] { display: none; }
 
 .w, .wi { display: inline-block; }
+
+/* ---------- Secrets: the moon you can wish on, and its shooting star ---------- */
+
+.moon-hit {
+  position: fixed;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.moon-hit[hidden] { display: none; }
+.moon-hit:focus-visible { outline: var(--px) dashed var(--cream); outline-offset: 2px; }
+
+.shooting-star {
+  position: fixed;
+  z-index: 3;
+  width: calc(var(--px) * 16);
+  height: var(--px);
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, #fff3d1 70%, #fff);
+}
+.shooting-star.is-left { background: linear-gradient(to left, transparent, #fff3d1 70%, #fff); }

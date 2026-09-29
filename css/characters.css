@@ -216,3 +216,7 @@ body[data-scene="title"] .actors { visibility: hidden; }
   font-size: 1.125rem;
   color: var(--cream);
 }
+
+/* Tufo sitting on the No button (it lives in the dodge layer, z-index 20) */
+.cat-wrap.is-perched { z-index: 21; }
+.cat-wrap.is-perched .cat { translate: 0 calc(var(--perch, 0px) * -1); }

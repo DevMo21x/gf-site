@@ -165,5 +165,25 @@ const Fireworks = (() => {
     raf = requestAnimationFrame(frame);
   }
 
-  return { run, boom };
+  // A shooting star from (x, y) in CSS pixels, streaking down and away across the sky.
+  // An element of its own, so it never fights the fireworks for the canvas.
+  function star(x, y) {
+    const el = document.createElement("i");
+    el.className = "shooting-star";
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    document.body.appendChild(el);
+    const dir = x > window.innerWidth / 2 ? -1 : 1;
+    el.classList.toggle("is-left", dir < 0);
+    const a = el.animate(reducedMotion()
+      ? [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }]
+      : [
+        { opacity: 0, transform: `translate(0, 0) rotate(${dir * 25}deg)` },
+        { opacity: 1, offset: 0.15 },
+        { opacity: 0, transform: `translate(${dir * 420}px, 190px) rotate(${dir * 25}deg)` },
+      ], { duration: 1100, easing: "steps(12, end)", fill: "both" });
+    a.onfinish = () => el.remove();
+  }
+
+  return { run, boom, star };
 })();

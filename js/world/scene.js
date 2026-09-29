@@ -10,6 +10,7 @@ const Scene = (() => {
   const clouds = $("[data-clouds]");
   const flies = $("[data-flies]");
   const meta = $('meta[name="theme-color"]');
+  const moonHit = $("[data-moon]");
   let front = 0;
   let time = TIMES[0];
 
@@ -29,6 +30,22 @@ const Scene = (() => {
     skies[front].classList.remove("is-front");
     front = back;
     document.body.dataset.time = time;
+    placeMoon();
+  }
+
+  // an invisible button over the moon, so she can wish on it (same maths as Pixel.scene)
+  function placeMoon() {
+    const body = Pixel.TIMES[time].body;
+    moonHit.hidden = body.kind !== "moon";
+    if (moonHit.hidden) return;
+    const px = PX();
+    const W = Math.ceil(window.innerWidth / px) + 1;
+    const H = Math.ceil(window.innerHeight / px) + 1;
+    const horizon = H - Math.ceil(groundH() / px) - 4;
+    const r = (body.r + 3) * px;
+    moonHit.style.width = moonHit.style.height = r * 2 + "px";
+    moonHit.style.left = Math.round(body.x * W) * px - r + "px";
+    moonHit.style.top = Math.round(body.y * horizon) * px - r + "px";
   }
 
   function makeClouds() {
@@ -69,7 +86,7 @@ const Scene = (() => {
     makeFlies();
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => paint(skies[front]), 150);
+      resizeTimer = setTimeout(() => { paint(skies[front]); placeMoon(); }, 150);
     });
   }
 
