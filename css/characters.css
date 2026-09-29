@@ -28,6 +28,26 @@ body[data-scene="title"] .actors { visibility: hidden; }
 .actor--mo .actor__flip { transform: scaleX(-1); } /* he faces her */
 .actor.is-gone { visibility: hidden; }
 
+/* tap him twice for a kiss: an invisible button over him, above the pages (like the cats) */
+.kiss-hit {
+  position: fixed;
+  z-index: 3;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + var(--px) * var(--stand));
+  width: calc(var(--px) * 22);
+  height: calc(var(--px) * 42);
+  margin-left: calc(var(--px) * 4);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.kiss-hit:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+body[data-scene="title"] .kiss-hit,
+.actors:has(.actor--mo.is-gone) ~ .kiss-hit { visibility: hidden; }
+
 .actor.is-jumping .actor__hop { animation: actor-jump 600ms steps(7, end); }
 @keyframes actor-jump {
   0% { transform: translateY(0); }

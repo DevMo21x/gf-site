@@ -103,6 +103,33 @@ const Actors = (() => {
   const gab = make("gab");
   const mo = make("mo");
 
+  // Double-tap him (or press him with the keyboard): a kiss. One tap only gets a "…"
+  const kissBtn = $("[data-kiss]");
+  const kiss = CONTENT.eggs.kiss;
+  kissBtn.setAttribute("aria-label", kiss.label);
+  let lastTap = 0;
+  let lastKiss = -Infinity;
+  let tapTimer = 0;
+  kissBtn.addEventListener("click", (e) => {
+    const now = performance.now();
+    const double = e.detail === 0 || now - lastTap < 350; // detail 0: a key, not a finger
+    lastTap = now;
+    clearTimeout(tapTimer);
+    if (!double) { tapTimer = setTimeout(() => mo.emote("dots", 1000), 360); return; }
+    lastTap = 0;
+    if (now - lastKiss < 3000) return;
+    lastKiss = now;
+    mo.setFace("shocked", 500);
+    setTimeout(() => mo.setFace("blush", 3000), 500);
+    Portrait.set("blush", 3500);
+    gab.emote("heart");
+    mo.jump();
+    Music.chime();
+    Mei.say(kiss.mei, 2200);
+    setTimeout(() => Tufo.say(kiss.tufo, 1800), 1200);
+    Achievements.unlock("kiss");
+  });
+
   // No ran away again: he panics a little more each time
   function onDodge(n) {
     const face = n % 3 === 1 ? "shocked" : "nervous";

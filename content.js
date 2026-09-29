@@ -195,6 +195,12 @@ const CONTENT = {
       label: "Make a wish on the moon",
       wish: ["a shooting star! quick, make a wish.", "wish granted. probably. I have connections.", "I wished for tuna. don't tell."],
     },
+    // tap Mohaimen twice
+    kiss: {
+      label: "Kiss Mohaimen",
+      mei: "get a room. not MY room.",
+      tufo: "gross.",
+    },
     // type "sand person" anywhere
     sand: {
       tufo: "great. now I'm itchy.",
