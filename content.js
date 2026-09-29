@@ -5,6 +5,7 @@
    ========================================================================== */
 
 const CONTENT = {
+  // the link preview (title, description, image) is in index.html's <head>: crawlers don't run this file
   pageTitle: "For Gabrielle",
 
   // The start menu
