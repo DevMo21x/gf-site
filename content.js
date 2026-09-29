@@ -202,6 +202,23 @@ const CONTENT = {
     },
   },
 
+  // Little Stardew-style achievements for the secrets. Counted in Credits.
+  // hint: what Credits shows while one is still locked
+  achievements: {
+    toast: "Achievement unlocked",
+    found: "Secrets found: {n}/{total}",
+    locked: "???",
+    list: {
+      mei: { title: "Cat whisperer", hint: "Mei wants more pets." },
+      tufo: { title: "Tufo tolerated you", hint: "keep trying with the mean one." },
+      moon: { title: "Wished on the moon", hint: "look up at night." },
+      sand: { title: "Certified sand person", hint: "type what you call me." },
+      kiss: { title: "Smooch", hint: "he looks kissable. tap tap." },
+      stars: { title: "Stargazer", hint: "stay up late with me." },
+      no: { title: "Caught the No button", hint: "impossible. obviously." },
+    },
+  },
+
   photos: {
     title: { src: "assets/images/us-cheek.webp", alt: "Gabrielle and Mohaimen cheek to cheek under the trees, smiling" },
     celebration: { src: "assets/images/us-cake.webp", alt: "Gabrielle holding a slice of cake next to Mohaimen doing a peace sign" },

@@ -129,6 +129,21 @@
   margin-top: .3em;
   background: var(--img-heartSmall) 0 0 / 100% 100% no-repeat;
 }
+/* the secrets she has found, under the credits */
+.credits__count { margin: 0; font-weight: 700; }
+.credits__secrets {
+  display: grid;
+  gap: .3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.credits__secrets small { font-size: .9rem; opacity: .8; }
+.credits__secrets .is-got { color: var(--ink); font-weight: 700; }
+.credits__secrets .is-got::before { content: "\2605  "; color: var(--gold); }
+
 .credits__actions {
   display: flex;
   justify-content: flex-end;
@@ -535,3 +550,28 @@ body:not([data-scene="title"]) .stage {
   line-height: 1.5;
   text-wrap: pretty;
 }
+
+/* ---------- Achievement toast: drops in at the top for a moment ---------- */
+
+.toast {
+  position: fixed;
+  z-index: 35;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: calc(var(--px) * 1) calc(var(--px) * 3);
+  border: calc(var(--px) * 6) solid transparent;
+  border-image: var(--img-frame-gold) 6 fill / calc(var(--px) * 6) round;
+  filter: drop-shadow(0 calc(var(--px) * 2) 0 rgb(40 18 6 / .38));
+  pointer-events: none;
+}
+.toast[hidden] { display: none; }
+.toast .achievement__star { width: calc(var(--px) * 9); height: calc(var(--px) * 9); }
+.toast__words { margin: 0; line-height: 1.2; }
+.toast__label { display: block; font-size: .85rem; color: var(--ink-soft); }
+.toast__title { font-size: 1.1rem; }

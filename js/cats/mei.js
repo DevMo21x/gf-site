@@ -31,6 +31,7 @@ const Mei = (() => {
       REACTIONS[(petted - 1) % REACTIONS.length]();
     }
     petted += 1;
+    if (petted === 10) Achievements.unlock("mei");
     Tufo.jealous();
   }
 

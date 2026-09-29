@@ -164,6 +164,7 @@ const Tufo = (() => {
       Music.purr();
       const [heart] = cat.hearts(1);
       cat.say(text.allow, 1400);
+      Achievements.unlock("tufo");
       setTimeout(() => {
         swat(text.allowAfter);
         if (heart && heart.isConnected) heart.remove();

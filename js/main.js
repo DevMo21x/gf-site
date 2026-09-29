@@ -77,6 +77,7 @@ function wish() {
   const r = $("[data-moon]").getBoundingClientRect();
   Fireworks.star(r.left + r.width / 2, r.top + r.height / 2);
   Music.chime();
+  Achievements.unlock("moon");
   setTimeout(() => Mei.say(CONTENT.eggs.moon.wish[Math.floor(Math.random() * CONTENT.eggs.moon.wish.length)], 2800), 700);
 }
 
@@ -89,6 +90,7 @@ document.addEventListener("keydown", (e) => {
   if (typed !== "sandperson" || performance.now() - lastSand < 10000) return;
   lastSand = performance.now();
   Petals.sand();
+  Achievements.unlock("sand");
   Actors.mo.emote("sweat");
   Tufo.say(CONTENT.eggs.sand.tufo, 2600);
   setTimeout(() => Mei.say(CONTENT.eggs.sand.mei, 2400), 1200);
@@ -118,6 +120,7 @@ document.addEventListener("click", (e) => {
     Tufo.scoff(CONTENT.title.loadJoke.tufo);
     setTimeout(() => Mei.say(CONTENT.title.loadJoke.mei, 2400), 1100);
   } else if (action === "credits") {
+    Achievements.render();
     openBox(credits);
   } else if (action === "letter") {
     Music.chime();
