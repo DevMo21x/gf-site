@@ -158,6 +158,13 @@ const CONTENT = {
     },
   },
 
+  // The bouquet he gives her right before he asks (on the farm, that's how dating starts)
+  bouquet: {
+    give: "…I brought you these. Out here on the farm, a bouquet means *something*.",
+    // her relationship status on the celebration page
+    status: "Status: Dating",
+  },
+
   question: {
     lead: "Gabrielle Doney,",
     title: "Will you be my *girlfriend*?",

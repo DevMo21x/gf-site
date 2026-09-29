@@ -489,6 +489,25 @@
       ".....KwWwK......",
       "......KKK.......",
     ], { K, G: "#6fb04a", R: "#d9433b", M: "#9a5a2e", T: "#e9c98a", t: "#c9a060", W: "#dfe3ea", w: "#9aa0ab" }),
+    // the bouquet he gives her before he asks: pink and white flowers, paper, a red bow
+    bouquet: () => fromRows([
+      "....KK...KK.....",
+      "...KPPK.KWWK....",
+      "..KPYPPKWYWWKK..",
+      "..KPPPKKWWWKPPK.",
+      "...KKKLKKKKPYPK.",
+      "..KLLKLKWWKPPPK.",
+      "..KLWWKLWYWKKK..",
+      "...KWYWKWWWKLK..",
+      "...KKCCCCCCKLK..",
+      "....KCCcCCCKK...",
+      ".....KCCcCK.....",
+      "....KRRKRRK.....",
+      ".....KKRKK......",
+      "......KCcK......",
+      "......KCcK......",
+      ".......KK.......",
+    ], { K, P: "#f58aa8", Y: "#fbd24e", W: "#fbf6ec", L: LEAF, C: CREAM, c: PARCH_SH, R: RED }),
   };
 
   /* ---------- Gabrielle and Mohaimen, standing on the farm ---------- */

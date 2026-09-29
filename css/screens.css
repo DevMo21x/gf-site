@@ -324,6 +324,7 @@ body:not([data-scene="title"]) .stage {
 .item--nervous { background-image: var(--img-item-nervous); }
 .item--jacket { background-image: var(--img-item-jacket); }
 .item--shawarma { background-image: var(--img-item-shawarma); }
+.item--bouquet { background-image: var(--img-item-bouquet); }
 
 .sparkle {
   position: absolute;
@@ -376,6 +377,19 @@ body:not([data-scene="title"]) .stage {
 .page--question { max-width: 38rem; }
 .dialog--question { text-align: center; padding-bottom: calc(var(--px) * 5); }
 .portrait--question { margin: calc(var(--px) * 1) auto 10px; }
+/* the bouquet he's holding out, tucked in the corner of the box */
+.question__bouquet {
+  position: absolute;
+  top: calc(var(--px) * 2);
+  right: calc(var(--px) * 3);
+  width: calc(var(--px) * 22);
+  height: calc(var(--px) * 22);
+  rotate: 12deg;
+}
+
+/* the relationship status after she says yes, on the photo's plaque */
+.status { display: inline-flex; align-items: center; gap: 4px; }
+.status .item { width: calc(var(--px) * 10); height: calc(var(--px) * 10); }
 
 .question {
   display: grid;

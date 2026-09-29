@@ -98,6 +98,8 @@ const Story = (() => {
     Actors.sit(false);
     Clock.set(NIGHT);
     await Dialogue.say({ text: quiz.full, face: "soft" });
+    Dialogue.showItem("bouquet");
+    await Dialogue.say({ text: CONTENT.bouquet.give, face: "blush" });
     Actors.mo.setFace("soft");
     Actors.gab.emote("exclaim");
     await wait(1100);
