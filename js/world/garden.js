@@ -35,6 +35,8 @@ const Garden = (() => {
       draw(4, true);
       setTimeout(() => { draw(5, true); Music.chime(); }, reducedMotion() ? 0 : 700);
     },
+    // already in bloom (the farm, opened from a save)
+    full: () => draw(5),
     reset: () => draw(-1),
   };
 })();

@@ -66,6 +66,36 @@ function showEnvelope() {
   ], { duration: 1400, easing: "steps(12, end)" });
 }
 
+/* ---------- The farm after yes: free play ---------- */
+
+function goFarm() {
+  document.body.dataset.scene = "talk";
+  Scene.set(6);
+  Clock.set(6);
+  Actors.sit(false);
+  Actors.gab.setFace("happy");
+  Actors.mo.setFace("happy");
+  Garden.full();
+  Pages.show("farm", () => Fireworks.run());
+}
+
+// Tap the sky for a firework, or the lily for a little shower of petals
+let lastBurst = 0;
+document.addEventListener("click", (e) => {
+  if (Pages.current !== "farm" || e.target.closest("button, a, dialog, .dialog, .hud, .cat-wrap")) return;
+  const g = $("[data-garden]").getBoundingClientRect();
+  if (e.clientX >= g.left && e.clientX <= g.right && e.clientY >= g.top && e.clientY <= g.bottom) {
+    Petals.run({ density: 0.4 });
+    Mei.say(CONTENT.garden.tap, 2400);
+    return;
+  }
+  const now = performance.now();
+  if (e.clientY > window.innerHeight - groundH() || now - lastBurst < 600) return;
+  lastBurst = now;
+  Fireworks.boom(e.clientX, e.clientY);
+  Music.blip(1.5);
+});
+
 /* ---------- Secrets ---------- */
 
 // Tap the moon: a shooting star, and a wish
@@ -139,6 +169,8 @@ document.addEventListener("click", (e) => {
       setTimeout(Petals.run, reducedMotion() ? 0 : 250);
       setTimeout(showEnvelope, reducedMotion() ? 0 : 4000);
     });
+  } else if (action === "farm") {
+    goFarm();
   } else if (action === "try-again") {
     Boom.reset();
   } else if (action === "replay") {

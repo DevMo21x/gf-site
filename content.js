@@ -171,6 +171,8 @@ const CONTENT = {
     planted: "Okay. Now we wait. I'm very good at waiting. I'm not.",
     mei: "I'll guard it. mostly from Tufo.",
     bloom: "Look. It grew all day. Kind of like something else did.",
+    // Mei, when she taps the lily on the farm
+    tap: "careful. that's OUR flower now.",
   },
 
   // Connect the stars, at night. points: where each star sits (x, y in % of a small box
@@ -203,7 +205,6 @@ const CONTENT = {
     title: "Sand person *achievement unlocked*",
     body: "Got the girl. Now the real mistakes begin.",
     signoff: "Mohaimen, your new owner :)",
-    replay: "Play again",
   },
 
   // The letter that floats down after she says yes. Write the real thing here.
@@ -237,6 +238,14 @@ const CONTENT = {
       tufo: "great. now I'm itchy.",
       mei: "sand?? in MY fur??",
     },
+  },
+
+  // After she says yes: the farm, to play around on
+  farm: {
+    stay: "Stay on the farm",
+    hint: "The festival's still on. Tap around, everyone's here. Tap the sky, too.",
+    letter: "Letter",
+    menu: "Play again",
   },
 
   // Little Stardew-style achievements for the secrets. Counted in Credits.
@@ -296,6 +305,7 @@ const CONTENT = {
     pages: {
       question: "say yes, darling. I didn't do my fur for nothing.",
       yay: "I'd like to thank me. mostly me.",
+      farm: "stay as long as you like. I'm not going anywhere.",
     },
     dodge: ["hehe, the drama", "that button has no star power", "the big one, sweetie. the BIG one"],
     startled: "EXCUSE me??",
@@ -328,6 +338,7 @@ const CONTENT = {
     pages: {
       question: "press No. I dare you.",
       yay: "ugh. fine. welcome, I guess",
+      farm: "you're still here? …fine. stay.",
     },
     // the No button runs out of steam and he sits on it
     sitOnNo: {

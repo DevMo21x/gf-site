@@ -526,6 +526,12 @@ body:not([data-scene="title"]) .stage {
 .signoff::before { content: "— "; }
 
 .btn--replay { min-width: 150px; }
+
+/* ---------- The farm after yes: a small box up top, the sky left open ---------- */
+
+.page--farm { align-self: start; }
+.dialog--farm .dialog__actions { flex-wrap: wrap; gap: 8px; margin-top: .75rem; }
+.dialog--farm .btn { font-size: 1rem; }
 .signoff__heart {
   display: inline-block;
   width: calc(var(--px) * 7);

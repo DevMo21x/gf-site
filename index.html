@@ -208,25 +208,27 @@
               <button class="btn btn--letter" type="button" data-action="letter" hidden>
                 <i class="btn__envelope" aria-hidden="true"></i><span data-text="letter.envelope"></span>
               </button>
-              <button class="btn btn--quiet btn--replay" type="button" data-action="replay">
-                <span data-text="celebration.replay"></span>
+              <button class="btn btn--quiet btn--replay" type="button" data-action="farm">
+                <span data-text="farm.stay"></span>
               </button>
             </div>
           </article>
         </div>
       </div>
 
-      <!-- The letter, once she's said yes -->
-      <dialog class="credits letter" data-letter aria-labelledby="letter-title">
-        <div class="dialog credits__box">
-          <h2 class="credits__title" id="letter-title" data-text="letter.title"></h2>
-          <div class="letter__body" data-letter-body></div>
-          <p class="signoff"><span data-text="letter.signoff"></span><i class="signoff__heart" aria-hidden="true"></i></p>
-          <form method="dialog" class="credits__actions">
-            <button class="btn btn--primary" type="submit"><span data-text="letter.close"></span></button>
-          </form>
+    </section>
+
+    <!-- 5 · After yes: the farm, to play around on -->
+    <section class="page page--farm" data-page="farm" hidden aria-labelledby="farm-hint">
+      <div class="dialog dialog--farm">
+        <p class="dialog__body" id="farm-hint" tabindex="-1" data-text="farm.hint"></p>
+        <div class="dialog__actions">
+          <button class="btn btn--letter" type="button" data-action="letter">
+            <i class="btn__envelope" aria-hidden="true"></i><span data-text="farm.letter"></span>
+          </button>
+          <button class="btn btn--quiet" type="button" data-action="replay"><span data-text="farm.menu"></span></button>
         </div>
-      </dialog>
+      </div>
     </section>
 
   </main>
@@ -243,6 +245,18 @@
     </div>
     <canvas class="garden" data-garden width="15" height="24" hidden></canvas>
   </div>
+
+  <!-- The letter, once she's said yes (opens from the celebration and the farm) -->
+  <dialog class="credits letter" data-letter aria-labelledby="letter-title">
+    <div class="dialog credits__box">
+      <h2 class="credits__title" id="letter-title" data-text="letter.title"></h2>
+      <div class="letter__body" data-letter-body></div>
+      <p class="signoff"><span data-text="letter.signoff"></span><i class="signoff__heart" aria-hidden="true"></i></p>
+      <form method="dialog" class="credits__actions">
+        <button class="btn btn--primary" type="submit"><span data-text="letter.close"></span></button>
+      </form>
+    </div>
+  </dialog>
 
   <!-- Connect the stars, at night -->
   <div class="constellation" data-stars role="group" hidden>
