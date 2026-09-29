@@ -442,6 +442,8 @@ body[data-scene="title"] .clock { visibility: hidden; } /* the day starts when s
 .logo__bloom--c { right: calc(var(--px) * -6); bottom: calc(var(--px) * -2); background-image: var(--img-flower-lily); }
 
 .logo__ribbon { z-index: 2; bottom: calc(var(--px) * -9); }
+/* a smaller heart on the ribbon, sized to its text (keeps the sprite's 7:6 shape) */
+.logo__ribbon .signoff__heart { width: .8em; height: .8em; margin-left: 0px; vertical-align: 0; }
 
 .title__row {
   display: grid;

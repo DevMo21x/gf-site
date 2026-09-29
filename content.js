@@ -10,8 +10,8 @@ const CONTENT = {
   // The start menu
   title: {
     logo: "For Gabrielle",
-    ribbon: "a very short dating sim",
-    greeting: "Hey my sweet beautiful *angel*… I made you a little game. Turn your sound on if you can.",
+    ribbon: "Love from 2000km away",
+    greeting: "My sweet angel… every pixel of this was made thinking about you. Turn your sound on and come play with me <3.",
     plaque: "Starring: you",
     play: "Play",
     load: "Load game",
@@ -262,7 +262,7 @@ const CONTENT = {
 
   // Background music. Swap the file in /audio and change src to use another song.
   music: {
-    src: "audio/farm.m4a",
+    src: "audio/gymnopedie.m4a",
     volume: 1,     // 0–1 (the file itself is already mixed soft; iPhones ignore this and play at 1)
     startAt: 0,    // seconds into the song to begin from
     credit: "Music: original cozy farm loop in the spirit of Stardew Valley",

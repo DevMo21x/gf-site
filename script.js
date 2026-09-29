@@ -30,7 +30,10 @@
     String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
   // *word* → <em>word</em>, everything else escaped
-  const format = (str) => escapeHTML(str).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  // *word* becomes emphasis, <3 becomes the pixel heart
+  const format = (str) => escapeHTML(str)
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/&lt;3/g, '<i class="signoff__heart" aria-hidden="true"></i>');
 
   const lookup = (path) =>
     path.split(".").reduce((obj, key) => (obj == null ? undefined : obj[key]), CONTENT);
@@ -856,7 +859,8 @@
     }
 
     // Music belongs on the title screen too. Try right away (allowed if she has
-    // played before); otherwise the first tap or key anywhere starts it.
+    // played before); otherwise the first touch, click or key anywhere starts it.
+    // Browsers never allow sound before that first gesture on a new visit.
     audio.play().then(() => {
       if (started) return;
       started = true;
@@ -865,7 +869,8 @@
     }).catch(() => {
       if (started) return;
       audio.pause();
-      ["pointerup", "keydown"].forEach((type) =>
+      // every event a browser counts as a gesture: iPhones only accept touchend
+      ["pointerdown", "pointerup", "touchend", "mousedown", "click", "keydown"].forEach((type) =>
         document.addEventListener(type, start, { once: true }));
     });
 
