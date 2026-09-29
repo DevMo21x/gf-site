@@ -4,6 +4,11 @@
   :root { --hpx: 2px; --gutter: 10px; }
 }
 
+/* "Load game" on one line in a third of a small phone */
+@media (max-width: 379px) {
+  .btn--tile { font-size: 1rem; }
+}
+
 @media (max-width: 759px) {
   /* she's read the memory's title by now: fold it away so her replies fit above the two of them */
   .dialog--talk.is-choosing .talk__title { display: none; }
@@ -14,7 +19,8 @@
 @media (max-height: 700px) and (max-width: 759px) {
   .stage { padding-top: calc(env(safe-area-inset-top) + 70px); }
   .page--title { gap: 16px; }
-  .frame--title { width: clamp(90px, 28vw, 120px); }
+  .greeting { grid-template-columns: clamp(80px, 24vw, 104px) minmax(0, 1fr); }
+  .btn--tile { min-height: calc(var(--px) * 30); }
 }
 
 /* ---------- Larger screens ---------- */
@@ -35,28 +41,15 @@
   .dialog__title { font-size: clamp(1.75rem, 1rem + 2vw, 2.5rem); }
   .btn { font-size: 1.5rem; min-height: 60px; }
   .btn--quiet { font-size: 1.3125rem; }
-  .btn--play { font-size: 1.75rem; min-height: 68px; }
   .cat__bubble { font-size: 1.1875rem; max-width: 280px; }
 
-  /* photo on the left, sign, greeting and menu on the right */
-  .page--title {
-    max-width: 62rem;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-areas:
-      "photo logo"
-      "photo greet"
-      "photo menu";
-    align-content: center;
-    align-items: center;
-    column-gap: clamp(2.5rem, 5vw, 4.5rem);
-    row-gap: 22px;
-  }
-  .title__row { display: contents; }
-  .frame--title { grid-area: photo; width: 100%; max-width: 340px; justify-self: end; }
-  .logo { grid-area: logo; justify-self: start; }
-  .dialog--greeting { grid-area: greet; width: 100%; }
-  .dialog--greeting .dialog__body { font-size: inherit; line-height: 1.35; }
-  .menu { grid-area: menu; }
+  /* one centred column over the farm */
+  .page--title { max-width: 40rem; }
+  .greeting { grid-template-columns: 150px minmax(0, 1fr); gap: 22px; }
+  .greeting .dialog__body { font-size: inherit; line-height: 1.35; }
+  .polaroid__caption { font-size: 1rem; }
+  .btn--tile { font-size: 1.3125rem; min-height: calc(var(--px) * 31); }
+  .menu { gap: 14px; }
 
   /* talk: words on the left, his portrait, name and hearts on the right */
   .page--talk { max-width: 46rem; }
@@ -110,7 +103,9 @@
   .credits[open] .credits__box,
   .meter i.is-new,
   .meter i.is-lost,
-  .btn:hover .btn__arrow { animation: none; }
+  .btn:hover .btn__arrow,
+  .logo, .btn--tile .tile__icon, .btn--tile::before { animation: none; }
+  .world__title { display: none; }
   .world__sky, .world__clouds, .world__flies { transition-duration: 300ms; }
   .btn--yes, .btn--no.is-loose, .cat__bubble { transition-duration: 1ms; }
 }

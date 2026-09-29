@@ -27,7 +27,7 @@ function arrive(page) {
 
   animateIn(page, [{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "steps(2, end)" });
 
-  $$(".logo, .frame", page).forEach((el, i) => {
+  $$(".logo, .frame, .polaroid", page).forEach((el, i) => {
     animateIn(el, [
       { opacity: 0, transform: `translateY(${-P * 14}px)` },
       { opacity: 1, transform: `translateY(${P * 2}px)`, offset: 0.7 },
@@ -63,7 +63,7 @@ function arrive(page) {
 
   typed.forEach((el) => Typer.play(el, afterWords));
 
-  $$(".dialog__actions, .answers, .menu, .signoff", page).forEach((el, i) => {
+  $$(".dialog__actions, .answers, .menu > .btn, .signoff", page).forEach((el, i) => {
     animateIn(el, [
       { opacity: 0, transform: `translateY(${P * 3}px)` },
       { opacity: 1, transform: "none" },

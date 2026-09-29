@@ -263,6 +263,14 @@
       [[4, 4], [15, 4], [4, 15], [15, 15]].forEach(([x, y]) => g.set(x, y, "#f2c46a").set(x + 1, y + 1, WOOD.dk));
       return g;
     },
+    // the photo on the title letter: a white instant-photo border (slice 3)
+    polaroid: () => frame(10, (ring, tl) => {
+      switch (ring) {
+        case 0: return K;
+        case 1: return tl ? "#ffffff" : "#e2d6bf";
+        default: return "#fffaf0";
+      }
+    }),
     // Mohaimen's portrait: a light slot with a sky-warm backdrop (slice 3)
     portrait: () => frame(10, (ring, tl) => {
       switch (ring) {
@@ -352,6 +360,28 @@
       ".KWWWK.....",
       "..KKK......",
     ], { K, W: "#ffffff" }),
+    // the hand turned to point down, over the start menu's tiles
+    handDown: () => {
+      const h = SPRITES.hand();
+      const g = new Grid(h.h, h.w);
+      for (let y = 0; y < h.h; y++) for (let x = 0; x < h.w; x++) g.set(y, x, h.get(x, y));
+      return g;
+    },
+    // the pushpin holding the photo to the title letter
+    pin: () => fromRows([
+      ".KKK.",
+      "KRHRK",
+      "KRRRK",
+      ".KKK.",
+      "..K..",
+      "..K..",
+    ], { K, R: RED, H: RED_HI }),
+    // two frames of a far-off bird, side by side: wings up, wings down
+    birds: () => fromRows([
+      "K.....K..KKK..",
+      ".K...K..K...K.",
+      "..KKK..K.....K",
+    ], { K }),
     soundOn: () => fromRows([
       "...W......",
       "..WW...W..",
@@ -427,6 +457,68 @@
       "KtK",
       "KtK",
     ], { K, T: "#d9b574", t: "#a9803e" }),
+  };
+
+  /* ---------- Start menu icons (16×16) ---------- */
+
+  const ICONS = {
+    // Play: a heart sprouting from the soil
+    play: () => fromRows([
+      ".....KK.KK......",
+      "....KRHKRRK.....",
+      "....KRRRRRK.....",
+      ".....KRRRK......",
+      "......KRK.......",
+      ".KKK...K...KKK..",
+      "KLLLK.KLK.KLLLK.",
+      "KLlLLKKLKKLLlLK.",
+      ".KLLLLKLKLLLLK..",
+      "..KKKKKLKKKKK...",
+      "......KLK.......",
+      "...KKKKLKKKK....",
+      "..KSSSSSSSSSK...",
+      ".KSsSSSsSSSsSK..",
+      ".KKKKKKKKKKKKK..",
+      "................",
+    ], { K, R: RED, H: RED_HI, L: LEAF, l: LEAF_HI, S: "#8a5a2b", s: "#6b4220" }),
+    // Load game: a wooden chest with a brass clasp
+    load: () => fromRows([
+      "................",
+      "...KKKKKKKKKK...",
+      "..KHHHHHHHHHHK..",
+      ".KHWWWWWWWWWWDK.",
+      ".KWWWWWWWWWWWDK.",
+      ".KGWWWWWWWWWWGK.",
+      "KKGKKKKYYKKKKGKK",
+      "KGGGGGGYgGGGGGGK",
+      "KDWWWWWKKWWWWWDK",
+      "KDWWWWWWWWWWWWDK",
+      "KDDDDDDDDDDDDDDK",
+      "KDWWWWWWWWWWWWDK",
+      "KGWWWWWWWWWWWWGK",
+      "KGDDDDDDDDDDDDGK",
+      ".KKKKKKKKKKKKKK.",
+      "................",
+    ], { K, H: WOOD.hi, W: WOOD.mid, D: WOOD.dk, G: GOLD, g: GOLD_DK, Y: GOLD_HI }),
+    // Credits: a scroll sealed with red wax
+    credits: () => fromRows([
+      ".KKKKKKKKKKKKKK.",
+      "KCCCCCCCCCCCCCCK",
+      "KccccccccccccccK",
+      ".KKKKKKKKKKKKKK.",
+      "..KPPPPPPPPPPK..",
+      "..KPIIIIIIPPPK..",
+      "..KPPPPPPPPPPK..",
+      "..KPIIIIIIIIPK..",
+      "..KPPPPPPPPPPK..",
+      "..KPIIIIIPPPPK..",
+      "..KPPPPPPPRRPK..",
+      "..KPPPPPPRRRRK..",
+      ".KKKKKKKKKRRKKK.",
+      "KCCCCCCCCCCCCCCK",
+      "KccccccccccccccK",
+      ".KKKKKKKKKKKKKK.",
+    ], { K, C: CREAM, c: PARCH_SH, P: PARCH, I: "#b08a55", R: RED }),
   };
 
   /* ---------- Items found in the memories ---------- */
@@ -1634,6 +1726,8 @@
     set("--img-bubble", FRAMES.bubble());
     set("--img-sign", FRAMES.sign());
     set("--img-portrait", FRAMES.portrait());
+    set("--img-polaroid", FRAMES.polaroid());
+    Object.entries(ICONS).forEach(([name, make]) => set("--img-icon-" + name, make()));
     Object.entries(BUTTONS).forEach(([name, make]) => set("--img-btn-" + name, make()));
     Object.entries(SPRITES).forEach(([name, make]) => set("--img-" + name, make()));
     Object.entries(ITEMS).forEach(([name, make]) => set("--img-item-" + name, make()));

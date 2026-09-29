@@ -81,6 +81,7 @@ const tapOrigin = (e, el) => {
 
 function goFarm() {
   document.body.dataset.scene = "talk";
+  Scene.repaint();
   Scene.set(6);
   Clock.set(6);
   Actors.sit(false);
@@ -151,6 +152,7 @@ document.addEventListener("click", (e) => {
     // swap to the farm underneath while the flowers cover everything
     setTimeout(() => {
       document.body.dataset.scene = "talk";
+      Scene.repaint();
       Pages.show("talk", () => setTimeout(Story.start, reducedMotion() ? 200 : 1300));
     }, covered + 300);
   } else if (action === "load") {

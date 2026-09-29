@@ -61,6 +61,49 @@ body[data-place]:not([data-place=""]) .world__flies { opacity: 0; }
   100% { transform: translate3d(calc(var(--px) * 9), calc(var(--px) * -6), 0); opacity: .9; }
 }
 
+/* the start menu's morning: birds cross the sky, a few leaves come down */
+.world__title { position: absolute; inset: 0; transition: opacity 600ms steps(3, end); }
+body:not([data-scene="title"]) .world__title { opacity: 0; visibility: hidden; }
+.bird {
+  position: absolute;
+  left: 0;
+  top: var(--y);
+  width: calc(var(--px) * 7);
+  height: calc(var(--px) * 3);
+  background: var(--img-birds) 0 0 / 200% 100% no-repeat;
+  animation:
+    bird-cross var(--d, 26s) steps(260, end) infinite var(--delay, 0s),
+    flap 420ms steps(1, end) infinite;
+}
+@keyframes bird-cross {
+  0% { transform: translate3d(-10vw, 0, 0); }
+  55% { transform: translate3d(110vw, calc(var(--px) * -8), 0); }
+  100% { transform: translate3d(110vw, calc(var(--px) * -8), 0); }
+}
+@keyframes flap {
+  50% { background-position: 100% 0; }
+}
+.drift {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  width: calc(var(--px) * 9);
+  height: calc(var(--px) * 9);
+  background: var(--img-leaf) 0 0 / 100% 100% no-repeat;
+  animation:
+    leaf-fall var(--d, 12s) steps(120, end) infinite var(--delay, 0s),
+    leaf-sway 2.4s steps(4, end) infinite alternate;
+}
+@keyframes leaf-fall {
+  0% { translate: 0 -10vh; }
+  70% { translate: 0 70vh; opacity: 1; }
+  80%, 100% { translate: 0 80vh; opacity: 0; }
+}
+@keyframes leaf-sway {
+  from { transform: translateX(calc(var(--px) * -4)) scaleX(1); }
+  to { transform: translateX(calc(var(--px) * 4)) scaleX(-1); }
+}
+
 .fireworks {
   position: absolute;
   top: 0;

@@ -63,6 +63,16 @@
     <canvas class="world__sky" data-sky></canvas>
     <div class="world__clouds" data-clouds></div>
     <div class="world__flies" data-flies></div>
+    <div class="world__title">
+      <i class="bird" style="--y: 12%; --d: 26s; --delay: -4s"></i>
+      <i class="bird" style="--y: 15%; --d: 26s; --delay: -3.4s"></i>
+      <i class="bird" style="--y: 10%; --d: 26s; --delay: -2.9s"></i>
+      <i class="bird" style="--y: 24%; --d: 34s; --delay: -20s"></i>
+      <i class="drift" style="--x: 8%; --d: 11s; --delay: -2s"></i>
+      <i class="drift" style="--x: 30%; --d: 14s; --delay: -9s"></i>
+      <i class="drift" style="--x: 62%; --d: 12s; --delay: -5s"></i>
+      <i class="drift" style="--x: 86%; --d: 15s; --delay: -12s"></i>
+    </div>
     <canvas class="fireworks" data-fireworks></canvas>
   </div>
 
@@ -92,25 +102,26 @@
         <p class="logo__ribbon plaque" data-text="title.ribbon"></p>
       </div>
 
-      <div class="title__row">
-        <figure class="frame frame--title">
+      <div class="dialog greeting" data-dialog>
+        <figure class="polaroid">
+          <i class="polaroid__pin" aria-hidden="true"></i>
           <img data-photo="title" src="assets/images/us-cheek.webp" width="960" height="1280" alt="" decoding="async" fetchpriority="high">
-          <figcaption class="plaque" data-text="title.plaque"></figcaption>
+          <figcaption class="polaroid__caption" data-text="title.plaque"></figcaption>
         </figure>
-        <div class="dialog dialog--greeting" data-dialog>
-          <p class="dialog__body" data-type data-text="title.greeting"></p>
-          <i class="dialog__more" aria-hidden="true"></i>
-        </div>
+        <p class="dialog__body" data-type data-text="title.greeting"></p>
+        <i class="dialog__more" aria-hidden="true"></i>
       </div>
 
       <nav class="menu" aria-label="Menu">
-        <button class="btn btn--primary btn--play" type="button" data-action="play">
-          <span data-text="title.play"></span>
+        <button class="btn btn--tile btn--play" type="button" data-action="play">
+          <i class="tile__icon" aria-hidden="true"></i><span data-text="title.play"></span>
         </button>
-        <div class="menu__row">
-          <button class="btn btn--quiet" type="button" data-action="load"><span data-text="title.load"></span></button>
-          <button class="btn btn--quiet" type="button" data-action="credits"><span data-text="title.credits"></span></button>
-        </div>
+        <button class="btn btn--tile btn--quiet btn--load" type="button" data-action="load">
+          <i class="tile__icon" aria-hidden="true"></i><span data-text="title.load"></span>
+        </button>
+        <button class="btn btn--tile btn--quiet btn--credits" type="button" data-action="credits">
+          <i class="tile__icon" aria-hidden="true"></i><span data-text="title.credits"></span>
+        </button>
       </nav>
 
       <dialog class="credits" data-credits aria-labelledby="credits-title">

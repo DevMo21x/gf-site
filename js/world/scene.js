@@ -17,8 +17,12 @@ const Scene = (() => {
   // places that happened at another time of day than the clock says
   const PLACE_TIMES = { docks: "night" };
 
+  // the start menu raises the horizon so the farm fills more of the screen
+  const sceneGround = () =>
+    document.body.dataset.scene === "title" ? Math.max(groundH(), Math.round(window.innerHeight * 0.3)) : groundH();
+
   function paint(canvas) {
-    const info = Pixel.scene(canvas, time, PX(), groundH(), place, cssNumber("--stand", 29));
+    const info = Pixel.scene(canvas, time, PX(), sceneGround(), place, cssNumber("--stand", 29));
     root.style.setProperty("--sky", info.sky);
     if (meta) meta.content = info.sky;
   }
@@ -46,7 +50,7 @@ const Scene = (() => {
     const px = PX();
     const W = Math.ceil(window.innerWidth / px) + 1;
     const H = Math.ceil(window.innerHeight / px) + 1;
-    const horizon = H - Math.ceil(groundH() / px) - 4;
+    const horizon = H - Math.ceil(sceneGround() / px) - 4;
     const r = (body.r + 3) * px;
     moonHit.style.width = moonHit.style.height = r * 2 + "px";
     moonHit.style.left = Math.round(body.x * W) * px - r + "px";
@@ -95,5 +99,8 @@ const Scene = (() => {
     });
   }
 
-  return { init, set };
+  // repaint the current hour (the start menu's horizon sits higher than the game's)
+  const repaint = () => { paint(skies[front]); placeMoon(); };
+
+  return { init, set, repaint };
 })();
