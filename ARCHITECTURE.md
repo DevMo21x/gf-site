@@ -81,6 +81,10 @@ It also holds the letter that floats down after she says yes (`letter`) and the 
 
 Two more story line types: `{ plant: true }` (dawn) has her plant a seed, drawn by `Pixel.plant(stage)`; `Garden.grow` raises it a stage per beat (it is hidden in the memory places) and `Garden.bloom` opens it right before he asks. `{ stars: true }` (night) folds the dialogue box away while she joins the stars in `CONTENT.stars.points` in order (`Stars.run`). Before the question he hands her a bouquet (`CONTENT.bouquet`, item `bouquet`), and the celebration photo's plaque shows her new status.
 
+After Yes she can "Stay on the farm" (`data-page="farm"`, `goFarm()` in `main.js`): the festival night with everyone on it, where a tap on the sky sets off `Fireworks.boom` and a tap on the lily drops petals. Saying yes stores `gab-saved` in `localStorage`; with it, "Load game" on the start menu skips the story and opens the farm. The letter `<dialog>` sits at body level so both pages can open it.
+
+The link preview (Open Graph tags, `assets/images/preview.png`, `icon.png`) is static in `index.html`'s `<head>`, because link crawlers don't run JavaScript. The preview image was rendered once from the site's own art; re-render it if the art changes.
+
 Secrets unlock achievements (`Achievements.unlock(id)`, ids in `CONTENT.achievements.list`): a toast drops in at the top, and Credits shows the tally. Unlocked ids are kept in `localStorage` (`gab-achievements`) so Play again keeps them; if storage is blocked they last for the visit only. "Caught the No button" can never unlock. Double-tapping Mohaimen is a kiss: an invisible `.kiss-hit` button sits over him above the pages (like `.moon-hit`), handled in `Actors`.
 
 The No button on the question page shrinks from the 6th dodge. On the 10th it drops to the grass, Tufo sits on it (`Tufo.sitOn`), and it gets back up as a second Yes (`Dodge`, `SHRINK_AT` / `DROP_AT`).
