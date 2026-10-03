@@ -79,7 +79,7 @@ function catSprite(wrap, canvas, kind) {
 }
 
 // On a phone the two speech bubbles would overlap, so the cats take turns
-const Chatter = { until: 0 };
+const Chatter = {}; // each cat's name → when its bubble is done
 
 function makeCat(name) {
   const wrap = $(`[data-cat="${name}"]`);
@@ -139,9 +139,10 @@ function makeCat(name) {
     if (!line) return;
     const now = performance.now();
     const narrow = document.documentElement.clientWidth < 700;
-    const wait = narrow && Chatter.until > now && Chatter.owner !== name ? Chatter.until - now + 150 : 0;
-    Chatter.until = now + wait + ms;
-    Chatter.owner = name;
+    // wait for the other cat's bubble, even if this cat already has a line queued
+    const other = Math.max(0, ...Object.keys(Chatter).filter((n) => n !== name).map((n) => Chatter[n]));
+    const wait = narrow && other > now ? other - now + 150 : 0;
+    Chatter[name] = now + wait + ms;
     clearTimeout(speakTimer);
     speakTimer = setTimeout(() => {
       clearTimeout(bubbleTimer);
@@ -158,7 +159,7 @@ function makeCat(name) {
     clearTimeout(speakTimer);
     clearTimeout(bubbleTimer);
     bubble.classList.remove("is-showing");
-    if (Chatter.owner === name) Chatter.until = 0;
+    Chatter[name] = 0;
     page += 1;
     return page;
   }

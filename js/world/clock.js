@@ -12,13 +12,15 @@ const Clock = (() => {
   const moon = Pixel.moon();
   let current = -1;
 
-  function set(index) {
-    if (index === current) return;
-    const first = current < 0;
-    current = index;
-    time.textContent = CONTENT.hud.times[index] || "";
+  // night: a night memory's own time (content.js story[].night), shown with the moon
+  function set(index, night) {
+    const key = night || index;
+    if (key === current) return;
+    const first = current === -1;
+    current = key;
+    time.textContent = night || CONTENT.hud.times[index] || "";
     ctx.clearRect(0, 0, 9, 9);
-    (index >= 5 ? moon : sun).paint(ctx);
+    (night || index >= 5 ? moon : sun).paint(ctx);
     // the plate hops when the hour changes
     if (!first && !reducedMotion()) {
       const P = PX();

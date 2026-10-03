@@ -2,7 +2,7 @@
 
 "use strict";
 
-/* ---------- Friendship hearts: right answers fill them, wrong ones break them ---------- */
+/* ---------- Friendship hearts: gifts and moments fill them, misses break them ---------- */
 
 const Meter = (() => {
   const meter = $("[data-meter]");

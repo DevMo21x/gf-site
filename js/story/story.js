@@ -141,7 +141,7 @@ const Story = (() => {
       await Dialogue.close();
       Scene.set(hour, beats[i].place);
       Actors.sit(beats[i].place === "airbnb");
-      Clock.set(hour);
+      Clock.set(hour, beats[i].night);
       if (beats[i].place) placeCard(beats[i].place);
       Garden.grow(i - 2); // it grows while they're away; she sees it again at sunset
       Actors.mo.setFace("neutral");

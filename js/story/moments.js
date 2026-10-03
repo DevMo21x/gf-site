@@ -116,7 +116,8 @@ const Moments = (() => {
         b.disabled = true;
         Tufo.say(t.steal, 1800);
         Music.blip(0.5);
-        setTimeout(() => { b.remove(); chase(); }, reducedMotion() ? 0 : 420);
+        // the clock may have run out mid-hop (it removes the jacket): no chase then
+        setTimeout(() => { if (b.isConnected) { b.remove(); chase(); } }, reducedMotion() ? 0 : 420);
       }, { once: true });
 
       function chase() {
@@ -196,15 +197,17 @@ const Moments = (() => {
         close().then(() => resolve(inTime));
       };
       const stop = clock(t.seconds, () => finish(false));
+      const bar = $(".moment__timer", layer);
+      const top = bar.offsetTop + bar.offsetHeight + PX() * 2; // they fall from under the hint and its clock
       const drop = () => {
         if (done) return;
         dropped += 1;
         const x = PX() * 4 + Math.random() * (layer.clientWidth - s - PX() * 8);
-        const b = thing("shawarma", t.label, x, 0);
+        const b = thing("shawarma", t.label, x, top);
         if (!reducedMotion()) {
           const fall = b.animate([
             { transform: "translateY(0)" },
-            { transform: `translateY(${layer.clientHeight - s}px)` },
+            { transform: `translateY(${layer.clientHeight - s - top}px)` },
           ], { duration: 2600, easing: "steps(20, end)", fill: "forwards" });
           fall.onfinish = () => {
             if (!b.isConnected || done) return;

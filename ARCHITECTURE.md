@@ -46,7 +46,8 @@ gf-site/
     │   ├── actors.js     # Gabrielle and Mohaimen on the grass, their faces (Actors, FACES)
     │   ├── portrait.js   # Mohaimen's portrait in the boxes (Portrait)
     │   ├── dialogue.js   # Dialogue box: his lines, her choices (Dialogue)
-    │   ├── story.js      # Runs CONTENT.story beat by beat, quiz scoring (Story)
+    │   ├── moments.js    # Timed finger moments: calm his heart, the jacket, the shawarma (Moments)
+    │   ├── story.js      # Runs CONTENT.story beat by beat, gifts and hearts (Story)
     │   └── boom.js       # Zero-hearts explosion and reset (Boom)
     └── main.js           # Boot: sound toggle, init calls, global click handler. Loaded last
 ```
@@ -73,7 +74,7 @@ index.html
 
 ## 3. Content
 
-`content.js` holds the start menu, memories, the story beats (lines, memories, quizzes, cat interjections), quiz reactions, the question, the celebration, every cat line, photo paths and the music path. The comment above `story` documents the beat format. Wrap a word in `*asterisks*` to make it red.
+`content.js` holds the start menu, memories, the story beats (lines, memories, gifts, moments, cat interjections), the gifts and moments themselves, the question, the celebration, every cat line, photo paths and the music path. The comment above `story` documents the beat format. Wrap a word in `*asterisks*` to make it red.
 
 A story beat can name a `place` (`airport`, `docks`, `airbnb`). For that beat the farm is replaced by the place where the memory happened. The places are drawn in `js/art/pixels.js` (`PLACES`, called from `Pixel.scene`), and `Scene.set(hour, place)` switches them. In the Airbnb, `Actors.sit(true)` seats Gabrielle and Mohaimen on the bed with shawarma in hand.
 

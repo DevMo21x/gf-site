@@ -167,6 +167,9 @@ document.addEventListener("click", (e) => {
     const saved = CONTENT.title.loadSaved;
     enter(e, target, () => {
       goFarm();
+      // she won the day, so his jacket is hers
+      Actors.mo.swapJacket(true);
+      Actors.gab.swapJacket(true);
       setTimeout(() => Tufo.scoff(saved.tufo), 2600);
       setTimeout(() => Mei.say(saved.mei, 2800), 4000);
     });

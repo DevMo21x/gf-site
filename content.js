@@ -85,6 +85,7 @@ const CONTENT = {
        { stars: true }                She joins up stars in the night sky (stars below). It fills the rest of the hearts
      A beat can also have place: "airport" | "docks" | "airbnb": the farm turns into that place
      for the whole beat (drawn in js/art/pixels.js, PLACES). In the Airbnb the two of them sit on the bed.
+     And night: "11:40pm" for a memory that happened at night: the clock shows that time, with the moon.
      He starts with heartsAtStart hearts. Ten and he asks the question.
      Zero and… well (boom below). */
   story: [
@@ -107,18 +108,20 @@ const CONTENT = {
         { moment: "heart" },
       ],
     },
-    // 12:30pm, on the docks of Halifax
+    // 11:40pm (in the memory), on the docks of Halifax
     {
       place: "docks",
+      night: "11:40pm",
       lines: [
         { memory: 1, face: "soft" },
         { tufo: "oops. not sorry.", knock: true },
         { moment: "jacket" },
       ],
     },
-    // 3:40pm, back at the Airbnb
+    // 2:10am (in the memory), back at the Airbnb
     {
       place: "airbnb",
+      night: "2:10am",
       lines: [
         { memory: 2, face: "happy" },
         { tufo: "and nobody saved me any" },
@@ -146,12 +149,12 @@ const CONTENT = {
   ],
 
   // The gifts in her bag. item: its picture (drawn in js/art/pixels.js, ITEMS);
-  // hearts: 2 for the ones he loves, 1 for the rest; mei / tufo: what a cat says about it
+  // hearts: 1 for the ones he loves, -1 (one breaks) for the rest; mei / tufo: what a cat says about it
   gifts: {
     dawn: {
       ask: "So… did you bring me anything?",
       options: [
-        { item: "rtx", label: "An RTX 5090", hearts: 2, face: "happy",
+        { item: "rtx", label: "An RTX 5090", hearts: 1, face: "happy",
           reply: "An RTX 5090?? For ME?? Okay. I'm keeping you. And it." },
         { item: "rock", label: "A very nice rock", hearts: -1, face: "shocked",
           reply: "…a rock. Cool. Cool cool cool. I'll treasure it. I won't." },
@@ -162,9 +165,9 @@ const CONTENT = {
     sunset: {
       ask: "Okay… your turn. Got anything else in that bag?",
       options: [
-        { item: "shawarma", label: "The last bite of shawarma", hearts: 2, face: "happy",
+        { item: "shawarma", label: "The last bite of shawarma", hearts: 1, face: "happy",
           reply: "You saved me the LAST BITE?? That's love. That's actual love.", tufo: "traitor." },
-        { item: "hug", label: "A big hug", hearts: 2, face: "blush",
+        { item: "hug", label: "A big hug", hearts: 1, face: "blush",
           reply: "…okay, I'm not letting go. We live here now." },
         { item: "mei", label: "Mei", hearts: -1, face: "shocked",
           reply: "She sat down, looked at me, and left. I think I just got rejected by a cat.", mei: "I'm not a gift, darling. I'm a treasure." },
