@@ -4,8 +4,7 @@
 
 /* ---------- Pages & choreography ---------- */
 
-const animate = (el, frames, opts) =>
-  el && el.animate ? el.animate(frames, Object.assign({ fill: "both" }, opts)) : null;
+const animate = (el, frames, opts) => el?.animate(frames, { fill: "both", ...opts });
 
 // entrance animations hand the element back to its stylesheet when done
 const animateIn = (el, frames, opts) => {

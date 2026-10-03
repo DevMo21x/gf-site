@@ -40,8 +40,7 @@ const Boom = (() => {
     }
     setTimeout(() => Tufo.speak(text.tufo), 700);
     await new Promise((r) => setTimeout(r, reducedMotion() ? 300 : 1400));
-    if (box.showModal) box.showModal();
-    else box.setAttribute("open", "");
+    box.showModal();
   }
 
   function reset() {

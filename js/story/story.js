@@ -166,7 +166,7 @@ const Story = (() => {
     Clock.set(NIGHT);
     Garden.bloom();
     await Dialogue.say({ text: CONTENT.garden.bloom, face: "blush" });
-    await Dialogue.say({ text: CONTENT.ending.full, face: "soft" });
+    await Dialogue.say({ text: CONTENT.ending, face: "soft" });
     // he holds the bouquet up, then out to her, and keeps holding it while he asks
     Music.pickup();
     (await Actors.mo.holdUp("bouquet")).remove();
@@ -190,7 +190,6 @@ const Story = (() => {
     Actors.mo.hold(false);
     Actors.mo.swapJacket(false);
     Actors.gab.swapJacket(false);
-    Portrait.jacketOff(false);
     Clock.set(0);
     Actors.mo.setFace("neutral");
     Actors.gab.setFace("neutral");

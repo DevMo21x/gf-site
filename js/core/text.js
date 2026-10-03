@@ -7,21 +7,26 @@
 const escapeHTML = (str) =>
   String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-// *word* → <em>word</em>, everything else escaped
-// *word* becomes emphasis, <3 becomes the pixel heart
+// *word* becomes emphasis, <3 becomes the pixel heart, everything else is escaped
 const format = (str) => escapeHTML(str)
   .replace(/\*([^*]+)\*/g, "<em>$1</em>")
   .replace(/&lt;3/g, '<i class="signoff__heart" aria-hidden="true"></i>');
 
 const lookup = (path) =>
-  path.split(".").reduce((obj, key) => (obj == null ? undefined : obj[key]), CONTENT);
+  path.split(".").reduce((obj, key) => obj?.[key], CONTENT);
+
+// every text node under node is swapped for what fn(its text) returns
+function eachText(node, fn) {
+  Array.from(node.childNodes).forEach((child) => {
+    if (child.nodeType === 1) eachText(child, fn);
+    else if (child.nodeType === 3) node.replaceChild(fn(child.textContent), child);
+  });
+}
 
 function splitWords(node) {
-  Array.from(node.childNodes).forEach((child) => {
-    if (child.nodeType === 1) { splitWords(child); return; }
-    if (child.nodeType !== 3) return;
+  eachText(node, (text) => {
     const frag = document.createDocumentFragment();
-    child.textContent.split(/(\s+)/).forEach((part) => {
+    text.split(/(\s+)/).forEach((part) => {
       if (!part) return;
       if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
       const outer = document.createElement("span");
@@ -33,7 +38,7 @@ function splitWords(node) {
       outer.appendChild(inner);
       frag.appendChild(outer);
     });
-    node.replaceChild(frag, child);
+    return frag;
   });
 }
 
@@ -44,18 +49,16 @@ const Typer = (() => {
   const runs = new Map();
 
   function wrapLetters(node) {
-    Array.from(node.childNodes).forEach((child) => {
-      if (child.nodeType === 1) { wrapLetters(child); return; }
-      if (child.nodeType !== 3) return;
+    eachText(node, (text) => {
       const frag = document.createDocumentFragment();
-      for (const ch of child.textContent) {
+      for (const ch of text) {
         if (/\s/.test(ch)) { frag.appendChild(document.createTextNode(ch)); continue; }
         const span = document.createElement("span");
         span.className = "ch";
         span.textContent = ch;
         frag.appendChild(span);
       }
-      node.replaceChild(frag, child);
+      return frag;
     });
   }
 

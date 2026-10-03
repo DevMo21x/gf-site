@@ -8,11 +8,9 @@
    cats) are made live with Web Audio, tuned to the track's key. */
 
 const Music = (() => {
-  const AC = window.AudioContext || window.webkitAudioContext;
   const TRACK = CONTENT.music;
   const SFX_VOLUME = 0.1;
-  const KEY = 0; // the flourishes were written in F, same as the farm track
-  const mtof = (m) => 440 * Math.pow(2, (m + KEY - 69) / 12);
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
   // The song plays through a plain <audio> element, never through Web Audio:
   // iPhones mute Web Audio when the silent switch is on, and browsers silence
@@ -22,13 +20,11 @@ const Music = (() => {
   audio.preload = "none";
   audio.src = TRACK.src;
   audio.loop = true;
-  const preloadSong = () => { audio.preload = "auto"; };
-  if (document.readyState === "complete") setTimeout(preloadSong, 300);
-  else window.addEventListener("load", () => setTimeout(preloadSong, 300), { once: true });
+  window.addEventListener("load", () => setTimeout(() => { audio.preload = "auto"; }, 300), { once: true });
   audio.setAttribute("playsinline", "");
   audio.volume = 0;
   audio.addEventListener("error", () => {
-    console.warn("Music file could not be loaded:", TRACK.src, audio.error && audio.error.code);
+    console.warn("Music file could not be loaded:", TRACK.src, audio.error?.code);
   });
 
   let ctx = null;
@@ -57,7 +53,7 @@ const Music = (() => {
   }
 
   function build() {
-    ctx = new AC();
+    ctx = new AudioContext();
 
     master = ctx.createGain(); // mute lives here
     master.gain.value = muted ? 0 : 1;
@@ -100,23 +96,18 @@ const Music = (() => {
 
   function playSong() {
     audio.muted = muted;
-    const playing = audio.play();
-    if (playing && playing.then) {
-      playing.then(() => fadeElement(TRACK.volume, 3000)).catch((err) => {
-        // blocked (rare): try again on her next tap anywhere
-        console.warn("Music was blocked, retrying on next tap:", err && err.name);
-        started = false;
-        document.addEventListener("pointerup", start, { once: true });
-      });
-    } else {
-      fadeElement(TRACK.volume, 3000);
-    }
+    audio.play().then(() => fadeElement(TRACK.volume, 3000)).catch((err) => {
+      // blocked (rare): try again on her next tap anywhere
+      console.warn("Music was blocked, retrying on next tap:", err?.name);
+      started = false;
+      document.addEventListener("pointerup", start, { once: true });
+    });
   }
 
   // Called on her first tap or key anywhere: browsers only allow sound after one
   function start() {
     setSession();
-    if (AC && !ctx) build();
+    if (!ctx) build();
     if (ctx && ctx.state === "suspended") ctx.resume();
     if (started) return;
     started = true;
@@ -258,7 +249,7 @@ const Music = (() => {
   // Build the effects graph early (on finger-down) so the tap itself stays light
   function warm() {
     setSession();
-    if (AC && !ctx) build();
+    if (!ctx) build();
   }
 
   // Mei's voice: a sawtooth through two vowel formants sliding "mee-ow"

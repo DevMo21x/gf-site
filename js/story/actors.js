@@ -128,6 +128,7 @@ const Actors = (() => {
 
     function swapJacket(on) {
       jacket = on;
+      if (kind === "mo") Portrait.jacketOff(on); // the dialogue portrait too
       draw();
     }
 

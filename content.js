@@ -145,7 +145,7 @@ const CONTENT = {
     },
   ],
 
-  // The gifts in her bag. item: its picture (drawn in js/art/pixels.js, GIFTS or ITEMS);
+  // The gifts in her bag. item: its picture (drawn in js/art/pixels.js, ITEMS);
   // hearts: 2 for the ones he loves, 1 for the rest; mei / tufo: what a cat says about it
   gifts: {
     dawn: {
@@ -225,9 +225,7 @@ const CONTENT = {
   },
 
   // ten hearts: the night is almost over
-  ending: {
-    full: "Ten hearts. That's all of them. Okay. Gabrielle…",
-  },
+  ending: "Ten hearts. That's all of them. Okay. Gabrielle…",
 
   // The seed she plants at dawn. It grows through the day and blooms right before he asks.
   garden: {

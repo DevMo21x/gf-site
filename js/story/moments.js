@@ -9,7 +9,6 @@ const Moments = (() => {
   const layer = $("[data-moment]");
   const hint = $("[data-moment-hint]");
   const text = CONTENT.moments;
-  const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
   function open(words) {
     layer.replaceChildren(hint);
@@ -62,11 +61,9 @@ const Moments = (() => {
     const b = thing("nervous", t.hint, layer.clientWidth / 2 - s / 2, layer.clientHeight * 0.35 - s / 2);
     b.classList.add("moment__heart");
     let left = t.taps;
-    b.style.setProperty("--beat", "220ms");
     b.focus({ preventScroll: true });
     return new Promise((resolve) => {
       const stop = clock(t.seconds, () => {
-        left = 0;
         b.disabled = true;
         Actors.mo.setFace("shocked");
         Actors.mo.emote("sweat");
@@ -95,7 +92,6 @@ const Moments = (() => {
     const P = PX();
     const from = inLayer(Actors.mo.rect);
     Actors.mo.swapJacket(true);
-    Portrait.jacketOff(true);
     const b = thing("jacket", t.hint, from.x - s / 2, from.y - s - P * 4);
     b.classList.add("moment__jacket");
     b.focus({ preventScroll: true });
@@ -182,11 +178,10 @@ const Moments = (() => {
   // At the Airbnb: shawarma bites fall; she catches them before Tufo does
   function shawarma() {
     const t = text.shawarma;
-    const goal = t.goal;
     let caught = 0;
     let dropped = 0;
     let done = false;
-    const count = () => t.hint.replace("{n}", caught).replace("{total}", goal);
+    const count = () => t.hint.replace("{n}", caught).replace("{total}", t.goal);
     open(count());
     const s = size();
     return new Promise((resolve) => {
@@ -224,13 +219,13 @@ const Moments = (() => {
           caught += 1;
           hint.textContent = count();
           Music.blip(1 + caught * 0.15);
-          if (caught >= goal) finish(true);
+          if (caught >= t.goal) finish(true);
         });
       };
       drop();
       // under reduced motion they wait where they appear, so only as many as she needs
       timer = setInterval(() => {
-        if (reducedMotion() && dropped >= goal) return clearInterval(timer);
+        if (reducedMotion() && dropped >= t.goal) return clearInterval(timer);
         drop();
       }, 800);
     });

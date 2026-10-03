@@ -226,7 +226,7 @@ function makeCat(name) {
   };
 
   return {
-    wrap, button, width, spotFor, place, face, say, hush, current, mood, hearts, lookAt, lookAtEl, pick,
+    wrap, button, width, spotFor, place, face, say, hush, current, mood, hearts, lookAtEl, pick,
     get x() { return x; },
     get rect() { return button.getBoundingClientRect(); },
   };

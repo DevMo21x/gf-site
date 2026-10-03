@@ -639,35 +639,8 @@
       "......KCcK......",
       ".......KK.......",
     ], { K, P: "#f58aa8", Y: "#fbd24e", W: "#fbf6ec", L: LEAF, C: CREAM, c: PARCH_SH, R: RED }),
-  };
 
-  /* ---------- Gifts she can give him (16×16) ---------- */
-
-  // a cat's face, for Tufo or Mei offered up as a gift
-  function catHead(fur, stripe, eye) {
-    const g = new Grid(16, 16);
-    g.poly([[2, 8], [3, 1], [8, 5]], fur).poly([[13, 8], [12, 1], [7, 5]], fur);
-    g.ellipse(7.5, 9.5, 6, 5, fur);
-    g.outline(K);
-    g.px([[4, 4], [4, 5], [11, 4], [11, 5]], "#eba7ab");
-    if (stripe) g.px([[7, 5], [7, 6], [8, 5], [8, 6], [5, 6], [10, 6]], stripe);
-    g.rect(5, 9, 1, 2, eye).rect(10, 9, 1, 2, eye);
-    g.set(7, 12, "#e07a8a").set(8, 12, "#e07a8a");
-    return g;
-  }
-
-  const GIFTS = {
-    // a warm coffee, steaming
-    coffee: () => {
-      const g = new Grid(16, 16);
-      g.rect(3, 6, 9, 8, "#f3ecdc").rect(12, 8, 2, 4, "#f3ecdc");
-      g.outline(K);
-      g.rect(13, 9, 1, 2, null);
-      g.rect(4, 7, 7, 1, "#8a5a2b").rect(3, 12, 9, 1, "#d3c6aa");
-      g.set(7, 10, RED).set(6, 9, RED).set(8, 9, RED);
-      g.px([[5, 1], [5, 3], [6, 2], [8, 1], [8, 3], [9, 2]], "#ffffff");
-      return g;
-    },
+    /* ---------- gifts she can give him ---------- */
     // an RTX 5090: a big black graphics card, two fans, gold contacts
     rtx: () => {
       const g = new Grid(16, 16);
@@ -702,6 +675,19 @@
       return g;
     },
   };
+
+  // a cat's face, for Tufo or Mei offered up as a gift
+  function catHead(fur, stripe, eye) {
+    const g = new Grid(16, 16);
+    g.poly([[2, 8], [3, 1], [8, 5]], fur).poly([[13, 8], [12, 1], [7, 5]], fur);
+    g.ellipse(7.5, 9.5, 6, 5, fur);
+    g.outline(K);
+    g.px([[4, 4], [4, 5], [11, 4], [11, 5]], "#eba7ab");
+    if (stripe) g.px([[7, 5], [7, 6], [8, 5], [8, 6], [5, 6], [10, 6]], stripe);
+    g.rect(5, 9, 1, 2, eye).rect(10, 9, 1, 2, eye);
+    g.set(7, 12, "#e07a8a").set(8, 12, "#e07a8a");
+    return g;
+  }
 
   /* ---------- Gabrielle and Mohaimen, standing on the farm ---------- */
 
@@ -1836,7 +1822,6 @@
     Object.entries(BUTTONS).forEach(([name, make]) => set("--img-btn-" + name, make()));
     Object.entries(SPRITES).forEach(([name, make]) => set("--img-" + name, make()));
     Object.entries(ITEMS).forEach(([name, make]) => set("--img-item-" + name, make()));
-    Object.entries(GIFTS).forEach(([name, make]) => set("--img-item-" + name, make()));
     Object.entries(EMOTES).forEach(([name, make]) => set("--img-emote-" + name, make()));
     set("--img-flower-lily", flower(0, 2));
     set("--img-flower-pink", flower(1, 2));

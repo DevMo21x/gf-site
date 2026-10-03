@@ -7,6 +7,7 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const reducedMotion = () => reducedMotionQuery.matches;
 const root = document.documentElement;
+const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const cssNumber = (name, fallback) => parseFloat(getComputedStyle(root).getPropertyValue(name)) || fallback;
 const PX = () => cssNumber("--px", 3);          // one art pixel, in CSS pixels
 const groundH = () => cssNumber("--ground-h", 100);

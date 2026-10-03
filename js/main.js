@@ -34,11 +34,10 @@ const loadLatePhotos = () => {
     if (!img.dataset.src) return;
     img.src = img.dataset.src;
     delete img.dataset.src;
-    if (img.decode) img.decode().catch(() => {});
+    img.decode().catch(() => {});
   });
 };
-if (document.readyState === "complete") setTimeout(loadLatePhotos, 500);
-else window.addEventListener("load", () => setTimeout(loadLatePhotos, 500), { once: true });
+window.addEventListener("load", () => setTimeout(loadLatePhotos, 500), { once: true });
 
 // the engine is built the moment a finger or key goes down on "Play"
 const playButton = $('[data-action="play"]');
@@ -51,7 +50,6 @@ playButton.addEventListener("keydown", (e) => {
 const credits = $("[data-credits]");
 const letter = $("[data-letter]");
 [credits, letter].forEach((box) => box.addEventListener("click", (e) => { if (e.target === box) box.close(); }));
-const openBox = (box) => (box.showModal ? box.showModal() : box.setAttribute("open", ""));
 
 // The envelope floats down onto the celebration once the fireworks have had a moment
 function showEnvelope() {
@@ -78,6 +76,15 @@ const tapOrigin = (e, el) => {
   const r = el.getBoundingClientRect();
   return e.clientX || e.clientY ? { x: e.clientX, y: e.clientY } : { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 };
+
+// Play or Load: the lilies bloom over the title, and then() runs once they cover it
+function enter(e, button, then) {
+  if (button.dataset.used) return;
+  button.dataset.used = "true";
+  Music.start(); // the tap is the permission browsers need
+  Music.gliss();
+  setTimeout(then, Lilies.bloom(tapOrigin(e, button)) + 300);
+}
 
 function goFarm() {
   document.body.dataset.scene = "talk";
@@ -120,7 +127,7 @@ function wish() {
   Fireworks.star(r.left + r.width / 2, r.top + r.height / 2);
   Music.chime();
   Achievements.unlock("moon");
-  setTimeout(() => Mei.say(CONTENT.eggs.moon.wish[Math.floor(Math.random() * CONTENT.eggs.moon.wish.length)], 2800), 700);
+  setTimeout(() => Mei.say(pick(CONTENT.eggs.moon.wish), 2800), 700);
 }
 
 // Type "sand person" anywhere: it rains sand
@@ -144,17 +151,12 @@ document.addEventListener("click", (e) => {
   const action = target.dataset.action;
 
   if (action === "play") {
-    if (target.dataset.used) return;
-    target.dataset.used = "true";
-    Music.start(); // the tap is the permission browsers need
-    Music.gliss();
-    const covered = Lilies.bloom(tapOrigin(e, target));
     // swap to the farm underneath while the flowers cover everything
-    setTimeout(() => {
+    enter(e, target, () => {
       document.body.dataset.scene = "talk";
       Scene.repaint();
       Pages.show("talk", () => setTimeout(Story.start, reducedMotion() ? 200 : 1300));
-    }, covered + 300);
+    });
   } else if (action === "load") {
     if (!hasSave()) {
       Tufo.scoff(CONTENT.title.loadJoke.tufo);
@@ -162,23 +164,18 @@ document.addEventListener("click", (e) => {
       return;
     }
     // she has a save: straight back to the farm, festival and all
-    if (target.dataset.used) return;
-    target.dataset.used = "true";
-    Music.start();
-    Music.gliss();
-    const covered = Lilies.bloom(tapOrigin(e, target));
     const saved = CONTENT.title.loadSaved;
-    setTimeout(() => {
+    enter(e, target, () => {
       goFarm();
       setTimeout(() => Tufo.scoff(saved.tufo), 2600);
       setTimeout(() => Mei.say(saved.mei, 2800), 4000);
-    }, covered + 300);
+    });
   } else if (action === "credits") {
     Achievements.render();
-    openBox(credits);
+    credits.showModal();
   } else if (action === "letter") {
     Music.chime();
-    openBox(letter);
+    letter.showModal();
   } else if (action === "moon") {
     wish();
   } else if (action === "yes") {
